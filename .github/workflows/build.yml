@@ -1,0 +1,123 @@
+# Builds FM-1 Pocket for macOS on GitHub's Apple Silicon Mac, tests it, signs it ad hoc and packs a DMG.
+#
+#   Every push to main and every pull request: build, test, upload the DMG as a downloadable artifact.
+#   A version tag (v0.1.0) or "Run workflow" with "Publish a release" ticked: also a GitHub Release with the DMG.
+#
+# Nothing to install on your own Mac: everything runs here.
+name: Build Mac app
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Also publish this build as a GitHub Release"
+        type: boolean
+        default: false
+      version:
+        description: "Version number for the release (e.g. 0.1.0)"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15          # Apple Silicon (arm64)
+    timeout-minutes: 40
+    permissions:
+      contents: write          # only used by the release step
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Show the tools
+        run: |
+          sw_vers
+          uname -m
+          xcodebuild -version
+          swift --version
+
+      - name: Version
+        id: v
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then V="${GITHUB_REF#refs/tags/v}"
+          elif [ -n "${{ inputs.version }}" ]; then V="${{ inputs.version }}"
+          else V="0.1.0"; fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "Version $V, build ${{ github.run_number }}"
+
+      - name: Test the native firmware host (C, h1)
+        run: make -C Tests/ctest test | tee host-test.log
+
+      - name: Run the Swift tests
+        run: |
+          set -o pipefail
+          swift test 2>&1 | tee swift-test.log
+
+      - name: Check the live Pocket catalogue (does not block the build)
+        id: live
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          FM1_LIVE=1 swift test --filter CatalogueTests/testLiveCatalogue 2>&1 | tee live-test.log
+
+      - name: Build the app
+        env:
+          VERSION: ${{ steps.v.outputs.version }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: scripts/build-app.sh
+
+      - name: Self-test the packaged app (boots h1 inside the .app)
+        run: '"build/FM-1 Pocket.app/Contents/MacOS/FM1Pocket" --selftest build/selftest.json'
+
+      - name: Make the DMG
+        env:
+          VERSION: ${{ steps.v.outputs.version }}
+        run: scripts/make-dmg.sh
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## FM-1 Pocket ${{ steps.v.outputs.version }} (build ${{ github.run_number }})"
+            echo
+            echo "**Download:** scroll to *Artifacts* at the bottom of this page and click the FM1-Pocket entry. You get a .zip; double-click it to get the .dmg."
+            echo
+            echo "### Native host (C, h1)"
+            echo '```'; grep -E "^(loaded|ok|FAIL)" host-test.log 2>/dev/null || echo "(not run)"; echo '```'
+            echo "### Swift tests"
+            echo '```'; grep -E "Executed|h1 speed|error:|failed" swift-test.log 2>/dev/null | tail -15 || echo "(not run)"; echo '```'
+            echo "### Live catalogue (outcome: ${{ steps.live.outcome }})"
+            echo '```'; grep -E "live (catalogue|firmware)|Executed|error" live-test.log 2>/dev/null | tail -6 || echo "(not run)"; echo '```'
+            echo "### Packaged app self-test"
+            echo '```json'; cat build/selftest.json 2>/dev/null || echo "(not run)"; echo; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the DMG
+        uses: actions/upload-artifact@v7
+        with:
+          name: FM1-Pocket-${{ steps.v.outputs.version }}-build${{ github.run_number }}
+          path: build/*.dmg
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish a GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          V: ${{ steps.v.outputs.version }}
+        run: |
+          NOTES="FM-1 Pocket $V for Apple Silicon Macs (macOS 14 or newer). Not notarised: see \"If the app will not open.txt\" inside the DMG."
+          if gh release view "v$V" >/dev/null 2>&1; then
+            gh release upload "v$V" build/*.dmg --clobber
+          else
+            gh release create "v$V" build/*.dmg --title "FM-1 Pocket $V" --notes "$NOTES" --target "$GITHUB_SHA"
+          fi

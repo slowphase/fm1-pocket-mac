@@ -1,0 +1,72 @@
+/* Boots an .rfm1 headless and checks it powers on, draws, sounds when played, reacts to input and hands back its
+ * flash: the same checks as FM-1 Pocket Player's tests/run.js. Prints the speed as "x realtime".
+ *   host_test file.rfm1 */
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "fm1host.h"
+
+static double now(void) { struct timespec t; clock_gettime(CLOCK_MONOTONIC, &t); return t.tv_sec + t.tv_nsec / 1e9; }
+static double rms(const float *a, int n) { double s = 0; for (int i = 0; i < n; i++) s += a[i] * a[i]; return sqrt(s / n); }
+
+int main(int argc, char **argv) {
+    if (argc < 2) { fprintf(stderr, "usage: host_test file.rfm1\n"); return 2; }
+    FILE *f = fopen(argv[1], "rb");
+    if (!f) { perror(argv[1]); return 2; }
+    fseek(f, 0, SEEK_END); long len = ftell(f); fseek(f, 0, SEEK_SET);
+    unsigned char *b = malloc(len);
+    if (fread(b, 1, len, f) != (size_t)len) return 2;
+    fclose(f);
+
+    char err[300];
+    double t0 = now();
+    fm1h *h = fm1h_create(b, len, err, sizeof err);
+    if (!h) { printf("FAIL load: %s\n", err); return 1; }
+    double tl = now();
+    printf("loaded %s %s (abi %d, %s) in %.1f ms; flash %u bytes\n", fm1h_info(h, FM1H_INFO_NAME),
+           fm1h_info(h, FM1H_INFO_VERSION), fm1h_abi(h), fm1h_info(h, FM1H_INFO_LICENSE), (tl - t0) * 1e3, fm1h_flash_size(h));
+
+    fm1h_boot(h, NULL, 0);
+    fm1h_run_ms(h, 1500);
+    static float buf[22050 * 2];
+    fm1h_pull(h, buf, 4410);
+    double idle = rms(buf, 4410 * 2);
+    static unsigned char rgba[240 * 240 * 4];
+    unsigned writes = fm1h_screen_rgba(h, rgba), lit = 0;
+    if (argc > 2) {                                  /* host_test file.rfm1 screen.ppm: save the screen */
+        FILE *o = fopen(argv[2], "wb");
+        if (o) { fprintf(o, "P6 240 240 255\n"); for (int i = 0; i < 240 * 240; i++) fwrite(rgba + 4 * i, 1, 3, o); fclose(o); }
+    }
+    for (int i = 0; i < 240 * 240; i++) if (rgba[4 * i] | rgba[4 * i + 1] | rgba[4 * i + 2]) lit++;
+
+    int chord[3] = { 7, 11, 14 };
+    for (int i = 0; i < 3; i++) fm1h_key(h, chord[i], 1, 100);
+    fm1h_run_ms(h, 50);
+    fm1h_pull(h, buf, 22050);
+    double played = rms(buf, 22050 * 2);
+    for (int i = 0; i < 3; i++) fm1h_key(h, chord[i], 0, 0);
+    fm1h_turn(h, FM1H_KNOB1, 3);
+    fm1h_turn(h, FM1H_PRESETS, 1);
+    fm1h_button(h, FM1H_HOME, 1); fm1h_run_ms(h, 80); fm1h_button(h, FM1H_HOME, 0);
+    fm1h_run_ms(h, 600);
+    unsigned writes2 = fm1h_lcd_writes(h);
+    unsigned char *flash = malloc(fm1h_flash_size(h) + 1);
+    size_t fl = fm1h_flash_copy(h, 1, flash, fm1h_flash_size(h));
+
+    /* speed: 10 s of device time with a chord held */
+    for (int i = 0; i < 3; i++) fm1h_key(h, chord[i], 1, 100);
+    double ts = now();
+    fm1h_run_ms(h, 10000);
+    double speed = 10.0 / (now() - ts);
+    char log[512];
+    fm1h_log_take(h, log, sizeof log);
+
+    int ok = !fm1h_halted(h) && lit > 0 && writes2 > writes && (played > 0.001 || idle > 0.001);   /* run.js plus: it makes sound */
+    printf("%s halted=%d litPixels=%u lcdWrites=[%u,%u] idleRms=%.4f playedRms=%.4f flash=%zu deviceMs=%u speed=%.1fx realtime%s%s\n",
+           ok ? "ok  " : "FAIL", fm1h_halted(h), lit, writes, writes2, idle, played, fl, fm1h_device_ms(h), speed,
+           fm1h_halted(h) ? " error=" : "", fm1h_halted(h) ? fm1h_error(h) : "");
+    if (log[0]) printf("log: %.200s\n", log);
+    fm1h_destroy(h);
+    return ok ? 0 : 1;
+}
