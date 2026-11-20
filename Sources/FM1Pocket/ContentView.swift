@@ -47,6 +47,8 @@ private struct Sidebar: View {
                 row(.recent, "clock")
                 row(.new, "sparkles")
                 if !library.withdrawnItems.isEmpty { row(.withdrawn, "archivebox") }
+                if library.count(.experimental) > 0 { row(.experimental, "flask") }
+                if !library.moreItems.isEmpty { row(.more, "books.vertical") }
             }
             Section("Categories") {
                 ForEach(library.categoryNames, id: \.self) { c in row(.category(c), icon(for: c)) }
@@ -54,12 +56,15 @@ private struct Sidebar: View {
         }
         .listStyle(.sidebar)
         .safeAreaInset(edge: .bottom) {
-            Text(library.status)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(4)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(10)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(library.status)
+                    .lineLimit(4)
+                if let a = library.attribution { HubCredit(attribution: a) }
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
         }
     }
 
@@ -169,7 +174,7 @@ private struct IconGrid: View {
                             // one click selects; the second click of a double-click plays (as Finder opens)
                             .onTapGesture {
                                 library.select(item.id)
-                                if (NSApp.currentEvent?.clickCount ?? 1) >= 2 { player.play(item, library: library) }
+                                if (NSApp.currentEvent?.clickCount ?? 1) >= 2 { open(item) }
                             }
                             .contextMenu { FirmwareMenu(item: item) }
                     }
@@ -179,6 +184,44 @@ private struct IconGrid: View {
             .onAppear { if let s = library.selection { proxy.scrollTo(s) } }
         }
         .background(Color(nsColor: .controlBackgroundColor))
+    }
+
+    /// double-click: play, or (for firmware this app cannot play) open its source page
+    private func open(_ item: LibraryItem) {
+        if item.canPlay { player.play(item, library: library) }
+        else if let s = item.sourceURL ?? item.hubURL, let u = URL(string: s) { NSWorkspace.shared.open(u) }
+    }
+}
+
+/// The Firmware Hub's credit, as its terms ask: the credit line linked to the Hub, the licence linked, and what
+/// FM-1 Pocket changed.
+struct HubCredit: View {
+    let attribution: CatalogueV2.Attribution
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 1) {
+            if let u = URL(string: attribution.url) { Link(attribution.text, destination: u) } else { Text(attribution.text) }
+            HStack(spacing: 3) {
+                Text("Licence:")
+                if let l = attribution.licenseUrl, let u = URL(string: l) { Link(attribution.license, destination: u) }
+                else { Text(attribution.license) }
+            }
+        }
+        .help(attribution.changes ?? "")
+    }
+}
+
+/// The maker credits, each linked to their repository when known.
+struct MakerLinks: View {
+    let makers: [CatalogueV2.Maker]
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(Array(makers.enumerated()), id: \.offset) { i, m in
+                if let s = m.url, let u = URL(string: s) { Link(m.name, destination: u) } else { Text(m.name) }
+                if i < makers.count - 1 { Text("·").foregroundStyle(.secondary) }
+            }
+        }
     }
 }
 
@@ -209,6 +252,7 @@ private struct FirmwareCard: View {
                 Text(item.name).font(.headline).lineLimit(1)
                 if item.isNew { Tag(text: "NEW", color: .green) }
                 if item.isBeta { Tag(text: "BETA", color: .orange) }
+                if let t = item.stateTag { Tag(text: t, color: .secondary).help(item.macReason ?? "") }
             }
             Text(item.byline)
                 .font(.caption)
@@ -289,6 +333,7 @@ private struct FirmwareTable: View {
                     Text(item.name)
                     if item.isNew { Tag(text: "NEW", color: .green) }
                     if item.isBeta { Tag(text: "BETA", color: .orange) }
+                    if let t = item.stateTag { Tag(text: t, color: .secondary).help(item.macReason ?? "") }
                     if player.playingID == item.id { Image(systemName: "speaker.wave.2.fill").foregroundStyle(.tint) }
                 }
             }
@@ -301,7 +346,9 @@ private struct FirmwareTable: View {
         .contextMenu(forSelectionType: LibraryItem.ID.self) { ids in
             if let id = ids.first, let item = library.item(id) { FirmwareMenu(item: item) }
         } primaryAction: { ids in
-            if let id = ids.first, let item = library.item(id) { player.play(item, library: library) }
+            guard let id = ids.first, let item = library.item(id) else { return }
+            if item.canPlay { player.play(item, library: library) }
+            else if let s = item.sourceURL ?? item.hubURL, let u = URL(string: s) { NSWorkspace.shared.open(u) }
         }
     }
 }
@@ -313,16 +360,21 @@ struct FirmwareMenu: View {
     let item: LibraryItem
 
     var body: some View {
-        Button(player.playingID == item.id ? "Restart" : "Play") { player.play(item, library: library) }
-        if player.playingID == item.id { Button("Stop") { player.stop() } }
-        Divider()
-        Button(library.isFavourite(item) ? "Remove from Favourites" : "Add to Favourites") { library.toggleFavourite(item) }
-        if !item.isBuiltin && !item.isWithdrawn && item.download != .installed && !item.downloading {
-            Button("Download Now") { library.download(item) }
+        if item.canPlay {
+            Button(player.playingID == item.id ? "Restart" : "Play") { player.play(item, library: library) }
+            if player.playingID == item.id { Button("Stop") { player.stop() } }
+            Divider()
+            Button(library.isFavourite(item) ? "Remove from Favourites" : "Add to Favourites") { library.toggleFavourite(item) }
+            if !item.isBuiltin && !item.isWithdrawn && item.download != .installed && !item.downloading {
+                Button("Download Now") { library.download(item) }
+            }
+            Divider()
         }
         if let s = item.sourceURL, let u = URL(string: s) {
-            Divider()
             Button("Open Source Page") { NSWorkspace.shared.open(u) }
+        }
+        if let s = item.hubURL, let u = URL(string: s) {
+            Button("Open on The Firmware Hub") { NSWorkspace.shared.open(u) }
         }
     }
 }
@@ -390,6 +442,61 @@ private struct DetailView: View {
                     if !item.tag.isEmpty { Text(item.tag).font(.title3).foregroundStyle(.secondary) }
                 }
 
+                if item.isListedOnly {
+                    notAvailable
+                } else {
+                    controls
+                }
+
+                if let r = item.macReason, item.isExperimental {
+                    Label(r, systemImage: "flask")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if item.isWithdrawn {
+                    Label("Pocket no longer lists this firmware. Your downloaded copy and saved settings are kept.",
+                          systemImage: "archivebox")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+
+                if !item.about.isEmpty {
+                    Text(item.about).fixedSize(horizontal: false, vertical: true).textSelection(.enabled)
+                }
+
+                facts
+                    .font(.callout)
+
+                if item.hubURL != nil, let a = library.attribution {
+                    HubCredit(attribution: a).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    /// for firmware this app cannot play: why, and where to get it
+    @ViewBuilder private var notAvailable: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label(item.macReason ?? "This firmware is not available in this app.", systemImage: "info.circle")
+                .font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: 8) {
+                if let s = item.sourceURL, let u = URL(string: s) {
+                    Button { NSWorkspace.shared.open(u) } label: { Label("Open Source Page", systemImage: "arrow.up.right.square") }
+                        .keyboardShortcut(.defaultAction)
+                }
+                if let s = item.hubURL, let u = URL(string: s) {
+                    Button("Open on The Firmware Hub") { NSWorkspace.shared.open(u) }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private var controls: some View {
                 HStack(spacing: 8) {
                     if player.playingID == item.id {
                         Button { openWindow(id: "player") } label: { Label("Show Player", systemImage: "pianokeys") }
@@ -407,27 +514,28 @@ private struct DetailView: View {
                     .help(library.isFavourite(item) ? "Remove from Favourites" : "Add to Favourites")
                     if player.loadingID == item.id { ProgressView().controlSize(.small) }
                 }
+    }
 
-                if item.isWithdrawn {
-                    Label("Pocket no longer lists this firmware. Your downloaded copy and saved settings are kept.",
-                          systemImage: "archivebox")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                }
-
-                if !item.about.isEmpty {
-                    Text(item.about).fixedSize(horizontal: false, vertical: true).textSelection(.enabled)
-                }
-
+    @ViewBuilder private var facts: some View {
                 Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 5) {
                     fact("Version", item.version)
-                    fact("Author", item.authors)
+                    if item.makers.isEmpty {
+                        fact("Author", item.authors)
+                    } else {
+                        GridRow {
+                            Text(item.makers.count == 1 ? "Maker" : "Makers").foregroundStyle(.secondary)
+                            MakerLinks(makers: item.makers)
+                        }
+                    }
                     fact("Category", item.category)
                     fact("Licence", item.license)
-                    fact("Size", ByteCountFormatter.string(fromByteCount: Int64(item.size), countStyle: .file))
+                    if item.size > 0 {
+                        fact("Size", ByteCountFormatter.string(fromByteCount: Int64(item.size), countStyle: .file))
+                    }
                     fact("Added", day(item.added))
                     if item.updated != item.added { fact("Updated", day(item.updated)) }
                     fact("Download", item.downloadText)
+                    if let st = item.macState, !item.isListedOnly { fact("On this Mac", compatibility(st)) }
                     if let p = item.previousVersion { fact("Previous", "Version \(p) is kept too") }
                     if let r = library.recent[item.id] {
                         fact("Last played", RelativeDateTimeFormatter().localizedString(for: r, relativeTo: Date()))
@@ -439,10 +547,14 @@ private struct DetailView: View {
                         }
                     }
                 }
-                .font(.callout)
-            }
-            .padding(20)
-            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func compatibility(_ st: CatalogueV2.Status.State) -> String {
+        switch st {
+        case .playable: return item.testedOnMac ? "Tested on macOS" : "Tested"
+        case .experimental: return item.testedOnMac ? "Experimental" : "Not yet tested on macOS"
+        case .unsupported: return "Not supported"
+        case .sourceOnly: return "Source only"
         }
     }
 

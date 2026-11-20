@@ -83,6 +83,33 @@ private func publish(_ fws: [FW], on site: FakePocket) async {
     await site.set("/data/catalog.json", catalogueJSON(fws))
 }
 
+/// An expanded catalogue (schema 2) for these firmware: `downloadable` ones carry their catalog.json fields and the
+/// given Mac state; `listed` ones have no build (source-only) or a build the Mac must not download (unsupported).
+private func catalogueV2JSON(_ fws: [(FW, String)], listed: [(String, String, FW?)] = [], hub: Bool = false) -> Data {
+    var list: [[String: Any]] = []
+    for (f, mac) in fws {
+        var e = (try! JSONSerialization.jsonObject(with: try! JSONEncoder().encode(f.entry))) as! [String: Any]
+        e["makers"] = [["name": "Someone", "url": "https://example.test/\(f.id)"]]
+        e["status"] = ["web": ["state": "playable"], "mac": ["state": mac, "reason": mac == "experimental" ? "Not yet tested on macOS." : NSNull()]]
+        list.append(e)
+    }
+    for (id, mac, build) in listed {
+        var e: [String: Any] = ["id": id, "name": id.uppercased(), "version": "1", "authors": ["Maker"], "license": "GPL-3.0",
+                                "source": "https://example.test/\(id)", "category": "Synth",
+                                "status": ["web": ["state": mac], "mac": ["state": mac, "reason": "Why \(id) is not here."]],
+                                "restriction": ["code": "no-build", "reason": "No browser build has been published."]]
+        if hub { e["provenance"] = ["hub": ["url": "https://thefirmwarehub.com/firmware/\(id)"]] }
+        if let b = build { e["file"] = b.file; e["sha256"] = b.sha; e["size"] = b.data.count }
+        list.append(e)
+    }
+    var c: [String: Any] = ["schema": 2, "snapshot": "2026-11-20T00:00:00Z", "updated": "2026-11-20T00:00:00Z", "firmwares": list]
+    if hub {
+        c["attribution"] = ["text": "Firmware list: The Firmware Hub – thefirmwarehub.com", "url": "https://thefirmwarehub.com",
+                            "license": "CC BY 4.0", "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"]
+    }
+    return try! JSONSerialization.data(withJSONObject: c)
+}
+
 private func freshRoot() -> LibraryPaths {
     let u = FileManager.default.temporaryDirectory.appendingPathComponent("fm1lib-\(UUID().uuidString)", isDirectory: true)
     try? FileManager.default.createDirectory(at: u, withIntermediateDirectories: true)
@@ -144,7 +171,8 @@ final class LibrarySyncTests: XCTestCase {
         let r = await again.sync()
         XCTAssertEqual(r.installed, [])
         let reqs = await site.requests
-        XCTAssertEqual(reqs, ["/data/catalog.json"], "only the catalogue is fetched when nothing changed")
+        XCTAssertEqual(reqs, ["/data/catalog-v2.json", "/data/catalog.json"],
+                       "only the catalogue is fetched when nothing changed (v2 first, then v1 when the site has no v2)")
     }
 
     // 3
@@ -160,7 +188,7 @@ final class LibrarySyncTests: XCTestCase {
         let r = await lib.sync()
         XCTAssertEqual(r.installed, ["beta"])
         let reqs = await site.requests
-        XCTAssertEqual(Set(reqs), Set(["/data/catalog.json", "/data/" + b2.file, "/data/" + b2.imagePath!]))
+        XCTAssertEqual(Set(reqs), Set(["/data/catalog-v2.json", "/data/catalog.json", "/data/" + b2.file, "/data/" + b2.imagePath!]))
     }
 
     // 4
@@ -454,6 +482,103 @@ final class LibrarySyncTests: XCTestCase {
     }
 
     static func files(_ dir: URL) -> [URL] { FirmwareLibrary.files(under: dir) }
+
+    // v2: the expanded catalogue
+    func testV2IsPreferredAndOnlyMacDownloadableBuildsAreFetched() async throws {
+        let site = FakePocket(), paths = freshRoot()
+        let a = FW("alpha", "1.0"), b = FW("beta", "2.0"), bad = FW("broken", "1.0")
+        await publish([a, b], on: site)                                   // catalog.json (v1) lists alpha and beta
+        await site.set("/data/" + bad.file, bad.data)
+        await site.set("/data/catalog-v2.json", catalogueV2JSON([(a, "playable"), (b, "experimental")],
+            listed: [("nobuild", "source-only", nil), ("broken", "unsupported", bad)], hub: true))
+        let lib = library(paths, site)
+        let r = await lib.sync()
+        XCTAssertNil(r.catalogueError)
+        XCTAssertEqual(r.feed, "v2")
+        XCTAssertEqual(r.installed, ["alpha", "beta"])
+        let reqs = await site.requests
+        XCTAssertFalse(reqs.contains("/data/catalog.json"), "v1 is not needed when v2 is usable")
+        XCTAssertFalse(reqs.contains("/data/" + bad.file), "an unsupported build is never downloaded")
+        let snap = await lib.snapshot()
+        XCTAssertEqual(snap.feed, "v2")
+        XCTAssertEqual(snap.entries.map(\.entry.id), ["alpha", "beta"])
+        XCTAssertEqual(snap.entries.map { $0.mac?.state }, [.playable, .experimental])
+        XCTAssertEqual(snap.entries[0].makers.first?.url, "https://example.test/alpha")
+        XCTAssertEqual(Set(snap.more.map(\.id)), ["nobuild", "broken"])
+        XCTAssertEqual(snap.more.first { $0.id == "nobuild" }?.hubURL, "https://thefirmwarehub.com/firmware/nobuild")
+        XCTAssertEqual(snap.attribution?.license, "CC BY 4.0")
+        XCTAssertTrue(snap.withdrawn.isEmpty)
+        XCTAssertTrue(exists(paths.catalogueV2))
+
+        // relaunch offline: the cached v2 still drives the library
+        await site.setOffline(true)
+        let again = library(paths, site)
+        let snap2 = await again.snapshot()
+        XCTAssertEqual(snap2.feed, "v2")
+        XCTAssertEqual(snap2.more.count, 2)
+        XCTAssertEqual(snap2.entries.map(\.availability), [.installed, .installed])
+    }
+
+    func testBadV2FallsBackToV1() async throws {
+        for body in [Data("{not json".utf8), Data(#"{"schema":3,"snapshot":"x","updated":"x","firmwares":[]}"#.utf8),
+                     catalogueV2JSON([], listed: [("nobuild", "source-only", nil)])] {
+            let site = FakePocket(), paths = freshRoot()
+            let a = FW("alpha", "1.0")
+            await publish([a], on: site)
+            await site.set("/data/catalog-v2.json", body)
+            let lib = library(paths, site)
+            let r = await lib.sync()
+            XCTAssertNil(r.catalogueError)
+            XCTAssertEqual(r.feed, "v1")
+            XCTAssertEqual(r.installed, ["alpha"])
+            let snap = await lib.snapshot()
+            XCTAssertEqual(snap.feed, "v1")
+            XCTAssertTrue(snap.more.isEmpty)
+            XCTAssertNil(snap.attribution)
+            XCTAssertFalse(exists(paths.catalogueV2), "an unusable v2 is never kept")
+        }
+    }
+
+    func testV2WithdrawnFromSiteRetiresTheCachedCopy() async throws {
+        let site = FakePocket(), paths = freshRoot()
+        let a = FW("alpha", "1.0")
+        await publish([a], on: site)
+        await site.set("/data/catalog-v2.json", catalogueV2JSON([(a, "playable")], listed: [("nobuild", "source-only", nil)]))
+        _ = await library(paths, site).sync()
+        XCTAssertTrue(exists(paths.catalogueV2))
+        await site.set("/data/catalog-v2.json", nil)
+        let lib = library(paths, site)
+        let r = await lib.sync()
+        XCTAssertEqual(r.feed, "v1")
+        XCTAssertFalse(exists(paths.catalogueV2))
+        let snap = await lib.snapshot()
+        XCTAssertTrue(snap.more.isEmpty)
+        XCTAssertEqual(snap.entries.map(\.availability), [.installed], "nothing is re-downloaded")
+    }
+
+    /// The contract between the two repositories, on real data: the dry-run v2 that Pocket's discover.mjs built
+    /// from the 2026-11-19 catalogue gives this app exactly catalog.json's downloads, nothing more.
+    func testRealV2DryRunMatchesV1Downloads() throws {
+        let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Fixtures")
+        let v1 = try Catalogue.decode(Data(contentsOf: dir.appendingPathComponent("catalog-v1-2026-11-19.json"))).validated()
+        let v2 = try CatalogueV2.decode(Data(contentsOf: dir.appendingPathComponent("catalog-v2-dry.json")))
+        let mac = try v2.macCatalogue()
+        XCTAssertEqual(mac.firmwares.count, 95)
+        XCTAssertEqual(Dictionary(uniqueKeysWithValues: mac.firmwares.map { ($0.id, $0) }),
+                       Dictionary(uniqueKeysWithValues: v1.firmwares.map { ($0.id, $0) }))
+        XCTAssertEqual(v2.firmwares.count, 118 - 1, "118 discovered, h1 is built in")
+        XCTAssertTrue(v2.notDownloadable.allSatisfy { $0.mac.reason?.isEmpty == false }, "every firmware the app cannot get says why")
+        XCTAssertTrue(v2.notDownloadable.allSatisfy { $0.source != nil }, "and links to where it came from")
+    }
+
+    func testV2DecodingToleratesUnknownStatesAndFields() throws {
+        let json = #"{"schema":2,"snapshot":"s","updated":"u","future":true,"firmwares":[{"id":"x","name":"X","file":"fw/x.rfm1","sha256":"\#(String(repeating: "a", count: 64))","size":1,"status":{"web":{"state":"playable"},"mac":{"state":"teleported"}}},{"id":"y"}]}"#
+        let c = try CatalogueV2.decode(Data(json.utf8))
+        XCTAssertEqual(c.firmwares[0].mac.state, .sourceOnly, "an unknown state is never downloadable")
+        XCTAssertFalse(c.firmwares[0].macDownloadable)
+        XCTAssertEqual(c.firmwares[1].mac.state, .sourceOnly)
+        XCTAssertThrowsError(try c.macCatalogue(), "nothing downloadable: v1 is used instead")
+    }
 }
 
 final class LibraryStorageTests: XCTestCase {

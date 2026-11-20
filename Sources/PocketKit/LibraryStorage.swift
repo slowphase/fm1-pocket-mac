@@ -8,6 +8,7 @@ import Foundation
 ///     <root>/                              ~/Library/Application Support/FM-1 Pocket/
 ///       Managed/                           app-managed
 ///         catalog.json                     the last catalogue that downloaded and validated
+///         catalog-v2.json                  the same for the expanded catalogue (preferred when present)
 ///         registry.json, registry.bak.json what is installed (see Registry)
 ///         firmware/<id>/<sha256>.rfm1      verified firmware builds, named by their content hash
 ///         shots/<name>.png                 screenshots, named as the catalogue names them
@@ -24,6 +25,8 @@ public struct LibraryPaths: Sendable {
 
     public var managed: URL { root.appendingPathComponent("Managed", isDirectory: true) }
     public var catalogue: URL { managed.appendingPathComponent("catalog.json") }
+    /// the last catalog-v2.json that downloaded and validated (preferred over catalog.json when present)
+    public var catalogueV2: URL { managed.appendingPathComponent("catalog-v2.json") }
     public var registry: URL { managed.appendingPathComponent("registry.json") }
     public var registryBackup: URL { managed.appendingPathComponent("registry.bak.json") }
     public var firmware: URL { managed.appendingPathComponent("firmware", isDirectory: true) }

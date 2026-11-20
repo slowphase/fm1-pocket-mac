@@ -5,9 +5,25 @@ How FM-1 Pocket for macOS keeps a local, offline copy of FM-1 Pocket Player's ap
 name checks, the registry), `DownloadScheduler.swift` and `StateStore.swift`. Tests are in
 `Tests/PocketKitTests/LibraryTests.swift`.
 
-The app only reads what Pocket Player publishes: `catalog.json`, `fw/<id>-<sha8>.rfm1` and `shots/<id>-<sha8>.png`
-under `https://slowphase.github.io/fm1-pocket-player/data/`. It never looks for firmware anywhere else, so Pocket's
-review and approval stay the only way in.
+The app only reads what Pocket Player publishes: `catalog-v2.json` (when published), `catalog.json`,
+`fw/<id>-<sha8>.rfm1` and `shots/<id>-<sha8>.png` under `https://slowphase.github.io/fm1-pocket-player/data/`. It
+never downloads firmware from anywhere else, so Pocket's review and approval stay the only way in.
+
+## The two catalogues
+
+- `catalog-v2.json` (schema 2) is tried first. It lists every firmware Pocket has discovered, with each player's
+  status: **playable**, **experimental** (passed the checks, but not yet confirmed on macOS, or may run slowly),
+  **unsupported** or **source-only** (no build Pocket may redistribute), with the reason and the test behind it,
+  the makers linked to their repositories, and The Firmware Hub's credit when its list was used. The app downloads
+  only entries that have a build *and* a Mac status of playable or experimental. Those carry exactly their
+  `catalog.json` fields, so they are the same files. Everything else appears under **More Firmware** with its reason
+  and a link to its source page; it is never downloaded. A state the app does not recognise counts as source-only.
+- `catalog.json` (schema 1) is the fallback when v2 is missing, does not decode, has another schema or offers
+  nothing downloadable. Builds up to 19 only ever read this file, and Pocket keeps it unchanged.
+- Whichever feed is accepted is cached (`Managed/catalog-v2.json` or `Managed/catalog.json`). Falling back to v1
+  removes a cached v2, so More Firmware never shows a stale list. The library works offline from either.
+- A firmware whose Mac status changes to unsupported leaves the downloadable list, so it is treated like a withdrawn
+  firmware: the downloaded copy and its saved settings are kept.
 
 ## Storage layout
 
@@ -16,6 +32,7 @@ Everything is under `~/Library/Application Support/FM-1 Pocket/`.
 | Folder | Owner | Contents |
 | --- | --- | --- |
 | `Managed/catalog.json` | app | the last catalogue that downloaded and passed validation |
+| `Managed/catalog-v2.json` | app | the same for the expanded catalogue, preferred when present |
 | `Managed/registry.json`, `registry.bak.json` | app | what is installed (below) and its previous good copy |
 | `Managed/firmware/<id>/<sha256>.rfm1` | app | verified firmware, named by content hash |
 | `Managed/shots/<name>.png` | app | screenshots, named as the catalogue names them |

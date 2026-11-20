@@ -30,6 +30,10 @@ Versioned DMGs can also be published under **Releases** (see below).
   Pocket in the last 14 days) and the catalogue's categories. Show firmware as icons (⌘1) or a sortable list (⌘2),
   and search with the field in the toolbar ("kwa" finds K-WA SUB). Click a firmware to see its details; double-click,
   or press ⌘↩, to play it. Right-click for more.
+- **More Firmware** (when Pocket publishes its expanded catalogue) lists firmware this app cannot download, each with
+  the reason and its source page. **Experimental** gathers firmware that passed Pocket's checks but is not yet
+  confirmed on macOS (tagged UNTESTED) or may run slowly. Makers are linked to their repositories in the details
+  pane, and The Firmware Hub is credited at the bottom of the sidebar when its list was used.
 - **Favourites:** the star in the details pane, the list's ★ column, the right-click menu, or ⌘D.
 - **The player** is the FM-1 faceplate, laid out like FM-1 Pocket Player's and scaled to its window: PRESETS,
   ALGORITHM, SELECT and MASTER on the left, the screen in the middle, the four knobs and twelve buttons on the right,
