@@ -4,3 +4,4 @@ build/
 *.xcodeproj/
 Tests/ctest/host_test
 .DS_Store
+Tests/ctest/native_smoke

@@ -44,7 +44,7 @@ struct FM1PocketApp: App {
                     if let item = library.item(library.selection) { player.play(item, library: library) }
                 }
                 .keyboardShortcut(.return, modifiers: .command)
-                .disabled(library.selection == nil)
+                .disabled(!(library.item(library.selection)?.canPlay ?? false))
                 Button("Stop") { player.stop() }
                     .keyboardShortcut(".", modifiers: .command)
                     .disabled(player.playingID == nil)
@@ -70,11 +70,13 @@ struct FM1PocketApp: App {
                 Button("Download Now") {
                     if let item = library.item(library.selection) { library.download(item) }
                 }
-                .disabled(library.item(library.selection).map { $0.isBuiltin || $0.download == .installed || $0.downloading } ?? true)
+                .disabled(library.item(library.selection).map { $0.isBuiltin || $0.isListedOnly || $0.download == .installed || $0.downloading } ?? true)
                 Divider()
                 Button("Show All Firmware") { library.section = .all }.keyboardShortcut("a", modifiers: [.command, .shift])
                 Button("Show Favourites") { library.section = .favourites }.keyboardShortcut("f", modifiers: [.command, .shift])
                 Button("Show Recently Played") { library.section = .recent }.keyboardShortcut("r", modifiers: [.command, .shift])
+                Button("Show More Firmware") { library.section = .more }
+                    .disabled(library.moreItems.isEmpty)
             }
         }
 

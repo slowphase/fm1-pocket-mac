@@ -6,6 +6,8 @@ struct LibraryItem: Identifiable, Hashable {
     enum Source: Hashable {
         case builtin(URL)
         case catalogue(CatalogueEntry)
+        /// listed in the expanded catalogue but not downloadable in this app (its id)
+        case listed(String)
     }
 
     enum Download: Hashable {
@@ -38,8 +40,30 @@ struct LibraryItem: Identifiable, Hashable {
     var added: String?
     var updated: String?
     var previousVersion: String?
+    /// what the expanded catalogue says about it on the Mac (nil with catalog.json, and for h1)
+    var macState: CatalogueV2.Status.State?
+    var macReason: String?
+    /// whether the Mac status rests on a test run on macOS itself
+    var testedOnMac = false
+    var makers: [CatalogueV2.Maker] = []
+    /// The Firmware Hub's page for it
+    var hubURL: String?
 
     var isBuiltin: Bool { if case .builtin = source { return true } else { return false } }
+    var isListedOnly: Bool { if case .listed = source { return true } else { return false } }
+    /// the only kind of item that can be played: built in, or downloadable from the catalogue
+    var canPlay: Bool { !isListedOnly }
+    var isExperimental: Bool { macState == .experimental }
+
+    /// the small tag on its card, when its Mac status needs one
+    var stateTag: String? {
+        switch macState {
+        case .experimental: return testedOnMac ? "EXPERIMENTAL" : "UNTESTED"
+        case .unsupported: return "NOT SUPPORTED"
+        case .sourceOnly: return "SOURCE ONLY"
+        default: return nil
+        }
+    }
 
     static func builtinH1(screenshot: URL? = nil) -> LibraryItem? {
         guard let url = Bundle.main.url(forResource: "h1", withExtension: "rfm1"),
@@ -78,6 +102,25 @@ struct LibraryItem: Identifiable, Hashable {
         added = e.added
         updated = e.updated
         if let p = s.previous, p.sha256 != e.sha256 { previousVersion = p.version }
+        macState = s.mac?.state
+        macReason = s.mac?.reason
+        testedOnMac = s.mac?.tested?.macos?.outcome != nil
+        makers = s.makers
+        hubURL = s.hubURL
+    }
+
+    /// a firmware the expanded catalogue lists that this app cannot download: shown with why, never played
+    init(listed e: CatalogueV2.Entry) {
+        self.init(source: .listed(e.id), id: "more:" + e.id, name: e.name, version: e.version,
+                  authors: e.authors.joined(separator: ", "), category: e.category, tag: e.tag, about: e.about,
+                  license: e.license, sourceURL: e.source, imageURL: nil, screenshotFile: nil, size: 0,
+                  download: .notDownloaded, downloading: false, lastError: nil)
+        isBeta = e.beta
+        macState = e.mac.state
+        macReason = e.mac.reason ?? e.restriction?.reason
+        testedOnMac = e.mac.tested?.macos?.outcome != nil
+        makers = e.makers
+        hubURL = e.hubURL
     }
 
     /// a firmware Pocket no longer lists, from what the library kept about it
@@ -95,6 +138,7 @@ struct LibraryItem: Identifiable, Hashable {
 
     /// a short download state, for the list view's Status column
     var statusText: String {
+        if isListedOnly { return stateTag.map { $0.capitalized } ?? "Not available" }
         if downloading { return "Downloading" }
         switch download {
         case .installed: return isBuiltin ? "Built in" : "Downloaded"
@@ -107,6 +151,7 @@ struct LibraryItem: Identifiable, Hashable {
     var searchFields: [String] { [name, version, authors, about, tag, category] }
 
     var downloadText: String {
+        if isListedOnly { return "Not available in this app" }
         if downloading { return "Downloading…" }
         if isWithdrawn { return "Downloaded (no longer in the Pocket catalogue)" }
         switch download {
@@ -130,7 +175,7 @@ struct PlayableFirmware {
 
 /// The library window's sections.
 enum SidebarItem: Hashable {
-    case all, favourites, recent, new, withdrawn
+    case all, favourites, recent, new, withdrawn, experimental, more
     case category(String)
 
     var key: String {
@@ -140,6 +185,8 @@ enum SidebarItem: Hashable {
         case .recent: return "recent"
         case .new: return "new"
         case .withdrawn: return "withdrawn"
+        case .experimental: return "experimental"
+        case .more: return "more"
         case .category(let c): return "category:" + c
         }
     }
@@ -149,6 +196,8 @@ enum SidebarItem: Hashable {
         case "recent": self = .recent
         case "new": self = .new
         case "withdrawn": self = .withdrawn
+        case "experimental": self = .experimental
+        case "more": self = .more
         default: self = key.hasPrefix("category:") ? .category(String(key.dropFirst(9))) : .all
         }
     }
@@ -159,6 +208,8 @@ enum SidebarItem: Hashable {
         case .recent: return "Recently Played"
         case .new: return "New"
         case .withdrawn: return "No Longer Listed"
+        case .experimental: return "Experimental"
+        case .more: return "More Firmware"
         case .category(let c): return c
         }
     }
@@ -183,6 +234,10 @@ enum SortKey: String, CaseIterable, Identifiable {
 final class LibraryModel: ObservableObject {
     @Published private(set) var items: [LibraryItem] = []
     @Published private(set) var withdrawnItems: [LibraryItem] = []
+    /// firmware the expanded catalogue lists that this app cannot download (the More Firmware section)
+    @Published private(set) var moreItems: [LibraryItem] = []
+    /// The Firmware Hub's credit, when the catalogue used its list
+    @Published private(set) var attribution: CatalogueV2.Attribution?
     @Published private(set) var status = ""
     @Published private(set) var isRefreshing = false
     @Published var selection: LibraryItem.ID?
@@ -221,6 +276,8 @@ final class LibraryModel: ObservableObject {
         case .recent: list = (items + withdrawnItems).filter { recent[$0.id] != nil }
         case .new: list = items.filter(\.isNew)
         case .withdrawn: list = withdrawnItems
+        case .experimental: list = items.filter(\.isExperimental)
+        case .more: list = moreItems
         case .category(let c): list = items.filter { $0.category == c }
         }
         let q = search.trimmingCharacters(in: .whitespaces)
@@ -262,6 +319,8 @@ final class LibraryModel: ObservableObject {
         case .recent: return (items + withdrawnItems).filter { recent[$0.id] != nil }.count
         case .new: return items.filter(\.isNew).count
         case .withdrawn: return withdrawnItems.count
+        case .experimental: return items.filter(\.isExperimental).count
+        case .more: return moreItems.count
         case .category(let c): return items.filter { $0.category == c }.count
         }
     }
@@ -291,7 +350,7 @@ final class LibraryModel: ObservableObject {
         Task { _ = try? await lib.ensureInstalled(e, priority: .interactive) }
     }
 
-    func item(_ id: LibraryItem.ID?) -> LibraryItem? { (items + withdrawnItems).first { $0.id == id } }
+    func item(_ id: LibraryItem.ID?) -> LibraryItem? { (items + withdrawnItems + moreItems).first { $0.id == id } }
 
     /// Shows the cached library at once, then synchronises in the background.
     func start() {
@@ -371,7 +430,11 @@ final class LibraryModel: ObservableObject {
         }
         items = list
         withdrawnItems = snap.withdrawn.compactMap { LibraryItem(withdrawn: $0, paths: library.paths) }
+        moreItems = snap.more.map { LibraryItem(listed: $0) }
+        attribution = snap.attribution
         if section == .withdrawn && withdrawnItems.isEmpty { section = .all }
+        if section == .more && moreItems.isEmpty { section = .all }
+        if section == .experimental && !list.contains(where: \.isExperimental) { section = .all }
         if case .category(let c) = section, !categoryNames.contains(c), !list.isEmpty { section = .all }
         if selection == nil || item(selection) == nil { select(visible.first?.id ?? list.first?.id) }
 
@@ -400,6 +463,8 @@ final class LibraryModel: ObservableObject {
             let p = try await library.firmwareForPlayback(id: e.id)
             return PlayableFirmware(data: p.data, sha256: p.build.sha256, catalogueID: e.id, isFallback: p.isFallback,
                                     version: p.build.version)
+        case .listed:
+            throw PocketError.badFirmware("\(item.name) is not available in this app. \(item.macReason ?? "")")
         }
     }
 }

@@ -124,6 +124,7 @@ final class PlayerModel: ObservableObject {
     // MARK: - playing
 
     func play(_ item: LibraryItem, library: LibraryModel) {
+        guard item.canPlay else { return }
         error = nil
         loadingID = item.id
         showRequest += 1

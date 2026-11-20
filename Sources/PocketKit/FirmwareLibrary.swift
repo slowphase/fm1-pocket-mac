@@ -16,7 +16,10 @@ public actor FirmwareLibrary {
     private let store: RegistryStore
 
     public private(set) var registry: Registry
+    /// the firmware this app downloads and plays (from v2's Mac-downloadable entries, or from catalog.json)
     public private(set) var catalogue: Catalogue?
+    /// the expanded catalogue, when the last good catalogue came from catalog-v2.json
+    public private(set) var discovery: CatalogueV2?
     public nonisolated let registryLoad: RegistryLoad
 
     private var inflight: [String: Task<InstalledBuild, Error>] = [:]     // by firmware sha256
@@ -33,8 +36,11 @@ public actor FirmwareLibrary {
         self.fetcher = fetcher
         self.scheduler = scheduler
         self.store = RegistryStore(paths: paths)
-        let cat = Self.readCachedCatalogue(paths)
+        let v2 = Self.readCachedV2(paths)
+        let v2cat = v2.flatMap { try? $0.macCatalogue() }
+        let cat = v2cat ?? Self.readCachedCatalogue(paths)
         self.catalogue = cat
+        self.discovery = v2cat == nil ? nil : v2
         var (reg, how) = RegistryStore(paths: paths).load(catalogue: cat)
         if how == .fromBackup { reg = Self.reconcile(reg, catalogue: cat, paths: paths) }
         self.registry = reg
@@ -56,6 +62,11 @@ public actor FirmwareLibrary {
             r.firmwares[e.id]?.entry = e
         }
         return r
+    }
+
+    private static func readCachedV2(_ paths: LibraryPaths) -> CatalogueV2? {
+        guard let d = try? Data(contentsOf: paths.catalogueV2) else { return nil }
+        return try? CatalogueV2.decode(d)
     }
 
     private static func readCachedCatalogue(_ paths: LibraryPaths) -> Catalogue? {
@@ -85,6 +96,10 @@ public actor FirmwareLibrary {
         public var previous: InstalledBuild?
         /// the cached screenshot, when it is on disk
         public var screenshotFile: URL?
+        /// what the expanded catalogue says about it on the Mac (nil with catalog.json)
+        public var mac: CatalogueV2.Status?
+        public var makers: [CatalogueV2.Maker] = []
+        public var hubURL: String?
     }
 
     public struct Snapshot: Equatable, Sendable {
@@ -95,6 +110,12 @@ public actor FirmwareLibrary {
         /// the catalogue's `since` (its first day), for the "new" badge
         public var catalogueSince: String?
         public var registryLoad: RegistryLoad
+        /// firmware the expanded catalogue lists that this app cannot download (source-only, unsupported...)
+        public var more: [CatalogueV2.Entry] = []
+        /// The Firmware Hub's credit, when the catalogue used its list
+        public var attribution: CatalogueV2.Attribution?
+        /// "v2" or "v1": which feed the library came from
+        public var feed: String = "v1"
     }
 
     public func snapshot() -> Snapshot {
@@ -104,13 +125,15 @@ public actor FirmwareLibrary {
             let rec = registry.firmwares[e.id]
             let builds = (rec?.builds ?? []).filter { fm.fileExists(atPath: managedURL($0).path) }
             let avail: Availability = builds.first?.sha256 == e.sha256 ? .installed : (builds.isEmpty ? .notDownloaded : .olderInstalled)
+            let d = discovery?.entry(e.id)
             out.append(Entry(entry: e, availability: avail, downloading: downloadingIDs.contains(e.id), lastError: rec?.lastError,
                              current: builds.first, previous: builds.count > 1 ? builds[1] : nil,
-                             screenshotFile: localScreenshot(for: e)))
+                             screenshotFile: localScreenshot(for: e), mac: d?.mac, makers: d?.makers ?? [], hubURL: d?.hubURL))
         }
         let withdrawn = registry.firmwares.values.filter { $0.status == .withdrawn }.sorted { $0.id < $1.id }
         return Snapshot(entries: out, withdrawn: withdrawn, imports: registry.imports, catalogueUpdated: catalogue?.updated,
-                        catalogueSince: catalogue?.since, registryLoad: registryLoad)
+                        catalogueSince: catalogue?.since, registryLoad: registryLoad, more: discovery?.notDownloadable ?? [],
+                        attribution: discovery?.attribution, feed: discovery == nil ? "v1" : "v2")
     }
 
     public func localScreenshot(for e: CatalogueEntry) -> URL? {
@@ -135,6 +158,28 @@ public actor FirmwareLibrary {
         public var screenshotsDownloaded = 0
         public var cleaned: [CleanupCandidate] = []
         public var skippedBecauseBusy = false
+        /// which feed this sync used: "v2" (catalog-v2.json) or "v1" (catalog.json)
+        public var feed: String?
+    }
+
+    /// catalog-v2.json if the site has a usable one, else catalog.json (as builds up to 19 read it). Only a feed
+    /// that downloads and validates replaces the cached one; a v1 fallback retires the cached v2.
+    private func fetchCatalogues() async throws -> (Catalogue, CatalogueV2?) {
+        let fm = FileManager.default
+        let v2url = try url(for: "catalog-v2.json")
+        if let got = try? await fetcher.fetch(v2url), got.1 == 200,
+           let v2 = try? CatalogueV2.decode(got.0), let cat = try? v2.macCatalogue() {
+            try fm.createDirectory(at: paths.managed, withIntermediateDirectories: true)
+            try got.0.write(to: paths.catalogueV2, options: .atomic)
+            return (cat, v2)
+        }
+        let (data, code) = try await fetcher.fetch(url(for: "catalog.json"))
+        guard code == 200 else { throw PocketError.http(code, "the catalogue") }
+        let cat = try Catalogue.decode(data).validated()
+        try fm.createDirectory(at: paths.managed, withIntermediateDirectories: true)
+        try data.write(to: paths.catalogue, options: .atomic)
+        if fm.fileExists(atPath: paths.catalogueV2.path) { try? fm.removeItem(at: paths.catalogueV2) }
+        return (cat, nil)
     }
 
     /// Fetches the catalogue, downloads every missing or changed firmware and screenshot (two at a time), records
@@ -147,11 +192,10 @@ public actor FirmwareLibrary {
 
         let fresh: Catalogue
         do {
-            let (data, code) = try await fetcher.fetch(url(for: "catalog.json"))
-            guard code == 200 else { throw PocketError.http(code, "the catalogue") }
-            fresh = try Catalogue.decode(data).validated()
-            try FileManager.default.createDirectory(at: paths.managed, withIntermediateDirectories: true)
-            try data.write(to: paths.catalogue, options: .atomic)
+            let got = try await fetchCatalogues()
+            fresh = got.0
+            discovery = got.1
+            report.feed = got.1 == nil ? "v1" : "v2"
         } catch {
             report.catalogueError = error.localizedDescription
             changed()
@@ -482,7 +526,8 @@ public actor FirmwareLibrary {
         for url in Self.files(under: paths.firmware) where !counted.contains(url.standardizedFileURL.path) {
             u.awaitingCleanup += size(url)
         }
-        u.screenshotsAndMetadata = Self.total(paths.shots) + Self.total(paths.generated) + size(paths.catalogue) + size(paths.registry) + size(paths.registryBackup)
+        u.screenshotsAndMetadata = Self.total(paths.shots) + Self.total(paths.generated) + size(paths.catalogue) + size(paths.catalogueV2)
+            + size(paths.registry) + size(paths.registryBackup)
         u.savedStates = Self.total(paths.state) + Self.total(paths.userData)
         u.imported = Self.total(paths.imported)
         u.temporary = Self.total(paths.tmp) + Self.total(paths.legacyCatalogue)
