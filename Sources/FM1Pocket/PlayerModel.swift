@@ -13,6 +13,10 @@ final class PlayerModel: ObservableObject {
     @Published private(set) var heldKeys: Set<Int> = []
     @Published private(set) var loadingID: LibraryItem.ID?
     @Published var error: String?
+    /// bumped on every Play, so the library opens (or brings forward) the player window
+    @Published private(set) var showRequest = 0
+    /// the player window; computer keys only play the firmware while it is the key window
+    weak var playerWindow: NSWindow?
 
     private var core: FirmwareCore?
     private var flashID = "", flashVersion = "", flashSHA = ""
@@ -30,6 +34,7 @@ final class PlayerModel: ObservableObject {
     func play(_ item: LibraryItem, library: LibraryModel) {
         error = nil
         loadingID = item.id
+        showRequest += 1
         Task {
             defer { loadingID = nil }
             do {
@@ -59,6 +64,7 @@ final class PlayerModel: ObservableObject {
                 do { try audio.start(next) } catch { self.error = "No sound: \(error.localizedDescription)" }
                 startTimer()
                 installKeyboard()
+                library.notePlayed(item)
             } catch {
                 self.error = error.localizedDescription
             }
@@ -159,6 +165,7 @@ final class PlayerModel: ObservableObject {
         guard core != nil else { return false }
         if !ev.modifierFlags.intersection([.command, .control, .option]).isEmpty { return false }
         if ev.window?.firstResponder is NSText { return false }        // typing in the search field
+        guard let w = playerWindow, ev.window === w else { return false }  // only in the player window
         let code = ev.keyCode
         if let k = Self.keyMap[code] {
             if ev.type == .keyDown { if !ev.isARepeat { keyHeld[code] = k; key(k, down: true) } }
