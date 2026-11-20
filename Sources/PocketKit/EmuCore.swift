@@ -27,6 +27,19 @@ public final class EmuCore: @unchecked Sendable {
 
     private let package: Data
     private var booted = false
+    /// the firmware's audio has started (upstream's worklet then caps a render at 1.5 quanta)
+    private var playing = false
+
+    /// upstream's run budgets (web/worklet.js): while the firmware boots, 20 ms of emulated time per render, so a
+    /// firmware with no audio yet cannot hold the caller; once audio plays, 1.5 times the frames asked for
+    private func budget(_ frames: Int) -> UInt32 {
+        playing ? UInt32(240e6 * 1.5 * Double(frames) / 44100) : UInt32(240e6 * 0.02)
+    }
+    private func render(_ n: Int) -> Int {
+        let got = Int(fm1_render(UInt32(n), budget(n)))
+        if got > 0 { playing = true }
+        return got
+    }
     private var masterValue = 512
     private var lastFlashRevision: UInt32 = 0
 
@@ -57,6 +70,7 @@ public final class EmuCore: @unchecked Sendable {
         if fm1_boot_fwsc(p, n, nil, 0, 240) != 0 { booted = false; return }
         Self.current = ObjectIdentifier(self)
         booted = true
+        playing = false
         if let flash, !flash.isEmpty, flash.count % (4096 + 4) == 0, let r = fm1_alloc(UInt32(flash.count)) {
             flash.withUnsafeBytes { raw in r.update(from: raw.bindMemory(to: UInt8.self).baseAddress!, count: flash.count) }
             _ = fm1_flash_restore(r, UInt32(flash.count))
@@ -70,7 +84,7 @@ public final class EmuCore: @unchecked Sendable {
     public func run(milliseconds: Int) {
         let frames = max(0, milliseconds) * 441 / 10
         var left = frames
-        while left > 0 { let n = min(left, 1024); locked(()) { _ = fm1_render(UInt32(n), UInt32.max) }; left -= n }
+        while left > 0 { let n = min(left, 1024); locked(()) { _ = render(n) }; left -= n }
     }
 
     /// Interleaved stereo at 44.1 kHz, as FirmwareCore.pull.
@@ -79,7 +93,7 @@ public final class EmuCore: @unchecked Sendable {
         while done < frames {
             let n = min(frames - done, 1024)
             let ok: Bool = locked(false) {
-                _ = fm1_render(UInt32(n), UInt32.max)
+                _ = render(n)
                 guard let l = fm1_out_l(), let r = fm1_out_r() else { return false }
                 for i in 0..<n { out[2 * (done + i)] = l[i]; out[2 * (done + i) + 1] = r[i] }
                 return true

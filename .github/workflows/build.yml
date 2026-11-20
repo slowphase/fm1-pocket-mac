@@ -107,7 +107,9 @@ jobs:
           first=1
           for f in build/packages/*.fwsc; do
             id=$(basename "$f" .fwsc)
-            "build/FM-1 Pocket.app/Contents/MacOS/FM1Pocket" --selftest-fwsc "$f" "build/emu-$id.json" > /dev/null || true
+            # (a stuck package must not hold the build: two minutes each at most)
+            perl -e 'alarm 120; exec @ARGV' "build/FM-1 Pocket.app/Contents/MacOS/FM1Pocket" --selftest-fwsc "$f" "build/emu-$id.json" > /dev/null || true
+            [ -f "build/emu-$id.json" ] || echo '{"ok": false, "error": "no answer within 120 s"}' > "build/emu-$id.json"
             [ $first = 1 ] || echo ","; first=0
             python3 -c "import json,sys; r=json.load(open('build/emu-$id.json')); r['id']='$id'; print(json.dumps(r))"
             python3 -c "import json; r=json.load(open('build/emu-$id.json')); f=lambda k: '%.3f'%r.get(k,0); print(f\"| $id | {r['ok']} | {r.get('speedXRealtime',0):.2f}x | {f('keysRms')} | {f('midiRms')} | {f('playRms')} | {r.get('saveRoundTrip')} |\")" >> "$GITHUB_STEP_SUMMARY"
