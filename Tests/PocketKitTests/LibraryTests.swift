@@ -666,6 +666,23 @@ final class LibrarySyncTests: XCTestCase {
         XCTAssertNil(odd.makerURL)
     }
 
+    /// Discovery dates: the firmware's real release (version and date) and the day it was first listed; a missing
+    /// release stays unknown; a test build's preview fills them in where the catalogue lacks them.
+    func testV2ReleaseAndListedDates() throws {
+        let sha = String(repeating: "a", count: 64)
+        let json = #"{"schema":2,"firmwares":[{"id":"x","name":"X","file":"fw/x.rfm1","sha256":"\#(sha)","size":1,"status":{"mac":{"state":"playable"}},"release":{"version":"1.8.2","date":"2026-11-13T04:17:47Z","source":"The Firmware Hub"},"listed":"2026-10-08"},{"id":"y","name":"Y","status":{"mac":{"state":"source-only"}},"release":null,"provenance":{"hub":{"version":"1.0"}}}]}"#
+        let c = try CatalogueV2.decode(Data(json.utf8))
+        XCTAssertEqual(c.firmwares[0].release?.version, "1.8.2")
+        XCTAssertEqual(c.firmwares[0].release?.day, ISO8601DateFormatter().date(from: "2026-11-13T04:17:47Z"))
+        XCTAssertEqual(c.firmwares[0].listed, "2026-10-08")
+        XCTAssertNil(c.firmwares[1].release)
+        let preview = #"{"firmwares":{"y":{"hubVersion":"1.0","release":{"version":"1.0","date":"2026-11-02T00:00:00Z"},"listed":"2026-11-15"}}}"#
+        let p = c.withPreview(Data(preview.utf8))
+        XCTAssertEqual(p.firmwares[1].release?.version, "1.0")
+        XCTAssertEqual(p.firmwares[1].listed, "2026-11-15")
+        XCTAssertEqual(p.firmwares[0].release?.version, "1.8.2", "the catalogue's own dates win")
+    }
+
     func testEngineChoicesAreKept() throws {
         let paths = freshRoot(), store = EngineChoiceStore(paths: paths)
         XCTAssertEqual(store.load(), [:])

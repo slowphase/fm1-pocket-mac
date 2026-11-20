@@ -53,4 +53,20 @@ final class LibraryCountsTests: XCTestCase {
         XCTAssertEqual(LibraryCounts.confidenceLine(items), "Listened to: 1 · automated checks only: 1 · known issues: 1")
         XCTAssertEqual(items[2].confidenceText, "Automated checks only (nobody has listened yet)")
     }
+
+    /// Latest Release: newest release first, unknown release dates last; A–Z by name; New to Library from the listed day.
+    func testSortByLatestReleaseAndNewToLibrary() {
+        var a = entry("alpha", installed: true), b = entry("beta", installed: true), c = entry("gamma", installed: true)
+        a.release = CatalogueV2.Release(version: "1", date: "2026-10-01T00:00:00Z")
+        b.release = CatalogueV2.Release(version: "1", date: "2026-11-13T00:00:00Z")
+        a.listed = "2020-01-01"
+        b.listed = ISO8601DateFormatter().string(from: Date()).prefix(10).description
+        let snap = FirmwareLibrary.Snapshot(entries: [a, b, c], withdrawn: [], imports: [], catalogueUpdated: nil, catalogueSince: nil, registryLoad: .loaded)
+        let items = LibraryModel.merged(snap, choices: [:], base: URL(string: "https://example.test/")!,
+                                        paths: LibraryPaths(root: FileManager.default.temporaryDirectory), builtin: nil).items
+        XCTAssertEqual(LibraryModel.ordered(items, by: .latestRelease).map(\.name), ["Beta", "Alpha", "Gamma"])
+        XCTAssertEqual(LibraryModel.ordered(items, by: .name).map(\.name), ["Alpha", "Beta", "Gamma"])
+        XCTAssertEqual(items.filter(\.isNew).map(\.name), ["Beta"], "listed today; alpha's release is recent but it is not new to the library")
+        XCTAssertEqual(SortKey(rawValue: "added"), nil, "the old Date Added sort is gone (it falls back to Latest Release)")
+    }
 }

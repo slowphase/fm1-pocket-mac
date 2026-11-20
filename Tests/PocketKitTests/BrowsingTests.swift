@@ -30,12 +30,10 @@ final class BrowsingTests: XCTestCase {
 
     func testNewBadge() {
         let now = NewBadge.date("2026-11-20")!
-        XCTAssertTrue(NewBadge.isNew(added: "2026-11-19", since: "2026-11-01", now: now))
-        XCTAssertTrue(NewBadge.isNew(added: "2026-11-06", since: "2026-11-01", now: now), "14 days is still new")
-        XCTAssertFalse(NewBadge.isNew(added: "2026-11-05", since: "2026-11-01", now: now), "15 days is not")
-        XCTAssertFalse(NewBadge.isNew(added: "2026-11-01", since: "2026-11-01", now: now), "part of the first catalogue")
-        XCTAssertFalse(NewBadge.isNew(added: nil, since: "2026-11-01", now: now))
-        XCTAssertFalse(NewBadge.isNew(added: "2026-11-19", since: nil, now: now))
+        XCTAssertTrue(NewBadge.isNew(listed: "2026-11-19", now: now))
+        XCTAssertTrue(NewBadge.isNew(listed: "2026-11-06", now: now), "14 days is still new")
+        XCTAssertFalse(NewBadge.isNew(listed: "2026-11-05", now: now), "15 days is not")
+        XCTAssertFalse(NewBadge.isNew(listed: nil, now: now), "no date: not new")
     }
 
     func testRecentlyPlayedKeepsTheNewest() throws {

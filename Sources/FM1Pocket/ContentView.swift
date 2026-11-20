@@ -115,17 +115,16 @@ private struct Browser: View {
                 }
                 .pickerStyle(.segmented)
                 .help("Show as icons or as a list")
-                if library.viewMode == .icons {
-                    Menu {
-                        Picker("Sort By", selection: $library.sort) {
-                            ForEach(SortKey.allCases) { Text($0.title).tag($0) }
-                        }
-                        .pickerStyle(.inline)
-                    } label: {
-                        Label("Sort By", systemImage: "arrow.up.arrow.down")
+                Menu {
+                    Picker("Sort By", selection: $library.sort) {
+                        ForEach(SortKey.allCases) { Text($0.title).tag($0) }
                     }
-                    .help("Sort by")
+                    .pickerStyle(.inline)
+                } label: {
+                    Label(library.sort.title, systemImage: "arrow.up.arrow.down")
+                        .labelStyle(.titleAndIcon)
                 }
+                .help("Sort by latest release, name, author or category")
                 Button { library.refresh() } label: {
                     Label("Check for Updates", systemImage: "arrow.clockwise")
                 }
@@ -147,8 +146,8 @@ private struct Browser: View {
                 ContentUnavailableView("Nothing Played Yet", systemImage: "clock",
                                        description: Text("Firmware you play shows up here."))
             case .new:
-                ContentUnavailableView("Nothing New", systemImage: "sparkles",
-                                       description: Text("No firmware was added in the last \(NewBadge.days) days."))
+                ContentUnavailableView("Nothing New to the Library", systemImage: "sparkles",
+                                       description: Text("No firmware joined the library in the last \(NewBadge.days) days."))
             default:
                 ContentUnavailableView("No Firmware", systemImage: "square.dashed",
                                        description: Text("The catalogue has not downloaded yet. Check your connection, then choose Check for Firmware Updates."))
@@ -250,7 +249,7 @@ private struct FirmwareCard: View {
                 }
             HStack(spacing: 4) {
                 Text(item.name).font(.headline).lineLimit(1)
-                if item.isNew { Tag(text: "NEW", color: .green) }
+                if item.isNew { Tag(text: "NEW", color: .green).help("New to Library: first listed in the last \(NewBadge.days) days") }
                 if item.isBeta { Tag(text: "BETA", color: .orange) }
                 if let t = item.stateTag { Tag(text: t, color: .secondary).help(item.macReason ?? "") }
             }
@@ -331,7 +330,7 @@ private struct FirmwareTable: View {
                 HStack(spacing: 6) {
                     Thumbnail(item: item).frame(width: 22, height: 22).clipShape(RoundedRectangle(cornerRadius: 3))
                     Text(item.name)
-                    if item.isNew { Tag(text: "NEW", color: .green) }
+                    if item.isNew { Tag(text: "NEW", color: .green).help("New to Library: first listed in the last \(NewBadge.days) days") }
                     if item.isBeta { Tag(text: "BETA", color: .orange) }
                     if let t = item.stateTag { Tag(text: t, color: .secondary).help(item.macReason ?? "") }
                     if player.playingID == item.id { Image(systemName: "speaker.wave.2.fill").foregroundStyle(.tint) }
@@ -341,8 +340,13 @@ private struct FirmwareTable: View {
             TableColumn("Version", value: \.version).width(min: 50, ideal: 70)
             TableColumn("Author", value: \.authors).width(min: 80, ideal: 150)
             TableColumn("Category", value: \.category).width(min: 70, ideal: 100)
+            TableColumn("Released", value: \.releasedSort) { (item: LibraryItem) in
+                Text(item.release?.day.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "")
+            }
+            .width(min: 80, ideal: 100)
             TableColumn("Status", value: \.statusText).width(min: 90, ideal: 120)
         }
+        .onChange(of: library.sort) { order = [] }      // choosing Sort By takes over from a clicked column
         .contextMenu(forSelectionType: LibraryItem.ID.self) { ids in
             if let id = ids.first, let item = library.item(id) { FirmwareMenu(item: item) }
         } primaryAction: { ids in
@@ -436,7 +440,7 @@ private struct DetailView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
                         Text(item.name).font(.title).bold().textSelection(.enabled)
-                        if item.isNew { Tag(text: "NEW", color: .green) }
+                        if item.isNew { Tag(text: "NEW", color: .green).help("New to Library: first listed in the last \(NewBadge.days) days") }
                         if item.isBeta { Tag(text: "BETA", color: .orange) }
                     }
                     if !item.tag.isEmpty { Text(item.tag).font(.title3).foregroundStyle(.secondary) }
@@ -532,8 +536,7 @@ private struct DetailView: View {
                     if item.size > 0 {
                         fact("Size", ByteCountFormatter.string(fromByteCount: Int64(item.size), countStyle: .file))
                     }
-                    fact("Added", day(item.added))
-                    if item.updated != item.added { fact("Updated", day(item.updated)) }
+                    fact("Released", released)
                     fact("Download", item.downloadText)
                     engineRow
                     if let st = item.macState, !item.isListedOnly { fact("On this Mac", compatibility(st)) }
@@ -614,6 +617,15 @@ private struct DetailView: View {
         }
     }
 
+
+    /// "13 Nov 2026 (v1.8.2)", plus the version this app plays when it is not the latest release
+    private var released: String {
+        guard let r = item.release, let d = r.day else { return item.isBuiltin || item.isPackage ? "" : "Not known" }
+        var t = DateFormatter.localizedString(from: d, dateStyle: .medium, timeStyle: .none)
+        if let v = r.version, !v.isEmpty { t += " (\(v))" }
+        if let v = r.version, !item.version.isEmpty, v != item.version { t += "; this build: \(item.version)" }
+        return t
+    }
 
     private func day(_ s: String?) -> String {
         guard let d = NewBadge.date(s) else { return "" }

@@ -45,8 +45,10 @@ public enum NewBadge {
 
     public static func date(_ day: String?) -> Date? { day.flatMap { dayFormat.date(from: String($0.prefix(10))) } }
 
-    public static func isNew(added: String?, since: String?, now: Date = Date()) -> Bool {
-        guard let a = added, let s = since, a > s, let d = date(a) else { return false }
+    /// "New to Library": it first appeared in the library (the day The Firmware Hub added it, or the day Pocket first
+    /// saw it) within the last 14 days. Not a release date: a new release of an old firmware is not new to the library.
+    public static func isNew(listed: String?, now: Date = Date()) -> Bool {
+        guard let d = date(listed) else { return false }
         return now.timeIntervalSince(d) / 86400 <= Double(days)
     }
 }

@@ -55,7 +55,13 @@
      }
     }
    },
-   "hubVersion": "2.0"
+   "hubVersion": "2.0",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-11-04T01:06:34Z",
+    "source": "The Firmware Hub",
+    "version": "2.0"
+   }
   },
   "adrift": {
    "confidence": {
@@ -104,7 +110,13 @@
      }
     }
    },
-   "hubVersion": "0.4.0"
+   "hubVersion": "0.4.0",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-15T21:58:33Z",
+    "source": "The Firmware Hub",
+    "version": "0.4.0"
+   }
   },
   "aetherfm1": {
    "confidence": {
@@ -153,7 +165,13 @@
      }
     }
    },
-   "hubVersion": "2.0.4"
+   "hubVersion": "2.0.4",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-14T16:57:30Z",
+    "source": "The Firmware Hub",
+    "version": "2.0.4"
+   }
   },
   "agtdeck": {
    "confidence": {
@@ -197,7 +215,13 @@
      }
     }
    },
-   "hubVersion": "0.6.3"
+   "hubVersion": "0.6.3",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-13T18:19:46Z",
+    "source": "The Firmware Hub",
+    "version": "0.6.3"
+   }
   },
   "aisling": {
    "confidence": {
@@ -246,7 +270,13 @@
      }
     }
    },
-   "hubVersion": "1.5"
+   "hubVersion": "1.5",
+   "listed": "2026-11-03",
+   "release": {
+    "date": "2026-11-19T11:58:10Z",
+    "source": "The Firmware Hub",
+    "version": "1.5"
+   }
   },
   "aislingfx1": {
    "confidence": {
@@ -290,14 +320,20 @@
      }
     }
    },
-   "hubVersion": "1.1"
+   "hubVersion": "1.1",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-16T19:18:33Z",
+    "source": "The Firmware Hub",
+    "version": "1.1"
+   }
   },
   "amb": {
    "confidence": {
     "mac": {
      "fm1-emu": {
       "level": "listened",
-      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-20 (FM-1 Pocket 0.1.0 build 34)."
+      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-21 (FM-1 Pocket 0.1.0 build 37)."
      },
      "rfm1": {
       "level": "listened",
@@ -344,6 +380,7 @@
     }
    },
    "hubVersion": "1.3.2",
+   "listed": "2026-10-13",
    "listened": [
     {
      "app": "FM-1 Pocket 0.1.0 build 34",
@@ -370,8 +407,26 @@
      "player": "mac",
      "verdict": "good",
      "who": "Dean"
+    },
+    {
+     "app": "FM-1 Pocket 0.1.0 build 37",
+     "area": "saves",
+     "build": "a949a6a2a1ced8b3857d156ad0409a55e6ba53bbdd4094d0a38f2779364064f3",
+     "date": "2026-11-21",
+     "engine": "fm1-emu",
+     "firmware": "amb",
+     "machine": "MacBook (Apple M5)",
+     "notes": "A one-tap SAVE came back after relaunching; a G J L chord on the computer keyboard played all three notes; mute was silent at once.",
+     "player": "mac",
+     "verdict": "good",
+     "who": "Dean"
     }
-   ]
+   ],
+   "release": {
+    "date": "2026-11-06T05:16:23Z",
+    "source": "The Firmware Hub",
+    "version": "1.3.2"
+   }
   },
   "amenity": {
    "confidence": {
@@ -421,7 +476,13 @@
      }
     }
    },
-   "hubVersion": "2.1.1"
+   "hubVersion": "2.1.1",
+   "listed": "2026-11-01",
+   "release": {
+    "date": "2026-11-15T12:06:45Z",
+    "source": "The Firmware Hub",
+    "version": "2.1.1"
+   }
   },
   "andromeda": {
    "confidence": {
@@ -468,7 +529,13 @@
      }
     }
    },
-   "hubVersion": "1.8.2-an2-r5"
+   "hubVersion": "1.8.2-an2-r5",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-17T23:18:52Z",
+    "source": "The Firmware Hub",
+    "version": "1.8.2-an2-r5"
+   }
   },
   "arcticscream": {
    "confidence": {
@@ -520,7 +587,13 @@
      }
     }
    },
-   "hubVersion": "2.1.4"
+   "hubVersion": "2.1.4",
+   "listed": "2026-10-26",
+   "release": {
+    "date": "2026-11-19T18:31:30Z",
+    "source": "The Firmware Hub",
+    "version": "2.1.4"
+   }
   },
   "arcturus": {
    "confidence": {
@@ -569,7 +642,13 @@
      }
     }
    },
-   "hubVersion": "1.7"
+   "hubVersion": "1.7",
+   "listed": "2026-11-02",
+   "release": {
+    "date": "2026-11-01T23:14:34Z",
+    "source": "The Firmware Hub",
+    "version": "1.7"
+   }
   },
   "argo": {
    "confidence": {
@@ -617,7 +696,13 @@
      }
     }
    },
-   "hubVersion": "1.8.5"
+   "hubVersion": "1.8.5",
+   "listed": "2026-11-12",
+   "release": {
+    "date": "2026-11-16T02:20:24Z",
+    "source": "The Firmware Hub",
+    "version": "1.8.5"
+   }
   },
   "arpwav09": {
    "confidence": {
@@ -664,7 +749,13 @@
      }
     }
    },
-   "hubVersion": "1.0.5"
+   "hubVersion": "1.0.5",
+   "listed": "2026-11-14",
+   "release": {
+    "date": "2026-11-11T21:41:57Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.5"
+   }
   },
   "artihive": {
    "confidence": {
@@ -711,7 +802,13 @@
      }
     }
    },
-   "hubVersion": "2.0.4"
+   "hubVersion": "2.0.4",
+   "listed": "2026-11-07",
+   "release": {
+    "date": "2026-11-11T20:29:14Z",
+    "source": "The Firmware Hub",
+    "version": "2.0.4"
+   }
   },
   "assid": {
    "confidence": {
@@ -760,7 +857,13 @@
      }
     }
    },
-   "hubVersion": "1.0"
+   "hubVersion": "1.0",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-11T01:09:35Z",
+    "source": "The Firmware Hub",
+    "version": "1.0"
+   }
   },
   "astra": {
    "confidence": {
@@ -810,7 +913,13 @@
      }
     }
    },
-   "hubVersion": "0.1"
+   "hubVersion": "0.1",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-13T14:30:47Z",
+    "source": "The Firmware Hub",
+    "version": "0.1"
+   }
   },
   "atek303": {
    "confidence": {
@@ -859,7 +968,13 @@
      }
     }
    },
-   "hubVersion": "1.2"
+   "hubVersion": "1.2",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-08T16:46:10Z",
+    "source": "The Firmware Hub",
+    "version": "1.2"
+   }
   },
   "atlatl": {
    "confidence": {
@@ -907,7 +1022,13 @@
      }
     }
    },
-   "hubVersion": "1.2"
+   "hubVersion": "1.2",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-14T00:24:14Z",
+    "source": "The Firmware Hub",
+    "version": "1.2"
+   }
   },
   "atlatltheatltuner": {
    "confidence": {
@@ -951,7 +1072,13 @@
      }
     }
    },
-   "hubVersion": "0.8"
+   "hubVersion": "0.8",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-15T17:23:50Z",
+    "source": "The Firmware Hub",
+    "version": "0.8"
+   }
   },
   "audiorouter": {
    "confidence": {
@@ -1000,6 +1127,12 @@
     "mac": {
      "fm1-emu": "Processes audio coming in over USB or Bluetooth; neither player has an audio input."
     }
+   },
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-16T23:00:31Z",
+    "source": "The Firmware Hub",
+    "version": "0.6.1"
    }
   },
   "aurora": {
@@ -1011,7 +1144,8 @@
      }
     }
    },
-   "hubVersion": null
+   "hubVersion": null,
+   "listed": "2026-11-19"
   },
   "b1": {
    "confidence": {
@@ -1058,7 +1192,13 @@
      }
     }
    },
-   "hubVersion": "5.6"
+   "hubVersion": "5.6",
+   "listed": "2026-11-02",
+   "release": {
+    "date": "2026-11-02T15:17:49Z",
+    "source": "The Firmware Hub",
+    "version": "5.6"
+   }
   },
   "b3organ": {
    "confidence": {
@@ -1106,7 +1246,13 @@
      }
     }
    },
-   "hubVersion": "0.5.1"
+   "hubVersion": "0.5.1",
+   "listed": "2026-11-05",
+   "release": {
+    "date": "2026-11-17T14:48:28Z",
+    "source": "The Firmware Hub",
+    "version": "0.5.1"
+   }
   },
   "bb1": {
    "confidence": {
@@ -1154,7 +1300,13 @@
      }
     }
    },
-   "hubVersion": "2.3-hub.1"
+   "hubVersion": "2.3-hub.1",
+   "listed": "2026-10-30",
+   "release": {
+    "date": "2026-11-19T14:05:57Z",
+    "source": "The Firmware Hub",
+    "version": "2.3-hub.1"
+   }
   },
   "beetle": {
    "confidence": {
@@ -1203,6 +1355,12 @@
     "mac": {
      "fm1-emu": "A tracker: nothing plays until a song is written or loaded."
     }
+   },
+   "listed": "2026-10-16",
+   "release": {
+    "date": "2026-11-09T10:17:49Z",
+    "source": "The Firmware Hub",
+    "version": "1.8.3"
    }
   },
   "beetleblue": {
@@ -1252,6 +1410,12 @@
     "mac": {
      "fm1-emu": "A drum tracker: nothing plays until a pattern is written."
     }
+   },
+   "listed": "2026-11-02",
+   "release": {
+    "date": "2026-11-09T10:20:52Z",
+    "source": "The Firmware Hub",
+    "version": "1.3.1"
    }
   },
   "beiwagen": {
@@ -1296,7 +1460,13 @@
      }
     }
    },
-   "hubVersion": "0.2"
+   "hubVersion": "0.2",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-16T10:13:23Z",
+    "source": "The Firmware Hub",
+    "version": "0.2"
+   }
   },
   "berlinan": {
    "confidence": {
@@ -1344,7 +1514,22 @@
      }
     }
    },
-   "hubVersion": "0.5.1"
+   "hubVersion": "0.5.1",
+   "listed": "2026-10-27",
+   "release": {
+    "date": "2026-10-27T10:45:29Z",
+    "source": "The Firmware Hub",
+    "version": "0.5.1"
+   }
+  },
+  "bigorna": {
+   "hubVersion": "2026.11.18",
+   "listed": "2026-11-02",
+   "release": {
+    "date": "2026-11-18T18:46:17Z",
+    "source": "The Firmware Hub",
+    "version": "2026.11.18"
+   }
   },
   "blop": {
    "confidence": {
@@ -1392,7 +1577,13 @@
      }
     }
    },
-   "hubVersion": "1.1.0"
+   "hubVersion": "1.1.0",
+   "listed": "2026-11-02",
+   "release": {
+    "date": "2026-11-03T21:34:07Z",
+    "source": "The Firmware Hub",
+    "version": "1.1.0"
+   }
   },
   "bluesbox": {
    "confidence": {
@@ -1441,7 +1632,13 @@
      }
     }
    },
-   "hubVersion": "2.2.1"
+   "hubVersion": "2.2.1",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-19T02:16:51Z",
+    "source": "The Firmware Hub",
+    "version": "2.2.1"
+   }
   },
   "bocjuhn": {
    "confidence": {
@@ -1490,7 +1687,13 @@
      }
     }
    },
-   "hubVersion": "1.0.0-rc10"
+   "hubVersion": "1.0.0-rc10",
+   "listed": "2026-11-03",
+   "release": {
+    "date": "2026-11-11T05:28:20Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.0-rc10"
+   }
   },
   "bubba": {
    "confidence": {
@@ -1534,7 +1737,13 @@
      }
     }
    },
-   "hubVersion": "0.10.0-beta"
+   "hubVersion": "0.10.0-beta",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-10-25T00:44:28Z",
+    "source": "The Firmware Hub",
+    "version": "0.10.0-beta"
+   }
   },
   "bunker": {
    "confidence": {
@@ -1583,7 +1792,13 @@
      }
     }
    },
-   "hubVersion": "1.0.0"
+   "hubVersion": "1.0.0",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-10-17T01:20:13Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.0"
+   }
   },
   "bytemania": {
    "confidence": {
@@ -1634,7 +1849,13 @@
      }
     }
    },
-   "hubVersion": "1.3.2"
+   "hubVersion": "1.3.2",
+   "listed": "2026-10-20",
+   "release": {
+    "date": "2026-11-14T17:15:35Z",
+    "source": "The Firmware Hub",
+    "version": "1.3.2"
+   }
   },
   "caravel": {
    "confidence": {
@@ -1686,7 +1907,13 @@
      }
     }
    },
-   "hubVersion": "1.0.0"
+   "hubVersion": "1.0.0",
+   "listed": "2026-10-25",
+   "release": {
+    "date": "2026-11-18T05:24:57Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.0"
+   }
   },
   "carnacos": {
    "confidence": {
@@ -1697,7 +1924,13 @@
      }
     }
    },
-   "hubVersion": "0.9.6"
+   "hubVersion": "0.9.6",
+   "listed": "2026-10-24",
+   "release": {
+    "date": "2026-10-29T14:09:25Z",
+    "source": "The Firmware Hub",
+    "version": "0.9.6"
+   }
   },
   "castletunia": {
    "confidence": {
@@ -1746,7 +1979,13 @@
      }
     }
    },
-   "hubVersion": "1.0.2"
+   "hubVersion": "1.0.2",
+   "listed": "2026-11-20",
+   "release": {
+    "date": "2026-11-20T03:35:29Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.2"
+   }
   },
   "chimeravocal": {
    "confidence": {
@@ -1799,7 +2038,13 @@
      }
     }
    },
-   "hubVersion": "0.8.0"
+   "hubVersion": "0.8.0",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-17T14:45:19Z",
+    "source": "The Firmware Hub",
+    "version": "0.8.0"
+   }
   },
   "chipbox": {
    "confidence": {
@@ -1852,7 +2097,13 @@
      }
     }
    },
-   "hubVersion": "1.7.0-signatureshowcase"
+   "hubVersion": "1.7.0-signatureshowcase",
+   "listed": "2026-10-20",
+   "release": {
+    "date": "2026-11-14T02:25:59Z",
+    "source": "The Firmware Hub",
+    "version": "1.7.0-signatureshowcase"
+   }
   },
   "choppah": {
    "confidence": {
@@ -1901,7 +2152,13 @@
      }
     }
    },
-   "hubVersion": "1.4.1"
+   "hubVersion": "1.4.1",
+   "listed": "2026-11-04",
+   "release": {
+    "date": "2026-11-14T19:11:03Z",
+    "source": "The Firmware Hub",
+    "version": "1.4.1"
+   }
   },
   "choralroot": {
    "confidence": {
@@ -1952,7 +2209,13 @@
      }
     }
    },
-   "hubVersion": "0.42"
+   "hubVersion": "0.42",
+   "listed": "2026-10-08",
+   "release": {
+    "date": "2026-11-19T07:31:15Z",
+    "source": "The Firmware Hub",
+    "version": "0.42"
+   }
   },
   "chord": {
    "confidence": {
@@ -2001,7 +2264,13 @@
      }
     }
    },
-   "hubVersion": "0.3"
+   "hubVersion": "0.3",
+   "listed": "2026-10-12",
+   "release": {
+    "date": "2026-10-09T20:14:27Z",
+    "source": "The Firmware Hub",
+    "version": "0.3"
+   }
   },
   "clatter": {
    "confidence": {
@@ -2050,7 +2319,13 @@
      }
     }
    },
-   "hubVersion": "1.0.0"
+   "hubVersion": "1.0.0",
+   "listed": "2026-11-04",
+   "release": {
+    "date": "2026-11-03T23:34:08Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.0"
+   }
   },
   "clavioline": {
    "confidence": {
@@ -2098,7 +2373,13 @@
      }
     }
    },
-   "hubVersion": "1.3"
+   "hubVersion": "1.3",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-13T22:30:27Z",
+    "source": "The Firmware Hub",
+    "version": "1.3"
+   }
   },
   "clipper": {
    "emu": {
@@ -2134,7 +2415,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "1.3.1"
+   "hubVersion": "1.3.1",
+   "listed": "2026-10-22",
+   "release": {
+    "date": "2026-11-04T02:34:23Z",
+    "source": "The Firmware Hub",
+    "version": "1.3.1"
+   }
   },
   "conductor": {
    "confidence": {
@@ -2186,7 +2473,13 @@
      }
     }
    },
-   "hubVersion": "1.0"
+   "hubVersion": "1.0",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-17T05:39:24Z",
+    "source": "The Firmware Hub",
+    "version": "1.0"
+   }
   },
   "coqui": {
    "confidence": {
@@ -2235,7 +2528,13 @@
      }
     }
    },
-   "hubVersion": "1.1.1"
+   "hubVersion": "1.1.1",
+   "listed": "2026-11-07",
+   "release": {
+    "date": "2026-11-07T18:44:02Z",
+    "source": "The Firmware Hub",
+    "version": "1.1.1"
+   }
   },
   "coralflower": {
    "confidence": {
@@ -2287,7 +2586,13 @@
      }
     }
    },
-   "hubVersion": "0.7.1"
+   "hubVersion": "0.7.1",
+   "listed": "2026-10-15",
+   "release": {
+    "date": "2026-11-10T14:26:18Z",
+    "source": "The Firmware Hub",
+    "version": "0.7.1"
+   }
   },
   "cord": {
    "confidence": {
@@ -2336,7 +2641,22 @@
      }
     }
    },
-   "hubVersion": "1.0.3"
+   "hubVersion": "1.0.3",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-09T22:19:38Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.3"
+   }
+  },
+  "cs1": {
+   "hubVersion": "2026.10.22",
+   "listed": "2026-10-15",
+   "release": {
+    "date": "2026-10-22T14:46:11Z",
+    "source": "The Firmware Hub",
+    "version": "2026.10.22"
+   }
   },
   "csfm1": {
    "confidence": {
@@ -2386,7 +2706,13 @@
      }
     }
    },
-   "hubVersion": "0.19.0"
+   "hubVersion": "0.19.0",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-18T17:10:52Z",
+    "source": "The Firmware Hub",
+    "version": "0.19.0"
+   }
   },
   "ctl": {
    "confidence": {
@@ -2439,7 +2765,13 @@
      }
     }
    },
-   "hubVersion": "1.0.3"
+   "hubVersion": "1.0.3",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-11-06T16:39:27Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.3"
+   }
   },
   "cultbox": {
    "emu": {
@@ -2476,7 +2808,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "1.2"
+   "hubVersion": "1.2",
+   "listed": "2026-11-07",
+   "release": {
+    "date": "2026-11-05T22:16:11Z",
+    "source": "The Firmware Hub",
+    "version": "1.2"
+   }
   },
   "cutador": {
    "confidence": {
@@ -2523,7 +2861,13 @@
      }
     }
    },
-   "hubVersion": "1.2.1"
+   "hubVersion": "1.2.1",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-10-18T16:10:18Z",
+    "source": "The Firmware Hub",
+    "version": "1.2.1"
+   }
   },
   "dabke": {
    "confidence": {
@@ -2576,7 +2920,13 @@
      }
     }
    },
-   "hubVersion": "0.18-beta"
+   "hubVersion": "0.18-beta",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-17T19:59:18Z",
+    "source": "The Firmware Hub",
+    "version": "0.18-beta"
+   }
   },
   "dark1": {
    "confidence": {
@@ -2625,7 +2975,13 @@
      }
     }
    },
-   "hubVersion": "1.0.7"
+   "hubVersion": "1.0.7",
+   "listed": "2026-11-01",
+   "release": {
+    "date": "2026-11-14T03:30:14Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.7"
+   }
   },
   "darkfunkdurcalsynt": {
    "confidence": {
@@ -2671,7 +3027,22 @@
      }
     }
    },
-   "hubVersion": "1.8.2-dfd10"
+   "hubVersion": "1.8.2-dfd10",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-17T23:03:52Z",
+    "source": "The Firmware Hub",
+    "version": "1.8.2-dfd10"
+   }
+  },
+  "daurade": {
+   "hubVersion": "1.0.1-01d6bd0",
+   "listed": "2026-10-29",
+   "release": {
+    "date": "2026-11-08T18:39:00Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1-01d6bd0"
+   }
   },
   "dayvx": {
    "confidence": {
@@ -2719,7 +3090,13 @@
      }
     }
    },
-   "hubVersion": "0.1.1"
+   "hubVersion": "0.1.1",
+   "listed": "2026-11-18",
+   "release": {
+    "date": "2026-11-12T21:39:13Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.1"
+   }
   },
   "deepfield": {
    "confidence": {
@@ -2768,7 +3145,13 @@
      }
     }
    },
-   "hubVersion": "1.11"
+   "hubVersion": "1.11",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-17T06:28:04Z",
+    "source": "The Firmware Hub",
+    "version": "1.11"
+   }
   },
   "delrio": {
    "confidence": {
@@ -2815,7 +3198,13 @@
      }
     }
    },
-   "hubVersion": "1.0.1"
+   "hubVersion": "1.0.1",
+   "listed": "2026-10-24",
+   "release": {
+    "date": "2026-11-20T00:29:42Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1"
+   }
   },
   "demake": {
    "confidence": {
@@ -2864,7 +3253,13 @@
      }
     }
    },
-   "hubVersion": "0.4.25"
+   "hubVersion": "0.4.25",
+   "listed": "2026-11-03",
+   "release": {
+    "date": "2026-11-15T21:49:24Z",
+    "source": "The Firmware Hub",
+    "version": "0.4.25"
+   }
   },
   "dfdacidengine": {
    "confidence": {
@@ -2912,7 +3307,13 @@
      }
     }
    },
-   "hubVersion": "1-v1.8.2-da1-r7"
+   "hubVersion": "1-v1.8.2-da1-r7",
+   "listed": "2026-11-19",
+   "release": {
+    "date": "2026-11-19T18:17:41Z",
+    "source": "The Firmware Hub",
+    "version": "1-v1.8.2-da1-r7"
+   }
   },
   "dinghy": {
    "confidence": {
@@ -2960,7 +3361,13 @@
      }
     }
    },
-   "hubVersion": "0.5"
+   "hubVersion": "0.5",
+   "listed": "2026-10-09",
+   "release": {
+    "date": "2026-11-07T13:02:09Z",
+    "source": "The Firmware Hub",
+    "version": "0.5"
+   }
   },
   "dp3oyb": {
    "confidence": {
@@ -3008,7 +3415,13 @@
      }
     }
    },
-   "hubVersion": "1.0.8"
+   "hubVersion": "1.0.8",
+   "listed": "2026-11-18",
+   "release": {
+    "date": "2026-11-20T00:10:22Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.8"
+   }
   },
   "drift": {
    "confidence": {
@@ -3061,7 +3474,13 @@
      }
     }
    },
-   "hubVersion": "0.9.6"
+   "hubVersion": "0.9.6",
+   "listed": "2026-10-23",
+   "release": {
+    "date": "2026-11-02T17:51:05Z",
+    "source": "The Firmware Hub",
+    "version": "0.9.6"
+   }
   },
   "drumlab": {
    "confidence": {
@@ -3111,7 +3530,13 @@
      }
     }
    },
-   "hubVersion": "1.0.0-graduationday"
+   "hubVersion": "1.0.0-graduationday",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-14T02:31:37Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.0-graduationday"
+   }
   },
   "drumtonic": {
    "confidence": {
@@ -3155,7 +3580,13 @@
      }
     }
    },
-   "hubVersion": "0.9.6"
+   "hubVersion": "0.9.6",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-19T00:44:46Z",
+    "source": "The Firmware Hub",
+    "version": "0.9.6"
+   }
   },
   "dub": {
    "confidence": {
@@ -3208,7 +3639,13 @@
      }
     }
    },
-   "hubVersion": "1.4.3"
+   "hubVersion": "1.4.3",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-10-30T20:43:10Z",
+    "source": "The Firmware Hub",
+    "version": "1.4.3"
+   }
   },
   "dubbox": {
    "confidence": {
@@ -3257,6 +3694,12 @@
     "mac": {
      "fm1-emu": "Processes audio coming in over USB or Bluetooth; neither player has an audio input."
     }
+   },
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-14T23:04:52Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.9"
    }
   },
   "dubwise": {
@@ -3268,7 +3711,8 @@
      }
     }
    },
-   "hubVersion": null
+   "hubVersion": null,
+   "listed": "2026-11-19"
   },
   "duell": {
    "confidence": {
@@ -3321,7 +3765,13 @@
      }
     }
    },
-   "hubVersion": "1.3.2"
+   "hubVersion": "1.3.2",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-11-18T10:06:38Z",
+    "source": "The Firmware Hub",
+    "version": "1.3.2"
+   }
   },
   "dungeontracker": {
    "confidence": {
@@ -3374,7 +3824,13 @@
      }
     }
    },
-   "hubVersion": "1.5"
+   "hubVersion": "1.5",
+   "listed": "2026-10-29",
+   "release": {
+    "date": "2026-11-04T03:53:55Z",
+    "source": "The Firmware Hub",
+    "version": "1.5"
+   }
   },
   "dx747": {
    "emu": {
@@ -3410,7 +3866,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "0.1"
+   "hubVersion": "0.1",
+   "listed": "2026-11-06",
+   "release": {
+    "date": "2026-11-06T00:37:20Z",
+    "source": "The Firmware Hub",
+    "version": "0.1"
+   }
   },
   "echofield": {
    "confidence": {
@@ -3463,7 +3925,13 @@
      }
     }
    },
-   "hubVersion": "0.2.15"
+   "hubVersion": "0.2.15",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-17T13:29:54Z",
+    "source": "The Firmware Hub",
+    "version": "0.2.15"
+   }
   },
   "elixir": {
    "confidence": {
@@ -3510,7 +3978,13 @@
      }
     }
    },
-   "hubVersion": "1.4.7"
+   "hubVersion": "1.4.7",
+   "listed": "2026-11-05",
+   "release": {
+    "date": "2026-11-19T23:21:51Z",
+    "source": "The Firmware Hub",
+    "version": "1.4.7"
+   }
   },
   "emb": {
    "confidence": {
@@ -3559,7 +4033,13 @@
      }
     }
    },
-   "hubVersion": "1.5.2"
+   "hubVersion": "1.5.2",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-10-16T23:24:58Z",
+    "source": "The Firmware Hub",
+    "version": "1.5.2"
+   }
   },
   "estampie": {
    "confidence": {
@@ -3608,7 +4088,13 @@
      }
     }
    },
-   "hubVersion": "0.3.8"
+   "hubVersion": "0.3.8",
+   "listed": "2026-10-25",
+   "release": {
+    "date": "2026-11-07T12:06:20Z",
+    "source": "The Firmware Hub",
+    "version": "0.3.8"
+   }
   },
   "etch": {
    "confidence": {
@@ -3656,7 +4142,13 @@
      }
     }
    },
-   "hubVersion": "1.88"
+   "hubVersion": "1.88",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-10-30T14:19:27Z",
+    "source": "The Firmware Hub",
+    "version": "1.88"
+   }
   },
   "evilgenius": {
    "emu": {
@@ -3693,7 +4185,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "0.1.4"
+   "hubVersion": "0.1.4",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-17T07:23:46Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.4"
+   }
   },
   "fartmachine": {
    "emu": {
@@ -3729,18 +4227,24 @@
     },
     "preferred": {}
    },
-   "hubVersion": "1.1.0"
+   "hubVersion": "1.1.0",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-10-23T01:06:57Z",
+    "source": "The Firmware Hub",
+    "version": "1.1.0"
+   }
   },
   "felucca": {
    "confidence": {
     "mac": {
      "fm1-emu": {
-      "level": "known-issue",
-      "note": "Reported in a listening test (2026-11-20): Settings did not come back after relaunching. Investigation: Felucca keeps only user presets saved with SAVE, OCT+, OCT+ (it always starts on its first factory sound); its saves work through the app (automated). Save timing in the emulator integration was also fixed. Awaiting a retest."
+      "level": "listened",
+      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-21 (FM-1 Pocket 0.1.0 build 37)."
      },
      "rfm1": {
-      "level": "automated",
-      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+      "level": "listened",
+      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-21 (FM-1 Pocket 0.1.0 build 37)."
      }
     }
    },
@@ -3776,17 +4280,13 @@
     },
     "preferred": {
      "mac": {
-      "engine": "rfm1",
-      "reason": "The original package has a known issue."
+      "engine": "fm1-emu",
+      "reason": "Both run well; the original package is the maker's own fingerprint-checked firmware."
      }
     }
    },
    "hubVersion": "1.8.2",
-   "knownIssues": {
-    "mac": {
-     "fm1-emu": "Reported in a listening test (2026-11-20): Settings did not come back after relaunching. Investigation: Felucca keeps only user presets saved with SAVE, OCT+, OCT+ (it always starts on its first factory sound); its saves work through the app (automated). Save timing in the emulator integration was also fixed. Awaiting a retest."
-    }
-   },
+   "listed": "2026-10-08",
    "listened": [
     {
      "app": "FM-1 Pocket 0.1.0 build 34",
@@ -3800,8 +4300,39 @@
      "player": "mac",
      "verdict": "problems",
      "who": "Dean"
+    },
+    {
+     "app": "FM-1 Pocket 0.1.0 build 37",
+     "area": "saves",
+     "build": "770ea7c756088d08ac59a193f1ae78126476c3c8251a86938c837ead5ab0048a",
+     "date": "2026-11-21",
+     "engine": "fm1-emu",
+     "firmware": "felucca",
+     "machine": "MacBook (Apple M5)",
+     "notes": "A user preset saved with SAVE, OCT+, OCT+ came back after quitting and reopening; the .rfm1 build kept its own.",
+     "player": "mac",
+     "verdict": "good",
+     "who": "Dean"
+    },
+    {
+     "app": "FM-1 Pocket 0.1.0 build 37",
+     "area": "saves",
+     "build": "e37ac1af179a29c1445a4c876d134e4f37d6b4a6b4cde2661282c5e5857d9247",
+     "date": "2026-11-21",
+     "engine": "rfm1",
+     "firmware": "felucca",
+     "machine": "MacBook (Apple M5)",
+     "notes": "A user preset saved with SAVE, OCT+, OCT+ came back after quitting and reopening.",
+     "player": "mac",
+     "verdict": "good",
+     "who": "Dean"
     }
-   ]
+   ],
+   "release": {
+    "date": "2026-11-13T04:17:47Z",
+    "source": "The Firmware Hub",
+    "version": "1.8.2"
+   }
   },
   "felucca8": {
    "confidence": {
@@ -3849,7 +4380,13 @@
      }
     }
    },
-   "hubVersion": "1.8.5"
+   "hubVersion": "1.8.5",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-11-16T02:20:24Z",
+    "source": "The Firmware Hub",
+    "version": "1.8.5"
+   }
   },
   "fernbedienung": {
    "confidence": {
@@ -3893,7 +4430,13 @@
      }
     }
    },
-   "hubVersion": "1.1"
+   "hubVersion": "1.1",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-18T15:53:18Z",
+    "source": "The Firmware Hub",
+    "version": "1.1"
+   }
   },
   "fimba": {
    "confidence": {
@@ -3946,7 +4489,13 @@
      }
     }
    },
-   "hubVersion": "0.7.0"
+   "hubVersion": "0.7.0",
+   "listed": "2026-10-08",
+   "release": {
+    "date": "2026-11-09T18:42:00Z",
+    "source": "The Firmware Hub",
+    "version": "0.7.0"
+   }
   },
   "fizz": {
    "confidence": {
@@ -3997,7 +4546,13 @@
      }
     }
    },
-   "hubVersion": "0.13.0"
+   "hubVersion": "0.13.0",
+   "listed": "2026-10-25",
+   "release": {
+    "date": "2026-11-15T21:31:36Z",
+    "source": "The Firmware Hub",
+    "version": "0.13.0"
+   }
   },
   "floyd": {
    "confidence": {
@@ -4044,7 +4599,22 @@
      }
     }
    },
-   "hubVersion": "2.4"
+   "hubVersion": "2.4",
+   "listed": "2026-10-09",
+   "release": {
+    "date": "2026-10-06T05:41:45Z",
+    "source": "The Firmware Hub",
+    "version": "2.4"
+   }
+  },
+  "flyfish": {
+   "hubVersion": "1.1.1-fc4974e",
+   "listed": "2026-10-20",
+   "release": {
+    "date": "2026-11-08T18:39:04Z",
+    "source": "The Firmware Hub",
+    "version": "1.1.1-fc4974e"
+   }
   },
   "fm106": {
    "confidence": {
@@ -4092,7 +4662,13 @@
      }
     }
    },
-   "hubVersion": "1.02"
+   "hubVersion": "1.02",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-11-14T22:27:01Z",
+    "source": "The Firmware Hub",
+    "version": "1.02"
+   }
   },
   "fm1amy": {
    "confidence": {
@@ -4140,7 +4716,13 @@
      }
     }
    },
-   "hubVersion": "0.1.0"
+   "hubVersion": "0.1.0",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-10T14:03:17Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.0"
+   }
   },
   "fm1dock": {
    "confidence": {
@@ -4188,7 +4770,13 @@
      }
     }
    },
-   "hubVersion": "0.9.0"
+   "hubVersion": "0.9.0",
+   "listed": "2026-11-01",
+   "release": {
+    "date": "2026-11-15T10:37:13Z",
+    "source": "The Firmware Hub",
+    "version": "0.9.0"
+   }
   },
   "fm1gm": {
    "confidence": {
@@ -4236,7 +4824,13 @@
      }
     }
    },
-   "hubVersion": "1.2.0"
+   "hubVersion": "1.2.0",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-11-08T11:33:57Z",
+    "source": "The Firmware Hub",
+    "version": "1.2.0"
+   }
   },
   "fm1midimania": {
    "confidence": {
@@ -4284,7 +4878,13 @@
      }
     }
    },
-   "hubVersion": "0.9.2"
+   "hubVersion": "0.9.2",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-17T07:30:27Z",
+    "source": "The Firmware Hub",
+    "version": "0.9.2"
+   }
   },
   "fm1quest": {
    "confidence": {
@@ -4332,7 +4932,13 @@
      }
     }
    },
-   "hubVersion": "43"
+   "hubVersion": "43",
+   "listed": "2026-10-18",
+   "release": {
+    "date": "2026-11-02T19:23:53Z",
+    "source": "The Firmware Hub",
+    "version": "43"
+   }
   },
   "fm1tonic": {
    "confidence": {
@@ -4379,7 +4985,13 @@
      }
     }
    },
-   "hubVersion": "1.7"
+   "hubVersion": "1.7",
+   "listed": "2026-11-18",
+   "release": {
+    "date": "2026-11-18T21:20:14Z",
+    "source": "The Firmware Hub",
+    "version": "1.7"
+   }
   },
   "fm1yoga": {
    "confidence": {
@@ -4428,7 +5040,13 @@
      }
     }
    },
-   "hubVersion": "1.0"
+   "hubVersion": "1.0",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-13T21:25:18Z",
+    "source": "The Firmware Hub",
+    "version": "1.0"
+   }
   },
   "fm1zx": {
    "confidence": {
@@ -4472,7 +5090,13 @@
      }
     }
    },
-   "hubVersion": "1.2.0"
+   "hubVersion": "1.2.0",
+   "listed": "2026-11-18",
+   "release": {
+    "date": "2026-11-19T20:22:23Z",
+    "source": "The Firmware Hub",
+    "version": "1.2.0"
+   }
   },
   "fmav1": {
    "confidence": {
@@ -4524,7 +5148,22 @@
      }
     }
    },
-   "hubVersion": "0.6.3"
+   "hubVersion": "0.6.3",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-19T17:36:31Z",
+    "source": "The Firmware Hub",
+    "version": "0.6.3"
+   }
+  },
+  "fmdj": {
+   "hubVersion": "2026.10.22",
+   "listed": "2026-10-29",
+   "release": {
+    "date": "2026-10-22T10:10:13Z",
+    "source": "The Firmware Hub",
+    "version": "2026.10.22"
+   }
   },
   "fmel1": {
    "emu": {
@@ -4560,7 +5199,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "1.3"
+   "hubVersion": "1.3",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-11-10T10:38:55Z",
+    "source": "The Firmware Hub",
+    "version": "1.3"
+   }
   },
   "fmfam": {
    "confidence": {
@@ -4608,7 +5253,13 @@
      }
     }
    },
-   "hubVersion": "0.3.1"
+   "hubVersion": "0.3.1",
+   "listed": "2026-11-10",
+   "release": {
+    "date": "2026-11-12T18:16:31Z",
+    "source": "The Firmware Hub",
+    "version": "0.3.1"
+   }
   },
   "fmini": {
    "confidence": {
@@ -4659,7 +5310,13 @@
      }
     }
    },
-   "hubVersion": "2.6.0"
+   "hubVersion": "2.6.0",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-11-15T23:43:19Z",
+    "source": "The Firmware Hub",
+    "version": "2.6.0"
+   }
   },
   "fmkick": {
    "confidence": {
@@ -4712,7 +5369,13 @@
      }
     }
    },
-   "hubVersion": "0.5.1"
+   "hubVersion": "0.5.1",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-19T13:54:24Z",
+    "source": "The Firmware Hub",
+    "version": "0.5.1"
+   }
   },
   "fmlarynx": {
    "confidence": {
@@ -4765,7 +5428,13 @@
      }
     }
    },
-   "hubVersion": "0.4.2"
+   "hubVersion": "0.4.2",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-15T11:29:14Z",
+    "source": "The Firmware Hub",
+    "version": "0.4.2"
+   }
   },
   "fomajam": {
    "confidence": {
@@ -4814,7 +5483,13 @@
      }
     }
    },
-   "hubVersion": "0.1.12"
+   "hubVersion": "0.1.12",
+   "listed": "2026-10-16",
+   "release": {
+    "date": "2026-11-10T02:31:16Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.12"
+   }
   },
   "fomni": {
    "confidence": {
@@ -4867,7 +5542,13 @@
      }
     }
    },
-   "hubVersion": "0.4.1"
+   "hubVersion": "0.4.1",
+   "listed": "2026-10-08",
+   "release": {
+    "date": "2026-11-05T19:44:56Z",
+    "source": "The Firmware Hub",
+    "version": "0.4.1"
+   }
   },
   "frasil": {
    "emu": {
@@ -4903,7 +5584,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "3.3.1"
+   "hubVersion": "3.3.1",
+   "listed": "2026-10-23",
+   "release": {
+    "date": "2026-11-14T02:43:38Z",
+    "source": "The Firmware Hub",
+    "version": "3.3.1"
+   }
   },
   "frodhes": {
    "confidence": {
@@ -4949,7 +5636,13 @@
      }
     }
    },
-   "hubVersion": "0.9.11"
+   "hubVersion": "0.9.11",
+   "listed": "2026-10-16",
+   "release": {
+    "date": "2026-11-12T11:36:41Z",
+    "source": "The Firmware Hub",
+    "version": "0.9.11"
+   }
   },
   "fumi": {
    "confidence": {
@@ -4997,7 +5690,13 @@
      }
     }
    },
-   "hubVersion": "1.1.1"
+   "hubVersion": "1.1.1",
+   "listed": "2026-10-12",
+   "release": {
+    "date": "2026-11-18T11:14:02Z",
+    "source": "The Firmware Hub",
+    "version": "1.1.1"
+   }
   },
   "gammawave": {
    "confidence": {
@@ -5046,7 +5745,13 @@
      }
     }
    },
-   "hubVersion": "1.2.1-GW"
+   "hubVersion": "1.2.1-GW",
+   "listed": "2026-10-16",
+   "release": {
+    "date": "2026-10-26T21:14:32Z",
+    "source": "The Firmware Hub",
+    "version": "1.2.1-GW"
+   }
   },
   "gator": {
    "confidence": {
@@ -5095,7 +5800,13 @@
      }
     }
    },
-   "hubVersion": "0.6"
+   "hubVersion": "0.6",
+   "listed": "2026-10-26",
+   "release": {
+    "date": "2026-10-17T08:08:28Z",
+    "source": "The Firmware Hub",
+    "version": "0.6"
+   }
   },
   "ghoulbox": {
    "confidence": {
@@ -5148,7 +5859,13 @@
      }
     }
    },
-   "hubVersion": "2.4"
+   "hubVersion": "2.4",
+   "listed": "2026-10-09",
+   "release": {
+    "date": "2026-10-24T11:29:25Z",
+    "source": "The Firmware Hub",
+    "version": "2.4"
+   }
   },
   "glitch": {
    "confidence": {
@@ -5201,7 +5918,13 @@
      }
     }
    },
-   "hubVersion": "2.0.2"
+   "hubVersion": "2.0.2",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-15T19:55:35Z",
+    "source": "The Firmware Hub",
+    "version": "2.0.2"
+   }
   },
   "golana": {
    "confidence": {
@@ -5252,7 +5975,13 @@
      }
     }
    },
-   "hubVersion": "1.3"
+   "hubVersion": "1.3",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-10-26T11:17:04Z",
+    "source": "The Firmware Hub",
+    "version": "1.3"
+   }
   },
   "golanadz": {
    "confidence": {
@@ -5299,7 +6028,13 @@
      }
     }
    },
-   "hubVersion": "0.1.0-beta"
+   "hubVersion": "0.1.0-beta",
+   "listed": "2026-10-22",
+   "release": {
+    "date": "2026-10-17T00:04:09Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.0-beta"
+   }
   },
   "golf": {
    "confidence": {
@@ -5351,7 +6086,13 @@
      }
     }
    },
-   "hubVersion": "1.0"
+   "hubVersion": "1.0",
+   "listed": "2026-11-14",
+   "release": {
+    "date": "2026-11-14T21:04:31Z",
+    "source": "The Firmware Hub",
+    "version": "1.0"
+   }
   },
   "grimm": {
    "confidence": {
@@ -5404,7 +6145,13 @@
      }
     }
    },
-   "hubVersion": "2.0.2"
+   "hubVersion": "2.0.2",
+   "listed": "2026-10-18",
+   "release": {
+    "date": "2026-11-03T19:19:44Z",
+    "source": "The Firmware Hub",
+    "version": "2.0.2"
+   }
   },
   "guitchordi": {
    "confidence": {
@@ -5456,7 +6203,13 @@
      }
     }
    },
-   "hubVersion": "0.1.0-beta.1"
+   "hubVersion": "0.1.0-beta.1",
+   "listed": "2026-10-27",
+   "release": {
+    "date": "2026-10-26T21:21:21Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.0-beta.1"
+   }
   },
   "guru600": {
    "confidence": {
@@ -5502,7 +6255,13 @@
      }
     }
    },
-   "hubVersion": "1.3.1"
+   "hubVersion": "1.3.1",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-19T14:42:33Z",
+    "source": "The Firmware Hub",
+    "version": "1.3.1"
+   }
   },
   "hadal1": {
    "confidence": {
@@ -5556,7 +6315,13 @@
      }
     }
    },
-   "hubVersion": "1.0.1"
+   "hubVersion": "1.0.1",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-15T18:55:27Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1"
+   }
   },
   "hawkchua": {
    "confidence": {
@@ -5607,7 +6372,13 @@
      }
     }
    },
-   "hubVersion": "2.1.7"
+   "hubVersion": "2.1.7",
+   "listed": "2026-10-30",
+   "release": {
+    "date": "2026-11-15T17:08:01Z",
+    "source": "The Firmware Hub",
+    "version": "2.1.7"
+   }
   },
   "hera": {
    "confidence": {
@@ -5655,14 +6426,20 @@
      }
     }
    },
-   "hubVersion": "1.1"
+   "hubVersion": "1.1",
+   "listed": "2026-10-23",
+   "release": {
+    "date": "2026-10-21T22:10:27Z",
+    "source": "The Firmware Hub",
+    "version": "1.1"
+   }
   },
   "hortator": {
    "confidence": {
     "mac": {
      "fm1-emu": {
-      "level": "known-issue",
-      "note": "Reported in a listening test (2026-11-20): No sound from the original package. Investigation: it starts with an empty pattern, so PLAY plays silence until steps are entered; with steps entered it plays through the app's own path (automated). Awaiting a listening retest."
+      "level": "listened",
+      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-21 (FM-1 Pocket 0.1.0 build 37)."
      },
      "rfm1": {
       "level": "listened",
@@ -5700,17 +6477,13 @@
     },
     "preferred": {
      "mac": {
-      "engine": "rfm1",
-      "reason": "The .rfm1 build is used first until a listening test confirms the original package in the app (its pattern starts empty, so PLAY is silent until steps are entered)."
+      "engine": "fm1-emu",
+      "reason": "The .rfm1 build did not pass every automated check here."
      }
     }
    },
    "hubVersion": "1.0.1",
-   "knownIssues": {
-    "mac": {
-     "fm1-emu": "Reported in a listening test (2026-11-20): No sound from the original package. Investigation: it starts with an empty pattern, so PLAY plays silence until steps are entered; with steps entered it plays through the app's own path (automated). Awaiting a listening retest."
-    }
-   },
+   "listed": "2026-10-08",
    "listened": [
     {
      "app": "FM-1 Pocket 0.1.0 build 34",
@@ -5737,8 +6510,26 @@
      "player": "mac",
      "verdict": "problems",
      "who": "Dean"
+    },
+    {
+     "app": "FM-1 Pocket 0.1.0 build 37",
+     "area": "sound",
+     "build": "ac81af292e035ee0c4b8b7ab3a78b942e4f03deee31ae213a2613c743cd9110f",
+     "date": "2026-11-21",
+     "engine": "fm1-emu",
+     "firmware": "hortator",
+     "machine": "MacBook (Apple M5)",
+     "notes": "With four steps entered on the keys, PLAY played the beat.",
+     "player": "mac",
+     "verdict": "good",
+     "who": "Dean"
     }
-   ]
+   ],
+   "release": {
+    "date": "2026-11-03T23:10:49Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1"
+   }
   },
   "hortator-bt": {
    "confidence": {
@@ -5784,7 +6575,13 @@
      }
     }
    },
-   "hubVersion": "1.0.1"
+   "hubVersion": "1.0.1",
+   "listed": "2026-10-28",
+   "release": {
+    "date": "2026-11-03T23:10:49Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1"
+   }
   },
   "hungrytravis": {
    "confidence": {
@@ -5833,7 +6630,13 @@
      }
     }
    },
-   "hubVersion": "2026.11.10"
+   "hubVersion": "2026.11.10",
+   "listed": "2026-11-10",
+   "release": {
+    "date": "2026-11-10T02:06:31Z",
+    "source": "The Firmware Hub",
+    "version": "2026.11.10"
+   }
   },
   "hyp1": {
    "confidence": {
@@ -5844,7 +6647,13 @@
      }
     }
    },
-   "hubVersion": "1.5.70"
+   "hubVersion": "1.5.70",
+   "listed": "2026-10-15",
+   "release": {
+    "date": "2026-11-17T20:28:09Z",
+    "source": "The Firmware Hub",
+    "version": "1.5.70"
+   }
   },
   "j6": {
    "confidence": {
@@ -5892,7 +6701,13 @@
      }
     }
    },
-   "hubVersion": "1.4.0"
+   "hubVersion": "1.4.0",
+   "listed": "2026-10-27",
+   "release": {
+    "date": "2026-10-29T19:58:58Z",
+    "source": "The Firmware Hub",
+    "version": "1.4.0"
+   }
   },
   "jam": {
    "confidence": {
@@ -5941,7 +6756,13 @@
      }
     }
    },
-   "hubVersion": "1.2.0"
+   "hubVersion": "1.2.0",
+   "listed": "2026-10-30",
+   "release": {
+    "date": "2026-10-29T14:13:28Z",
+    "source": "The Firmware Hub",
+    "version": "1.2.0"
+   }
   },
   "jamesos": {
    "confidence": {
@@ -5952,7 +6773,8 @@
      }
     }
    },
-   "hubVersion": null
+   "hubVersion": null,
+   "listed": "2026-11-19"
   },
   "jamtrack": {
    "confidence": {
@@ -6001,7 +6823,13 @@
      }
     }
    },
-   "hubVersion": "0.2.3"
+   "hubVersion": "0.2.3",
+   "listed": "2026-11-10",
+   "release": {
+    "date": "2026-11-09T18:58:06Z",
+    "source": "The Firmware Hub",
+    "version": "0.2.3"
+   }
   },
   "jangada": {
    "confidence": {
@@ -6049,7 +6877,13 @@
      }
     }
    },
-   "hubVersion": "1.0.1"
+   "hubVersion": "1.0.1",
+   "listed": "2026-10-08",
+   "release": {
+    "date": "2026-10-16T13:17:09Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1"
+   }
   },
   "jiant": {
    "confidence": {
@@ -6060,7 +6894,13 @@
      }
     }
    },
-   "hubVersion": "V10.7.58"
+   "hubVersion": "V10.7.58",
+   "listed": "2026-10-10",
+   "release": {
+    "date": "2026-11-20T03:45:57Z",
+    "source": "The Firmware Hub",
+    "version": "V10.7.58"
+   }
   },
   "juicy": {
    "confidence": {
@@ -6107,7 +6947,13 @@
      }
     }
    },
-   "hubVersion": "0.1"
+   "hubVersion": "0.1",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-15T15:27:37Z",
+    "source": "The Firmware Hub",
+    "version": "0.1"
+   }
   },
   "karma": {
    "emu": {
@@ -6143,7 +6989,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "3.1.5"
+   "hubVersion": "3.1.5",
+   "listed": "2026-10-30",
+   "release": {
+    "date": "2026-11-17T15:57:51Z",
+    "source": "The Firmware Hub",
+    "version": "3.1.5"
+   }
   },
   "kawa": {
    "confidence": {
@@ -6189,7 +7041,13 @@
      }
     }
    },
-   "hubVersion": "0.9"
+   "hubVersion": "0.9",
+   "listed": "2026-10-20",
+   "release": {
+    "date": "2026-11-09T02:08:10Z",
+    "source": "The Firmware Hub",
+    "version": "0.9"
+   }
   },
   "keystepone": {
    "confidence": {
@@ -6238,7 +7096,13 @@
      }
     }
    },
-   "hubVersion": "0.5.42"
+   "hubVersion": "0.5.42",
+   "listed": "2026-11-10",
+   "release": {
+    "date": "2026-11-10T11:34:04Z",
+    "source": "The Firmware Hub",
+    "version": "0.5.42"
+   }
   },
   "kitten": {
    "confidence": {
@@ -6286,7 +7150,13 @@
      }
     }
    },
-   "hubVersion": "2.8-kitten.13"
+   "hubVersion": "2.8-kitten.13",
+   "listed": "2026-10-28",
+   "release": {
+    "date": "2026-11-20T04:28:11Z",
+    "source": "The Firmware Hub",
+    "version": "2.8-kitten.13"
+   }
   },
   "kittenrack": {
    "confidence": {
@@ -6333,7 +7203,13 @@
      }
     }
    },
-   "hubVersion": "1.5.0"
+   "hubVersion": "1.5.0",
+   "listed": "2026-11-02",
+   "release": {
+    "date": "2026-11-15T23:00:10Z",
+    "source": "The Firmware Hub",
+    "version": "1.5.0"
+   }
   },
   "kriechstrom": {
    "confidence": {
@@ -6382,7 +7258,13 @@
      }
     }
    },
-   "hubVersion": "0.5.2"
+   "hubVersion": "0.5.2",
+   "listed": "2026-11-12",
+   "release": {
+    "date": "2026-11-20T01:48:39Z",
+    "source": "The Firmware Hub",
+    "version": "0.5.2"
+   }
   },
   "kris_jangle": {
    "confidence": {
@@ -6435,7 +7317,13 @@
      }
     }
    },
-   "hubVersion": "0.15"
+   "hubVersion": "0.15",
+   "listed": "2026-11-10",
+   "release": {
+    "date": "2026-11-19T18:52:03Z",
+    "source": "The Firmware Hub",
+    "version": "0.15"
+   }
   },
   "kurzhaar": {
    "confidence": {
@@ -6483,7 +7371,13 @@
      }
     }
    },
-   "hubVersion": "1.1"
+   "hubVersion": "1.1",
+   "listed": "2026-11-15",
+   "release": {
+    "date": "2026-11-14T22:20:47Z",
+    "source": "The Firmware Hub",
+    "version": "1.1"
+   }
   },
   "kwasub": {
    "confidence": {
@@ -6535,7 +7429,13 @@
      }
     }
    },
-   "hubVersion": "1.2.1b"
+   "hubVersion": "1.2.1b",
+   "listed": "2026-10-29",
+   "release": {
+    "date": "2026-11-18T03:40:02Z",
+    "source": "The Firmware Hub",
+    "version": "1.2.1b"
+   }
   },
   "loafbreaker": {
    "emu": {
@@ -6570,7 +7470,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "0.9.69"
+   "hubVersion": "0.9.69",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-18T10:14:39Z",
+    "source": "The Firmware Hub",
+    "version": "0.9.69"
+   }
   },
   "loom": {
    "emu": {
@@ -6604,7 +7510,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "0.17"
+   "hubVersion": "0.17",
+   "listed": "2026-10-22",
+   "release": {
+    "date": "2026-11-19T16:45:39Z",
+    "source": "The Firmware Hub",
+    "version": "0.17"
+   }
   },
   "loomfm1": {
    "confidence": {
@@ -6652,7 +7564,13 @@
      }
     }
    },
-   "hubVersion": "0.1.0"
+   "hubVersion": "0.1.0",
+   "listed": "2026-10-26",
+   "release": {
+    "date": "2026-10-18T14:35:38Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.0"
+   }
   },
   "loopheads": {
    "confidence": {
@@ -6700,7 +7618,13 @@
      }
     }
    },
-   "hubVersion": "0.1.2"
+   "hubVersion": "0.1.2",
+   "listed": "2026-11-19",
+   "release": {
+    "date": "2026-11-19T03:23:43Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.2"
+   }
   },
   "lrry": {
    "confidence": {
@@ -6749,7 +7673,13 @@
      }
     }
    },
-   "hubVersion": "0.1.0-beta"
+   "hubVersion": "0.1.0-beta",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-13T13:50:42Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.0-beta"
+   }
   },
   "lsdjburrito": {
    "confidence": {
@@ -6798,6 +7728,21 @@
     "mac": {
      "fm1-emu": "Plays only an LSDJ song sent over USB from its web page, which neither player can do."
     }
+   },
+   "listed": "2026-10-31",
+   "release": {
+    "date": "2026-11-08T17:44:49Z",
+    "source": "The Firmware Hub",
+    "version": "0.9.97"
+   }
+  },
+  "luxr": {
+   "hubVersion": "2026.11.02",
+   "listed": "2026-10-29",
+   "release": {
+    "date": "2026-11-02T21:01:56Z",
+    "source": "The Firmware Hub",
+    "version": "2026.11.02"
    }
   },
   "makohai": {
@@ -6847,7 +7792,13 @@
      }
     }
    },
-   "hubVersion": "1.4"
+   "hubVersion": "1.4",
+   "listed": "2026-10-25",
+   "release": {
+    "date": "2026-11-04T22:22:45Z",
+    "source": "The Firmware Hub",
+    "version": "1.4"
+   }
   },
   "maku": {
    "confidence": {
@@ -6896,7 +7847,13 @@
      }
     }
    },
-   "hubVersion": "1.0"
+   "hubVersion": "1.0",
+   "listed": "2026-10-12",
+   "release": {
+    "date": "2026-10-16T06:04:51Z",
+    "source": "The Firmware Hub",
+    "version": "1.0"
+   }
   },
   "manifold": {
    "confidence": {
@@ -6945,7 +7902,13 @@
      }
     }
    },
-   "hubVersion": "1.0.6"
+   "hubVersion": "1.0.6",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-19T16:53:07Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.6"
+   }
   },
   "manta": {
    "confidence": {
@@ -6994,7 +7957,13 @@
      }
     }
    },
-   "hubVersion": "1.1"
+   "hubVersion": "1.1",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-15T22:28:28Z",
+    "source": "The Firmware Hub",
+    "version": "1.1"
+   }
   },
   "matryoshka": {
    "confidence": {
@@ -7046,7 +8015,13 @@
      }
     }
    },
-   "hubVersion": "1.22.0"
+   "hubVersion": "1.22.0",
+   "listed": "2026-10-26",
+   "release": {
+    "date": "2026-11-20T01:23:14Z",
+    "source": "The Firmware Hub",
+    "version": "1.22.0"
+   }
   },
   "mc1": {
    "confidence": {
@@ -7095,7 +8070,13 @@
      }
     }
    },
-   "hubVersion": "1.2.0"
+   "hubVersion": "1.2.0",
+   "listed": "2026-10-16",
+   "release": {
+    "date": "2026-10-20T15:51:04Z",
+    "source": "The Firmware Hub",
+    "version": "1.2.0"
+   }
   },
   "melodee": {
    "confidence": {
@@ -7148,7 +8129,13 @@
      }
     }
    },
-   "hubVersion": "1.6.1"
+   "hubVersion": "1.6.1",
+   "listed": "2026-10-08",
+   "release": {
+    "date": "2026-11-02T22:18:38Z",
+    "source": "The Firmware Hub",
+    "version": "1.6.1"
+   }
   },
   "metronome": {
    "confidence": {
@@ -7194,7 +8181,13 @@
      }
     }
    },
-   "hubVersion": "0.3"
+   "hubVersion": "0.3",
+   "listed": "2026-11-19",
+   "release": {
+    "date": "2026-11-19T21:11:14Z",
+    "source": "The Firmware Hub",
+    "version": "0.3"
+   }
   },
   "midimon": {
    "confidence": {
@@ -7243,6 +8236,12 @@
     "mac": {
      "fm1-emu": "A MIDI monitor: it shows MIDI, it does not make sound."
     }
+   },
+   "listed": "2026-10-25",
+   "release": {
+    "date": "2026-11-08T03:47:09Z",
+    "source": "The Firmware Hub",
+    "version": "0.5"
    }
   },
   "mightyarp": {
@@ -7295,7 +8294,13 @@
      }
     }
    },
-   "hubVersion": "1.5"
+   "hubVersion": "1.5",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-16T17:06:43Z",
+    "source": "The Firmware Hub",
+    "version": "1.5"
+   }
   },
   "mikufm": {
    "confidence": {
@@ -7344,7 +8349,13 @@
      }
     }
    },
-   "hubVersion": "0.9"
+   "hubVersion": "0.9",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-19T15:01:41Z",
+    "source": "The Firmware Hub",
+    "version": "0.9"
+   }
   },
   "min1": {
    "confidence": {
@@ -7393,7 +8404,13 @@
      }
     }
    },
-   "hubVersion": "0.2.1"
+   "hubVersion": "0.2.1",
+   "listed": "2026-10-16",
+   "release": {
+    "date": "2026-10-16T03:14:29Z",
+    "source": "The Firmware Hub",
+    "version": "0.2.1"
+   }
   },
   "minigrain": {
    "confidence": {
@@ -7441,7 +8458,13 @@
      }
     }
    },
-   "hubVersion": "1.0.0"
+   "hubVersion": "1.0.0",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-15T06:50:44Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.0"
+   }
   },
   "miniju08": {
    "confidence": {
@@ -7489,7 +8512,13 @@
      }
     }
    },
-   "hubVersion": "08-1.00"
+   "hubVersion": "08-1.00",
+   "listed": "2026-11-12",
+   "release": {
+    "date": "2026-11-11T06:42:57Z",
+    "source": "The Firmware Hub",
+    "version": "08-1.00"
+   }
   },
   "minitone": {
    "confidence": {
@@ -7541,7 +8570,13 @@
      }
     }
    },
-   "hubVersion": "1.0.5"
+   "hubVersion": "1.0.5",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-10-26T10:13:19Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.5"
+   }
   },
   "mnm1": {
    "confidence": {
@@ -7591,7 +8626,13 @@
      }
     }
    },
-   "hubVersion": "1.0.1"
+   "hubVersion": "1.0.1",
+   "listed": "2026-10-27",
+   "release": {
+    "date": "2026-10-27T12:53:48Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1"
+   }
   },
   "modelar": {
    "confidence": {
@@ -7639,7 +8680,13 @@
      }
     }
    },
-   "hubVersion": "0.3"
+   "hubVersion": "0.3",
+   "listed": "2026-10-22",
+   "release": {
+    "date": "2026-10-22T12:28:20Z",
+    "source": "The Firmware Hub",
+    "version": "0.3"
+   }
   },
   "modularkoi": {
    "confidence": {
@@ -7650,7 +8697,8 @@
      }
     }
    },
-   "hubVersion": null
+   "hubVersion": null,
+   "listed": "2026-11-19"
   },
   "monk": {
    "confidence": {
@@ -7699,7 +8747,13 @@
      }
     }
    },
-   "hubVersion": "0.10"
+   "hubVersion": "0.10",
+   "listed": "2026-10-22",
+   "release": {
+    "date": "2026-11-05T20:03:44Z",
+    "source": "The Firmware Hub",
+    "version": "0.10"
+   }
   },
   "mono2k": {
    "confidence": {
@@ -7753,7 +8807,13 @@
      }
     }
    },
-   "hubVersion": "1.12"
+   "hubVersion": "1.12",
+   "listed": "2026-10-25",
+   "release": {
+    "date": "2026-11-18T10:37:12Z",
+    "source": "The Firmware Hub",
+    "version": "1.12"
+   }
   },
   "monohull": {
    "confidence": {
@@ -7801,7 +8861,13 @@
      }
     }
    },
-   "hubVersion": "0.2.0"
+   "hubVersion": "0.2.0",
+   "listed": "2026-10-26",
+   "release": {
+    "date": "2026-10-25T10:19:58Z",
+    "source": "The Firmware Hub",
+    "version": "0.2.0"
+   }
   },
   "mope1": {
    "confidence": {
@@ -7854,7 +8920,22 @@
      }
     }
    },
-   "hubVersion": "0.4.1"
+   "hubVersion": "0.4.1",
+   "listed": "2026-10-27",
+   "release": {
+    "date": "2026-11-07T20:58:23Z",
+    "source": "The Firmware Hub",
+    "version": "0.4.1"
+   }
+  },
+  "morpheus": {
+   "hubVersion": "1.0.0",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-10-19T17:04:13Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.0"
+   }
   },
   "morse": {
    "confidence": {
@@ -7904,7 +8985,13 @@
      }
     }
    },
-   "hubVersion": "0.8"
+   "hubVersion": "0.8",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-18T11:49:36Z",
+    "source": "The Firmware Hub",
+    "version": "0.8"
+   }
   },
   "moss1": {
    "confidence": {
@@ -7953,7 +9040,13 @@
      }
     }
    },
-   "hubVersion": "1.0"
+   "hubVersion": "1.0",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-14T02:27:45Z",
+    "source": "The Firmware Hub",
+    "version": "1.0"
+   }
   },
   "mpyre": {
    "emu": {
@@ -7985,7 +9078,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "1.0.3"
+   "hubVersion": "1.0.3",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-10T19:43:30Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.3"
+   }
   },
   "mutabledreams": {
    "confidence": {
@@ -8038,7 +9137,13 @@
      }
     }
    },
-   "hubVersion": "2.3"
+   "hubVersion": "2.3",
+   "listed": "2026-10-20",
+   "release": {
+    "date": "2026-11-16T20:40:12Z",
+    "source": "The Firmware Hub",
+    "version": "2.3"
+   }
   },
   "mvance": {
    "confidence": {
@@ -8086,7 +9191,13 @@
      }
     }
    },
-   "hubVersion": "2.6.3"
+   "hubVersion": "2.6.3",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-17T22:01:39Z",
+    "source": "The Firmware Hub",
+    "version": "2.6.3"
+   }
   },
   "mvsynth2": {
    "confidence": {
@@ -8138,7 +9249,13 @@
      }
     }
    },
-   "hubVersion": "1.5.2"
+   "hubVersion": "1.5.2",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-19T23:40:30Z",
+    "source": "The Firmware Hub",
+    "version": "1.5.2"
+   }
   },
   "mycelium": {
    "confidence": {
@@ -8187,7 +9304,13 @@
      }
     }
    },
-   "hubVersion": "1.0-test"
+   "hubVersion": "1.0-test",
+   "listed": "2026-10-14",
+   "release": {
+    "date": "2026-10-14T06:04:02Z",
+    "source": "The Firmware Hub",
+    "version": "1.0-test"
+   }
   },
   "nachtfahrt": {
    "confidence": {
@@ -8240,7 +9363,13 @@
      }
     }
    },
-   "hubVersion": "1.0.2"
+   "hubVersion": "1.0.2",
+   "listed": "2026-10-29",
+   "release": {
+    "date": "2026-11-15T01:27:12Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.2"
+   }
   },
   "nauclerus": {
    "confidence": {
@@ -8286,7 +9415,13 @@
      }
     }
    },
-   "hubVersion": "1.0.0"
+   "hubVersion": "1.0.0",
+   "listed": "2026-10-28",
+   "release": {
+    "date": "2026-11-05T18:35:37Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.0"
+   }
   },
   "nccnovationcircuitcompan": {
    "confidence": {
@@ -8333,7 +9468,13 @@
      }
     }
    },
-   "hubVersion": "0.7"
+   "hubVersion": "0.7",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-15T10:17:41Z",
+    "source": "The Firmware Hub",
+    "version": "0.7"
+   }
   },
   "neon": {
    "confidence": {
@@ -8381,7 +9522,13 @@
      }
     }
    },
-   "hubVersion": "0.1"
+   "hubVersion": "0.1",
+   "listed": "2026-11-19",
+   "release": {
+    "date": "2026-11-19T03:46:39Z",
+    "source": "The Firmware Hub",
+    "version": "0.1"
+   }
   },
   "niagaradrift": {
    "confidence": {
@@ -8431,7 +9578,13 @@
      }
     }
    },
-   "hubVersion": "0.3.1"
+   "hubVersion": "0.3.1",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-11-17T15:32:38Z",
+    "source": "The Firmware Hub",
+    "version": "0.3.1"
+   }
   },
   "noizdemons": {
    "confidence": {
@@ -8479,7 +9632,22 @@
      }
     }
    },
-   "hubVersion": "666"
+   "hubVersion": "666",
+   "listed": "2026-10-15",
+   "release": {
+    "date": "2026-10-15T05:15:44Z",
+    "source": "The Firmware Hub",
+    "version": "666"
+   }
+  },
+  "nomansky": {
+   "hubVersion": "0.9",
+   "listed": "2026-10-18",
+   "release": {
+    "date": "2026-11-02T23:00:38Z",
+    "source": "The Firmware Hub",
+    "version": "0.9"
+   }
   },
   "obervave": {
    "confidence": {
@@ -8530,7 +9698,13 @@
      }
     }
    },
-   "hubVersion": "3.5.2"
+   "hubVersion": "3.5.2",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-11-13T09:51:03Z",
+    "source": "The Firmware Hub",
+    "version": "3.5.2"
+   }
   },
   "obssynth": {
    "confidence": {
@@ -8581,7 +9755,13 @@
      }
     }
    },
-   "hubVersion": "0.2.0"
+   "hubVersion": "0.2.0",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-15T20:56:24Z",
+    "source": "The Firmware Hub",
+    "version": "0.2.0"
+   }
   },
   "ombak": {
    "confidence": {
@@ -8630,7 +9810,13 @@
      }
     }
    },
-   "hubVersion": "1.2"
+   "hubVersion": "1.2",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-05T22:09:43Z",
+    "source": "The Firmware Hub",
+    "version": "1.2"
+   }
   },
   "opn1": {
    "confidence": {
@@ -8679,7 +9865,13 @@
      }
     }
    },
-   "hubVersion": "2.0.1"
+   "hubVersion": "2.0.1",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-11-13T14:00:32Z",
+    "source": "The Firmware Hub",
+    "version": "2.0.1"
+   }
   },
   "orbit": {
    "emu": {
@@ -8715,7 +9907,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "1.0.1B"
+   "hubVersion": "1.0.1B",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-11-04T11:39:31Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1B"
+   }
   },
   "orbita": {
    "confidence": {
@@ -8763,7 +9961,13 @@
      }
     }
    },
-   "hubVersion": "2.0.12"
+   "hubVersion": "2.0.12",
+   "listed": "2026-11-18",
+   "release": {
+    "date": "2026-11-19T21:16:19Z",
+    "source": "The Firmware Hub",
+    "version": "2.0.12"
+   }
   },
   "orgigs": {
    "confidence": {
@@ -8815,7 +10019,13 @@
      }
     }
    },
-   "hubVersion": "1.0.2"
+   "hubVersion": "1.0.2",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-16T11:45:07Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.2"
+   }
   },
   "paperlagoon": {
    "confidence": {
@@ -8864,7 +10074,13 @@
      }
     }
    },
-   "hubVersion": "1.1"
+   "hubVersion": "1.1",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-14T07:25:18Z",
+    "source": "The Firmware Hub",
+    "version": "1.1"
+   }
   },
   "patchwerk": {
    "confidence": {
@@ -8915,7 +10131,13 @@
      }
     }
    },
-   "hubVersion": "1.0.3"
+   "hubVersion": "1.0.3",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-08T20:47:24Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.3"
+   }
   },
   "penumbra": {
    "confidence": {
@@ -8968,7 +10190,13 @@
      }
     }
    },
-   "hubVersion": "1.8"
+   "hubVersion": "1.8",
+   "listed": "2026-10-30",
+   "release": {
+    "date": "2026-11-17T20:37:37Z",
+    "source": "The Firmware Hub",
+    "version": "1.8"
+   }
   },
   "perf1": {
    "confidence": {
@@ -9021,7 +10249,13 @@
      }
     }
    },
-   "hubVersion": "0.17.0"
+   "hubVersion": "0.17.0",
+   "listed": "2026-10-26",
+   "release": {
+    "date": "2026-11-07T21:10:58Z",
+    "source": "The Firmware Hub",
+    "version": "0.17.0"
+   }
   },
   "pigeon": {
    "confidence": {
@@ -9069,7 +10303,13 @@
      }
     }
    },
-   "hubVersion": "0.5.0-beta.1"
+   "hubVersion": "0.5.0-beta.1",
+   "listed": "2026-10-15",
+   "release": {
+    "date": "2026-10-21T18:40:27Z",
+    "source": "The Firmware Hub",
+    "version": "0.5.0-beta.1"
+   }
   },
   "pingos1": {
    "confidence": {
@@ -9119,7 +10359,13 @@
      }
     }
    },
-   "hubVersion": "1.0.0"
+   "hubVersion": "1.0.0",
+   "listed": "2026-11-19",
+   "release": {
+    "date": "2026-11-19T21:16:32Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.0"
+   }
   },
   "piterfly": {
    "confidence": {
@@ -9167,7 +10413,13 @@
      }
     }
    },
-   "hubVersion": "1.2.5"
+   "hubVersion": "1.2.5",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-17T23:28:30Z",
+    "source": "The Firmware Hub",
+    "version": "1.2.5"
+   }
   },
   "playa": {
    "confidence": {
@@ -9216,7 +10468,13 @@
      }
     }
    },
-   "hubVersion": "0.1"
+   "hubVersion": "0.1",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-10T21:29:11Z",
+    "source": "The Firmware Hub",
+    "version": "0.1"
+   }
   },
   "plissken": {
    "confidence": {
@@ -9263,7 +10521,13 @@
      }
     }
    },
-   "hubVersion": "0.14"
+   "hubVersion": "0.14",
+   "listed": "2026-11-18",
+   "release": {
+    "date": "2026-11-19T21:18:18Z",
+    "source": "The Firmware Hub",
+    "version": "0.14"
+   }
   },
   "pocketband": {
    "confidence": {
@@ -9311,7 +10575,13 @@
      }
     }
    },
-   "hubVersion": "0.4"
+   "hubVersion": "0.4",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-11T10:32:30Z",
+    "source": "The Firmware Hub",
+    "version": "0.4"
+   }
   },
   "polly": {
    "confidence": {
@@ -9360,7 +10630,13 @@
      }
     }
    },
-   "hubVersion": "0.6.4"
+   "hubVersion": "0.6.4",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-11-13T07:42:54Z",
+    "source": "The Firmware Hub",
+    "version": "0.6.4"
+   }
   },
   "pond": {
    "confidence": {
@@ -9413,7 +10689,31 @@
      }
     }
    },
-   "hubVersion": "0.1.2"
+   "hubVersion": "0.1.2",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-17T11:34:17Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.2"
+   }
+  },
+  "ptfm": {
+   "hubVersion": "0.26",
+   "listed": "2026-10-28",
+   "release": {
+    "date": "2026-10-28T16:32:31Z",
+    "source": "The Firmware Hub",
+    "version": "0.26"
+   }
+  },
+  "pulhra": {
+   "hubVersion": "1.5.1",
+   "listed": "2026-11-01",
+   "release": {
+    "date": "2026-10-22T17:19:15Z",
+    "source": "The Firmware Hub",
+    "version": "1.5.1"
+   }
   },
   "purplemonkey": {
    "confidence": {
@@ -9466,7 +10766,13 @@
      }
     }
    },
-   "hubVersion": "0.12"
+   "hubVersion": "0.12",
+   "listed": "2026-10-16",
+   "release": {
+    "date": "2026-11-08T10:33:54Z",
+    "source": "The Firmware Hub",
+    "version": "0.12"
+   }
   },
   "quantumgammawave": {
    "confidence": {
@@ -9517,7 +10823,13 @@
      }
     }
    },
-   "hubVersion": "1.5.15"
+   "hubVersion": "1.5.15",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-20T04:54:41Z",
+    "source": "The Firmware Hub",
+    "version": "1.5.15"
+   }
   },
   "quartet": {
    "confidence": {
@@ -9566,7 +10878,13 @@
      }
     }
    },
-   "hubVersion": "2.2"
+   "hubVersion": "2.2",
+   "listed": "2026-11-10",
+   "release": {
+    "date": "2026-11-19T23:00:38Z",
+    "source": "The Firmware Hub",
+    "version": "2.2"
+   }
   },
   "quartz": {
    "confidence": {
@@ -9618,7 +10936,22 @@
      }
     }
    },
-   "hubVersion": "0.8.2"
+   "hubVersion": "0.8.2",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-20T01:17:02Z",
+    "source": "The Firmware Hub",
+    "version": "0.8.2"
+   }
+  },
+  "rainbow": {
+   "hubVersion": "1.1.5-rb",
+   "listed": "2026-10-12",
+   "release": {
+    "date": "2026-11-17T19:54:05Z",
+    "source": "The Firmware Hub",
+    "version": "1.1.5-rb"
+   }
   },
   "rakt": {
    "confidence": {
@@ -9667,7 +11000,13 @@
      }
     }
    },
-   "hubVersion": "0.1.8"
+   "hubVersion": "0.1.8",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-13T18:16:55Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.8"
+   }
   },
   "rambeaver": {
    "confidence": {
@@ -9715,7 +11054,13 @@
      }
     }
    },
-   "hubVersion": "745-hub"
+   "hubVersion": "745-hub",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-11T02:49:33Z",
+    "source": "The Firmware Hub",
+    "version": "745-hub"
+   }
   },
   "ravel": {
    "confidence": {
@@ -9766,7 +11111,13 @@
      }
     }
    },
-   "hubVersion": "1.42.0"
+   "hubVersion": "1.42.0",
+   "listed": "2026-10-27",
+   "release": {
+    "date": "2026-11-17T11:58:42Z",
+    "source": "The Firmware Hub",
+    "version": "1.42.0"
+   }
   },
   "remotefm1": {
    "confidence": {
@@ -9818,7 +11169,13 @@
      }
     }
    },
-   "hubVersion": "0.4.0"
+   "hubVersion": "0.4.0",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-20T03:53:39Z",
+    "source": "The Firmware Hub",
+    "version": "0.4.0"
+   }
   },
   "rhythmer": {
    "emu": {
@@ -9853,7 +11210,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "0.1.1-beta3"
+   "hubVersion": "0.1.1-beta3",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-07T12:07:11Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.1-beta3"
+   }
   },
   "rhytmsec1": {
    "confidence": {
@@ -9900,7 +11263,13 @@
      }
     }
    },
-   "hubVersion": "1.4.2"
+   "hubVersion": "1.4.2",
+   "listed": "2026-11-12",
+   "release": {
+    "date": "2026-11-12T14:16:17Z",
+    "source": "The Firmware Hub",
+    "version": "1.4.2"
+   }
   },
   "ruido": {
    "emu": {
@@ -9938,7 +11307,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "0.7.1"
+   "hubVersion": "0.7.1",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-18T00:24:18Z",
+    "source": "The Firmware Hub",
+    "version": "0.7.1"
+   }
   },
   "rupture": {
    "confidence": {
@@ -9988,7 +11363,13 @@
      }
     }
    },
-   "hubVersion": "2.0.14"
+   "hubVersion": "2.0.14",
+   "listed": "2026-11-01",
+   "release": {
+    "date": "2026-11-17T22:42:36Z",
+    "source": "The Firmware Hub",
+    "version": "2.0.14"
+   }
   },
   "s1vave": {
    "confidence": {
@@ -10039,7 +11420,13 @@
      }
     }
    },
-   "hubVersion": "2.0.1"
+   "hubVersion": "2.0.1",
+   "listed": "2026-10-26",
+   "release": {
+    "date": "2026-11-13T18:44:32Z",
+    "source": "The Firmware Hub",
+    "version": "2.0.1"
+   }
   },
   "salt": {
    "confidence": {
@@ -10087,7 +11474,13 @@
      }
     }
    },
-   "hubVersion": "0.9-salt14"
+   "hubVersion": "0.9-salt14",
+   "listed": "2026-10-08",
+   "release": {
+    "date": "2026-10-05T06:28:31Z",
+    "source": "The Firmware Hub",
+    "version": "0.9-salt14"
+   }
   },
   "samsara": {
    "confidence": {
@@ -10140,7 +11533,13 @@
      }
     }
    },
-   "hubVersion": "1.0.0"
+   "hubVersion": "1.0.0",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-17T18:01:02Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.0"
+   }
   },
   "sardine": {
    "confidence": {
@@ -10189,7 +11588,13 @@
      }
     }
    },
-   "hubVersion": "1.0.6"
+   "hubVersion": "1.0.6",
+   "listed": "2026-11-09",
+   "release": {
+    "date": "2026-11-08T20:38:48Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.6"
+   }
   },
   "satie1": {
    "confidence": {
@@ -10238,7 +11643,13 @@
      }
     }
    },
-   "hubVersion": "0.1.3-beta"
+   "hubVersion": "0.1.3-beta",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-10T21:53:13Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.3-beta"
+   }
   },
   "scintilla": {
    "confidence": {
@@ -10286,7 +11697,13 @@
      }
     }
    },
-   "hubVersion": "0.3.2"
+   "hubVersion": "0.3.2",
+   "listed": "2026-11-01",
+   "release": {
+    "date": "2026-11-12T22:03:22Z",
+    "source": "The Firmware Hub",
+    "version": "0.3.2"
+   }
   },
   "shineon": {
    "confidence": {
@@ -10333,7 +11750,13 @@
      }
     }
    },
-   "hubVersion": "3.5"
+   "hubVersion": "3.5",
+   "listed": "2026-10-18",
+   "release": {
+    "date": "2026-11-12T07:07:13Z",
+    "source": "The Firmware Hub",
+    "version": "3.5"
+   }
   },
   "sid": {
    "confidence": {
@@ -10386,7 +11809,13 @@
      }
     }
    },
-   "hubVersion": "0.3"
+   "hubVersion": "0.3",
+   "listed": "2026-11-01",
+   "release": {
+    "date": "2026-10-25T22:08:25Z",
+    "source": "The Firmware Hub",
+    "version": "0.3"
+   }
   },
   "sid1": {
    "confidence": {
@@ -10439,7 +11868,13 @@
      }
     }
    },
-   "hubVersion": "1.0.1"
+   "hubVersion": "1.0.1",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-11-13T14:03:01Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1"
+   }
   },
   "sidj": {
    "confidence": {
@@ -10493,6 +11928,7 @@
      "fm1-emu": "The original package has no songs: they are sent over USB from the maker's page, which the players cannot do."
     }
    },
+   "listed": "2026-10-30",
    "listened": [
     {
      "app": "FM-1 Pocket 0.1.0 build 34",
@@ -10507,7 +11943,12 @@
      "verdict": "good",
      "who": "Dean"
     }
-   ]
+   ],
+   "release": {
+    "date": "2026-11-07T08:40:16Z",
+    "source": "The Firmware Hub",
+    "version": "1.5.1"
+   }
   },
   "sidou": {
    "confidence": {
@@ -10560,7 +12001,22 @@
      }
     }
    },
-   "hubVersion": "2.0.0"
+   "hubVersion": "2.0.0",
+   "listed": "2026-10-23",
+   "release": {
+    "date": "2026-11-18T19:35:02Z",
+    "source": "The Firmware Hub",
+    "version": "2.0.0"
+   }
+  },
+  "sill": {
+   "hubVersion": "1.0.4-c5cfe9e",
+   "listed": "2026-10-29",
+   "release": {
+    "date": "2026-11-13T17:04:06Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.4-c5cfe9e"
+   }
   },
   "skiff": {
    "confidence": {
@@ -10612,7 +12068,13 @@
      }
     }
    },
-   "hubVersion": "2.7"
+   "hubVersion": "2.7",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-11-17T00:14:54Z",
+    "source": "The Firmware Hub",
+    "version": "2.7"
+   }
   },
   "sloop": {
    "emu": {
@@ -10648,7 +12110,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "2.8.5"
+   "hubVersion": "2.8.5",
+   "listed": "2026-10-08",
+   "release": {
+    "date": "2026-11-04T02:36:41Z",
+    "source": "The Firmware Hub",
+    "version": "2.8.5"
+   }
   },
   "sloop3": {
    "confidence": {
@@ -10659,7 +12127,8 @@
      }
     }
    },
-   "hubVersion": null
+   "hubVersion": null,
+   "listed": "2026-11-19"
   },
   "sloopbanks": {
    "confidence": {
@@ -10707,7 +12176,13 @@
      }
     }
    },
-   "hubVersion": "2.5-b28-test"
+   "hubVersion": "2.5-b28-test",
+   "listed": "2026-10-09",
+   "release": {
+    "date": "2026-10-09T12:13:03Z",
+    "source": "The Firmware Hub",
+    "version": "2.5-b28-test"
+   }
   },
   "sloopdub": {
    "confidence": {
@@ -10755,7 +12230,13 @@
      }
     }
    },
-   "hubVersion": "1.7"
+   "hubVersion": "1.7",
+   "listed": "2026-11-11",
+   "release": {
+    "date": "2026-11-14T02:31:46Z",
+    "source": "The Firmware Hub",
+    "version": "1.7"
+   }
   },
   "sloopdx": {
    "confidence": {
@@ -10803,7 +12284,13 @@
      }
     }
    },
-   "hubVersion": "4.0.1"
+   "hubVersion": "4.0.1",
+   "listed": "2026-10-08",
+   "release": {
+    "date": "2026-11-03T10:20:59Z",
+    "source": "The Firmware Hub",
+    "version": "4.0.1"
+   }
   },
   "smileyface": {
    "confidence": {
@@ -10854,7 +12341,13 @@
      }
     }
    },
-   "hubVersion": "1.3.0-tutorialtime"
+   "hubVersion": "1.3.0-tutorialtime",
+   "listed": "2026-10-30",
+   "release": {
+    "date": "2026-11-14T02:31:05Z",
+    "source": "The Firmware Hub",
+    "version": "1.3.0-tutorialtime"
+   }
   },
   "spampy": {
    "confidence": {
@@ -10902,7 +12395,13 @@
      }
     }
    },
-   "hubVersion": "1.1-r058"
+   "hubVersion": "1.1-r058",
+   "listed": "2026-10-29",
+   "release": {
+    "date": "2026-11-15T15:05:56Z",
+    "source": "The Firmware Hub",
+    "version": "1.1-r058"
+   }
   },
   "speak37": {
    "confidence": {
@@ -10913,7 +12412,8 @@
      }
     }
    },
-   "hubVersion": null
+   "hubVersion": null,
+   "listed": "2026-11-19"
   },
   "spellbox": {
    "confidence": {
@@ -10966,7 +12466,13 @@
      }
     }
    },
-   "hubVersion": "0.3"
+   "hubVersion": "0.3",
+   "listed": "2026-10-29",
+   "release": {
+    "date": "2026-10-28T14:37:13Z",
+    "source": "The Firmware Hub",
+    "version": "0.3"
+   }
   },
   "splitmilk": {
    "confidence": {
@@ -11014,7 +12520,13 @@
      }
     }
    },
-   "hubVersion": "1.0"
+   "hubVersion": "1.0",
+   "listed": "2026-11-12",
+   "release": {
+    "date": "2026-11-11T23:57:11Z",
+    "source": "The Firmware Hub",
+    "version": "1.0"
+   }
   },
   "sq80": {
    "confidence": {
@@ -11062,7 +12574,13 @@
      }
     }
    },
-   "hubVersion": "0.14.0"
+   "hubVersion": "0.14.0",
+   "listed": "2026-11-19",
+   "release": {
+    "date": "2026-11-19T05:10:48Z",
+    "source": "The Firmware Hub",
+    "version": "0.14.0"
+   }
   },
   "stallion": {
    "confidence": {
@@ -11114,7 +12632,13 @@
      }
     }
    },
-   "hubVersion": "1.1"
+   "hubVersion": "1.1",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-17T13:17:59Z",
+    "source": "The Firmware Hub",
+    "version": "1.1"
+   }
   },
   "sy1": {
    "confidence": {
@@ -11166,7 +12690,13 @@
      }
     }
    },
-   "hubVersion": "0.5.0"
+   "hubVersion": "0.5.0",
+   "listed": "2026-11-18",
+   "release": {
+    "date": "2026-11-18T20:36:06Z",
+    "source": "The Firmware Hub",
+    "version": "0.5.0"
+   }
   },
   "tack": {
    "confidence": {
@@ -11213,7 +12743,13 @@
      }
     }
    },
-   "hubVersion": "0.15.0"
+   "hubVersion": "0.15.0",
+   "listed": "2026-11-13",
+   "release": {
+    "date": "2026-11-14T09:35:17Z",
+    "source": "The Firmware Hub",
+    "version": "0.15.0"
+   }
   },
   "tastywaves": {
    "confidence": {
@@ -11259,7 +12795,13 @@
      }
     }
    },
-   "hubVersion": "1.0.1"
+   "hubVersion": "1.0.1",
+   "listed": "2026-10-26",
+   "release": {
+    "date": "2026-10-26T00:56:45Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1"
+   }
   },
   "tekstuur": {
    "confidence": {
@@ -11312,7 +12854,13 @@
      }
     }
    },
-   "hubVersion": "2.0"
+   "hubVersion": "2.0",
+   "listed": "2026-11-14",
+   "release": {
+    "date": "2026-11-14T21:04:36Z",
+    "source": "The Firmware Hub",
+    "version": "2.0"
+   }
   },
   "tessera": {
    "confidence": {
@@ -11364,7 +12912,13 @@
      }
     }
    },
-   "hubVersion": "3.7.3"
+   "hubVersion": "3.7.3",
+   "listed": "2026-10-23",
+   "release": {
+    "date": "2026-11-19T20:29:04Z",
+    "source": "The Firmware Hub",
+    "version": "3.7.3"
+   }
   },
   "tether": {
    "confidence": {
@@ -11408,7 +12962,13 @@
      }
     }
    },
-   "hubVersion": "1.0"
+   "hubVersion": "1.0",
+   "listed": "2026-11-20",
+   "release": {
+    "date": "2026-11-20T00:28:41Z",
+    "source": "The Firmware Hub",
+    "version": "1.0"
+   }
   },
   "textura": {
    "confidence": {
@@ -11456,7 +13016,13 @@
      }
     }
    },
-   "hubVersion": "0.2.9"
+   "hubVersion": "0.2.9",
+   "listed": "2026-11-18",
+   "release": {
+    "date": "2026-11-18T14:46:44Z",
+    "source": "The Firmware Hub",
+    "version": "0.2.9"
+   }
   },
   "tonitor": {
    "confidence": {
@@ -11467,7 +13033,13 @@
      }
     }
    },
-   "hubVersion": "2026.11.10"
+   "hubVersion": "2026.11.10",
+   "listed": "2026-10-15",
+   "release": {
+    "date": "2026-11-10T07:01:31Z",
+    "source": "The Firmware Hub",
+    "version": "2026.11.10"
+   }
   },
   "trapstationos": {
    "confidence": {
@@ -11518,7 +13090,13 @@
      }
     }
    },
-   "hubVersion": "1.1.0.2"
+   "hubVersion": "1.1.0.2",
+   "listed": "2026-11-16",
+   "release": {
+    "date": "2026-11-16T21:44:35Z",
+    "source": "The Firmware Hub",
+    "version": "1.1.0.2"
+   }
   },
   "trax": {
    "confidence": {
@@ -11571,7 +13149,22 @@
      }
     }
    },
-   "hubVersion": "0.9.5"
+   "hubVersion": "0.9.5",
+   "listed": "2026-11-01",
+   "release": {
+    "date": "2026-11-08T12:23:51Z",
+    "source": "The Firmware Hub",
+    "version": "0.9.5"
+   }
+  },
+  "tribe": {
+   "hubVersion": "0.3-beta",
+   "listed": "2026-10-13",
+   "release": {
+    "date": "2026-10-22T20:25:21Z",
+    "source": "The Firmware Hub",
+    "version": "0.3-beta"
+   }
   },
   "trumpagotchi": {
    "confidence": {
@@ -11619,7 +13212,22 @@
      }
     }
    },
-   "hubVersion": "1.0.1"
+   "hubVersion": "1.0.1",
+   "listed": "2026-11-10",
+   "release": {
+    "date": "2026-11-11T02:49:32Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.1"
+   }
+  },
+  "tuna": {
+   "hubVersion": "1.2-99d50fb",
+   "listed": "2026-10-16",
+   "release": {
+    "date": "2026-11-13T17:02:34Z",
+    "source": "The Firmware Hub",
+    "version": "1.2-99d50fb"
+   }
   },
   "u0u": {
    "confidence": {
@@ -11667,7 +13275,13 @@
      }
     }
    },
-   "hubVersion": "0.3"
+   "hubVersion": "0.3",
+   "listed": "2026-11-18",
+   "release": {
+    "date": "2026-11-19T21:39:03Z",
+    "source": "The Firmware Hub",
+    "version": "0.3"
+   }
   },
   "unholy": {
    "confidence": {
@@ -11715,7 +13329,13 @@
      }
     }
    },
-   "hubVersion": "0.2.3"
+   "hubVersion": "0.2.3",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-10-13T23:50:21Z",
+    "source": "The Firmware Hub",
+    "version": "0.2.3"
+   }
   },
   "valle": {
    "confidence": {
@@ -11763,7 +13383,13 @@
      }
     }
    },
-   "hubVersion": "0.9-alpha"
+   "hubVersion": "0.9-alpha",
+   "listed": "2026-11-19",
+   "release": {
+    "date": "2026-11-19T01:43:29Z",
+    "source": "The Firmware Hub",
+    "version": "0.9-alpha"
+   }
   },
   "vector37": {
    "confidence": {
@@ -11774,7 +13400,13 @@
      }
     }
    },
-   "hubVersion": "0.3.2"
+   "hubVersion": "0.3.2",
+   "listed": "2026-10-16",
+   "release": {
+    "date": "2026-11-13T21:43:02Z",
+    "source": "The Firmware Hub",
+    "version": "0.3.2"
+   }
   },
   "veffbox": {
    "confidence": {
@@ -11823,7 +13455,13 @@
      }
     }
    },
-   "hubVersion": "0.11.0"
+   "hubVersion": "0.11.0",
+   "listed": "2026-11-04",
+   "release": {
+    "date": "2026-11-13T17:00:53Z",
+    "source": "The Firmware Hub",
+    "version": "0.11.0"
+   }
   },
   "vesper": {
    "emu": {
@@ -11861,7 +13499,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "2.0.2"
+   "hubVersion": "2.0.2",
+   "listed": "2026-10-30",
+   "release": {
+    "date": "2026-11-09T18:47:29Z",
+    "source": "The Firmware Hub",
+    "version": "2.0.2"
+   }
   },
   "vibe-link": {
    "confidence": {
@@ -11910,6 +13554,12 @@
     "mac": {
      "fm1-emu": "Upstream fm1-emu holds it back: it shows its own crash screen a second or two after boot."
     }
+   },
+   "listed": "2026-11-07",
+   "release": {
+    "date": "2026-11-07T20:20:09Z",
+    "source": "The Firmware Hub",
+    "version": "0.4"
    }
   },
   "viscera": {
@@ -11921,7 +13571,8 @@
      }
     }
    },
-   "hubVersion": null
+   "hubVersion": null,
+   "listed": "2026-11-19"
   },
   "vnl1": {
    "confidence": {
@@ -11967,7 +13618,13 @@
      }
     }
    },
-   "hubVersion": "0.9.2"
+   "hubVersion": "0.9.2",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-15T02:53:29Z",
+    "source": "The Firmware Hub",
+    "version": "0.9.2"
+   }
   },
   "wanderer": {
    "confidence": {
@@ -12016,7 +13673,13 @@
      }
     }
    },
-   "hubVersion": "1.4.0"
+   "hubVersion": "1.4.0",
+   "listed": "2026-11-01",
+   "release": {
+    "date": "2026-11-02T15:46:56Z",
+    "source": "The Firmware Hub",
+    "version": "1.4.0"
+   }
   },
   "waveloop": {
    "confidence": {
@@ -12064,7 +13727,22 @@
      }
     }
    },
-   "hubVersion": "1.0.5.2-midi23"
+   "hubVersion": "1.0.5.2-midi23",
+   "listed": "2026-10-09",
+   "release": {
+    "date": "2026-10-09T15:59:34Z",
+    "source": "The Firmware Hub",
+    "version": "1.0.5.2-midi23"
+   }
+  },
+  "winampfm": {
+   "hubVersion": "0.12",
+   "listed": "2026-10-14",
+   "release": {
+    "date": "2026-10-14T16:09:19Z",
+    "source": "The Firmware Hub",
+    "version": "0.12"
+   }
   },
   "x0x": {
    "emu": {
@@ -12098,7 +13776,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "1.2.2"
+   "hubVersion": "1.2.2",
+   "listed": "2026-10-08",
+   "release": {
+    "date": "2026-11-11T16:55:37Z",
+    "source": "The Firmware Hub",
+    "version": "1.2.2"
+   }
   },
   "x0xrmx": {
    "confidence": {
@@ -12144,7 +13828,13 @@
      }
     }
    },
-   "hubVersion": "1.1.0"
+   "hubVersion": "1.1.0",
+   "listed": "2026-10-17",
+   "release": {
+    "date": "2026-10-18T11:43:41Z",
+    "source": "The Firmware Hub",
+    "version": "1.1.0"
+   }
   },
   "xenolith": {
    "confidence": {
@@ -12193,7 +13883,13 @@
      }
     }
    },
-   "hubVersion": "1.0"
+   "hubVersion": "1.0",
+   "listed": "2026-11-10",
+   "release": {
+    "date": "2026-11-10T03:59:47Z",
+    "source": "The Firmware Hub",
+    "version": "1.0"
+   }
   },
   "xmod": {
    "confidence": {
@@ -12241,7 +13937,13 @@
      }
     }
    },
-   "hubVersion": "1.2.1"
+   "hubVersion": "1.2.1",
+   "listed": "2026-10-30",
+   "release": {
+    "date": "2026-11-13T20:20:17Z",
+    "source": "The Firmware Hub",
+    "version": "1.2.1"
+   }
   },
   "yehnah": {
    "emu": {
@@ -12276,7 +13978,13 @@
     },
     "preferred": {}
    },
-   "hubVersion": "0.1.0"
+   "hubVersion": "0.1.0",
+   "listed": "2026-11-17",
+   "release": {
+    "date": "2026-11-16T21:49:45Z",
+    "source": "The Firmware Hub",
+    "version": "0.1.0"
+   }
   },
   "zen1": {
    "confidence": {
@@ -12329,7 +14037,13 @@
      }
     }
    },
-   "hubVersion": "1.2"
+   "hubVersion": "1.2",
+   "listed": "2026-10-19",
+   "release": {
+    "date": "2026-10-21T20:37:01Z",
+    "source": "The Firmware Hub",
+    "version": "1.2"
+   }
   },
   "zenith1": {
    "confidence": {
@@ -12378,7 +14092,22 @@
      }
     }
    },
-   "hubVersion": "1.0"
+   "hubVersion": "1.0",
+   "listed": "2026-11-18",
+   "release": {
+    "date": "2026-11-18T14:41:04Z",
+    "source": "The Firmware Hub",
+    "version": "1.0"
+   }
+  },
+  "zp12": {
+   "hubVersion": "2.5",
+   "listed": "2026-10-08",
+   "release": {
+    "date": "2026-10-24T08:58:41Z",
+    "source": "The Firmware Hub",
+    "version": "2.5"
+   }
   }
  },
  "made": "2026-11-20T06:05:36.441Z"

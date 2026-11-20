@@ -41,6 +41,10 @@ struct LibraryItem: Identifiable, Hashable {
     var isWithdrawn = false
     var added: String?
     var updated: String?
+    /// the firmware's latest release as its maker published it (never a catalogue or rebuild date), when known
+    var release: CatalogueV2.Release?
+    /// for sorting by release: newest first, unknown last ("" sorts last when descending)
+    var releasedSort: String { release?.date ?? "" }
     var previousVersion: String?
     /// what the expanded catalogue says about it on the Mac (nil with catalog.json, and for h1)
     var macState: CatalogueV2.Status.State?
@@ -170,6 +174,8 @@ struct LibraryItem: Identifiable, Hashable {
         }
         listened = s.listened
         confidence = s.confidence
+        release = s.release
+        isNew = NewBadge.isNew(listed: s.listed)
         preferredEngine = s.preferredEngine
         preferredReason = s.preferredReason
     }
@@ -272,7 +278,7 @@ enum SidebarItem: Hashable {
         case .all: return "All Firmware"
         case .favourites: return "Favourites"
         case .recent: return "Recently Played"
-        case .new: return "New"
+        case .new: return "New to Library"
         case .withdrawn: return "No Longer Listed"
         case .experimental: return "Experimental"
         case .more: return "More Firmware"
@@ -284,14 +290,14 @@ enum SidebarItem: Hashable {
 enum ViewMode: String, CaseIterable { case icons, list }
 
 enum SortKey: String, CaseIterable, Identifiable {
-    case name, author, category, added
+    case latestRelease, name, author, category
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .name: return "Name"
+        case .latestRelease: return "Latest Release"
+        case .name: return "Name (A–Z)"
         case .author: return "Author"
         case .category: return "Category"
-        case .added: return "Date Added"
         }
     }
 }
@@ -310,7 +316,7 @@ final class LibraryModel: ObservableObject {
     @Published var search = ""
     @Published var section: SidebarItem = .all { didSet { defaults.set(section.key, forKey: "library.section") } }
     @Published var viewMode: ViewMode = .icons { didSet { defaults.set(viewMode.rawValue, forKey: "library.viewMode") } }
-    @Published var sort: SortKey = .name { didSet { defaults.set(sort.rawValue, forKey: "library.sort") } }
+    @Published var sort: SortKey = .latestRelease { didSet { defaults.set(sort.rawValue, forKey: "library.sort") } }
     @Published private(set) var favourites: Set<String> = []
     @Published private(set) var recent: [String: Date] = [:]
 
@@ -330,7 +336,8 @@ final class LibraryModel: ObservableObject {
     init() {
         section = SidebarItem(key: defaults.string(forKey: "library.section") ?? "all")
         viewMode = ViewMode(rawValue: defaults.string(forKey: "library.viewMode") ?? "") ?? .icons
-        sort = SortKey(rawValue: defaults.string(forKey: "library.sort") ?? "") ?? .name
+        // "added" (the old Date Added, a catalogue date) and no choice yet both become Latest Release
+        sort = SortKey(rawValue: defaults.string(forKey: "library.sort") ?? "") ?? .latestRelease
         selection = defaults.string(forKey: "library.selection")
     }
 
@@ -354,7 +361,13 @@ final class LibraryModel: ObservableObject {
         if section == .recent && q.isEmpty {
             return list.sorted { (recent[$0.id] ?? .distantPast) > (recent[$1.id] ?? .distantPast) }
         }
-        return list.sorted { a, b in
+        return Self.ordered(list, by: sort, query: q)
+    }
+
+    /// The library's order: the built-in h1 first, then (when searching) names that match best, then the chosen
+    /// sort, then the name.
+    static func ordered(_ list: [LibraryItem], by sort: SortKey, query q: String = "") -> [LibraryItem] {
+        list.sorted { a, b in
             if a.isBuiltin != b.isBuiltin { return a.isBuiltin }
             if !q.isEmpty {
                 let ra = LibrarySearch.rank(name: a.name, query: q), rb = LibrarySearch.rank(name: b.name, query: q)
@@ -368,8 +381,9 @@ final class LibraryModel: ObservableObject {
             case .category:
                 let c = a.category.localizedCaseInsensitiveCompare(b.category)
                 if c != .orderedSame { return c == .orderedAscending }
-            case .added:
-                let x = a.added ?? "", y = b.added ?? ""
+            case .latestRelease:
+                // newest release first; a firmware whose release date is unknown goes after every dated one
+                let x = a.releasedSort, y = b.releasedSort
                 if x != y { return x > y }
             }
             return a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
@@ -542,7 +556,6 @@ final class LibraryModel: ObservableObject {
         var builds: [String: LibraryItem] = [:], packages: [String: LibraryItem] = [:], order: [String] = []
         for e in snap.entries {
             var it = LibraryItem(e, base: base)
-            it.isNew = NewBadge.isNew(added: e.entry.added, since: snap.catalogueSince)
             let b = e.entry.baseID
             if !order.contains(b) { order.append(b) }
             if e.entry.isPackage { packages[b] = it } else { builds[b] = it }

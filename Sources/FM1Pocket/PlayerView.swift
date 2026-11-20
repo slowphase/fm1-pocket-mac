@@ -342,6 +342,10 @@ private struct ControlSlider: View {
                 let from: CGFloat = state.absolute ? thumb / 2 : min(x, w / 2)
                 let to: CGFloat = state.absolute ? x : max(x, w / 2)
                 Capsule().fill(player.ink).frame(width: max(0, to - from), height: 10 * s).offset(x: from)
+                if !state.absolute {
+                    // an endless knob: a mark at the middle, where it rests between turns
+                    Rectangle().fill(Face.dim).frame(width: 2 * s, height: 18 * s).offset(x: w / 2 - s)
+                }
                 Circle()
                     .fill(RadialGradient(colors: [Face.hex(0x5a5a62), Face.hex(0x26262b)], center: UnitPoint(x: 0.35, y: 0.3), startRadius: 0, endRadius: thumb * 0.7))
                     .overlay(Circle().stroke(Color.black, lineWidth: 1))
@@ -370,6 +374,7 @@ private struct ControlSlider: View {
             )
         }
         .frame(height: 36 * s)
+        .help(state.absolute ? "Drag to set it" : "Endless knob: drag left or right to turn it; it springs back to the middle. The firmware keeps the setting.")
     }
 }
 

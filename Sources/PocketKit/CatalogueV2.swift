@@ -181,6 +181,20 @@ public struct CatalogueV2: Decodable, Equatable {
     }
     struct PerPlayer<T: Decodable>: Decodable { var mac: T? }
 
+    /// A firmware's latest release, as its maker published it (from The Firmware Hub's list, or the maker's GitHub
+    /// release): never a catalogue, rebuild or commit date.
+    public struct Release: Codable, Hashable, Sendable {
+        public var version: String?
+        /// ISO 8601, e.g. `2026-11-13T04:17:47Z`
+        public var date: String
+        public var source: String?
+        public init(version: String?, date: String, source: String? = nil) { self.version = version; self.date = date; self.source = source }
+        public var day: Date? {
+            let f = ISO8601DateFormatter()
+            return f.date(from: date) ?? NewBadge.date(date)
+        }
+    }
+
     public struct Restriction: Codable, Equatable, Sendable {
         public var code: String
         public var reason: String
@@ -219,10 +233,14 @@ public struct CatalogueV2: Decodable, Equatable {
         public var knownIssues: [String: String] = [:]
         /// real listening tests in the apps (both engines, both players), recorded by hand
         public var listened: [Emu.Listened] = []
+        /// the firmware's latest release (its version and the date its maker published it), when known
+        public var release: Release?
+        /// the day it first appeared in the library (`yyyy-MM-dd`): "New to Library" means in the last 14 days
+        public var listed: String?
 
         enum CodingKeys: String, CodingKey {
             case id, name, version, authors, makers, category, tag, about, license, source, beta, status, restriction, provenance, file, sha256, emu
-            case confidence, knownIssues, listened
+            case confidence, knownIssues, listened, release, listed
         }
         struct Statuses: Decodable { var web: Status?; var mac: Status? }
         struct Provenance: Decodable {
@@ -259,6 +277,8 @@ public struct CatalogueV2: Decodable, Equatable {
             confidence = (try? c.decodeIfPresent(PerPlayer<[String: Confidence]>.self, forKey: .confidence))?.mac ?? [:]
             knownIssues = (try? c.decodeIfPresent(PerPlayer<[String: String]>.self, forKey: .knownIssues))?.mac ?? [:]
             listened = (try? c.decodeIfPresent([Emu.Listened].self, forKey: .listened)) ?? []
+            release = try? c.decodeIfPresent(Release.self, forKey: .release)
+            listed = try? c.decodeIfPresent(String.self, forKey: .listed)
         }
 
         /// Whether the Mac app may download and play its .rfm1 build: a build exists and the Mac status allows it.
@@ -328,19 +348,24 @@ public struct CatalogueV2: Decodable, Equatable {
         return (e.preferredMacEngine == "fm1-emu") != pkg
     }
 
-    /// Fills in emu blocks the published catalogue does not have yet from a preview (`emu-preview.json`, bundled in
-    /// test builds), only where the Hub version matches, so a stale preview never offers an outdated package. Once
-    /// Pocket publishes its own emu blocks, the preview is ignored.
+    /// Fills in what the published catalogue does not have yet from a preview (`emu-preview.json`, bundled in test
+    /// builds), only where the Hub version matches, so a stale preview never offers an outdated package: the emu
+    /// blocks (ignored once Pocket publishes its own) and the discovery dates (release, listed) an entry lacks.
     public func withPreview(_ data: Data?) -> CatalogueV2 {
-        guard let data, !firmwares.contains(where: { $0.emu != nil }),
-              let p = try? JSONDecoder().decode(EmuPreview.self, from: data) else { return self }
+        guard let data, let p = try? JSONDecoder().decode(EmuPreview.self, from: data) else { return self }
+        // the emulator's blocks only while the published catalogue has none; discovery dates wherever it lacks them
+        let emuPublished = firmwares.contains { $0.emu != nil }
         var c = self
         for i in c.firmwares.indices {
             guard let b = p.firmwares[c.firmwares[i].id], b.hubVersion == nil || b.hubVersion == c.firmwares[i].hubVersion else { continue }
-            if let e = b.emu { c.firmwares[i].emu = e }
-            if let m = b.confidence?.mac { c.firmwares[i].confidence = m }
-            if let m = b.knownIssues?.mac { c.firmwares[i].knownIssues = m }
-            if let l = b.listened { c.firmwares[i].listened = l }
+            if !emuPublished {
+                if let e = b.emu { c.firmwares[i].emu = e }
+                if let m = b.confidence?.mac { c.firmwares[i].confidence = m }
+                if let m = b.knownIssues?.mac { c.firmwares[i].knownIssues = m }
+                if let l = b.listened { c.firmwares[i].listened = l }
+            }
+            if c.firmwares[i].release == nil, let r = b.release { c.firmwares[i].release = r }
+            if c.firmwares[i].listed == nil, let l = b.listed { c.firmwares[i].listed = l }
         }
         return c
     }
@@ -351,6 +376,8 @@ public struct CatalogueV2: Decodable, Equatable {
             var confidence: PerPlayer<[String: Confidence]>?
             var knownIssues: PerPlayer<[String: String]>?
             var listened: [Emu.Listened]?
+            var release: Release?
+            var listed: String?
         }
         var firmwares: [String: Item]
     }
