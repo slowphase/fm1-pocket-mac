@@ -557,6 +557,10 @@ private struct Keybed: View {
                         .offset(x: k.x)
                 }
             }
+            // The keys are placed with .offset, which moves where they are drawn but not the ZStack's own size: on
+            // its own the ZStack is one key wide, and contentShape(Rectangle()) would then make only the leftmost key
+            // (F) answer the mouse. Sizing it to the whole keybed first makes every key respond.
+            .frame(width: w, height: h, alignment: .topLeading)
             .contentShape(Rectangle())
             .gesture(
                 DragGesture(minimumDistance: 0)
