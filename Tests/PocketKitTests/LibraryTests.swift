@@ -571,6 +571,21 @@ final class LibrarySyncTests: XCTestCase {
         XCTAssertTrue(v2.notDownloadable.allSatisfy { $0.source != nil }, "and links to where it came from")
     }
 
+    func testMacVerificationLevels() throws {
+        func status(_ json: String) throws -> CatalogueV2.Status { try JSONDecoder().decode(CatalogueV2.Status.self, from: Data(json.utf8)) }
+        XCTAssertEqual(try status(#"{"state":"playable","verification":"macos"}"#).macVerification, .macos)
+        let rep = try status(#"{"state":"playable","verification":"representative","tested":{"macos":{"sample":true}}}"#)
+        XCTAssertEqual(rep.macVerification, .representative)
+        XCTAssertEqual(rep.tested?.macos?.sample, true)
+        let slow = try status(#"{"state":"experimental","verification":"representative","performance":"may-stutter"}"#)
+        XCTAssertTrue(slow.mayStutter)
+        // catalogues from before the field: worked out from the test record
+        XCTAssertEqual(try status(#"{"state":"playable","tested":{"macos":{"outcome":"pass"}}}"#).macVerification, .macos)
+        XCTAssertEqual(try status(#"{"state":"playable","tested":{"macos":{"date":"d"}}}"#).macVerification, .representative)
+        XCTAssertEqual(try status(#"{"state":"experimental","tested":{"runtime":"x"}}"#).macVerification, .linux)
+        XCTAssertEqual(try status(#"{"state":"playable","verification":"teleported"}"#).macVerification, .none)
+    }
+
     func testV2DecodingToleratesUnknownStatesAndFields() throws {
         let json = #"{"schema":2,"snapshot":"s","updated":"u","future":true,"firmwares":[{"id":"x","name":"X","file":"fw/x.rfm1","sha256":"\#(String(repeating: "a", count: 64))","size":1,"status":{"web":{"state":"playable"},"mac":{"state":"teleported"}}},{"id":"y"}]}"#
         let c = try CatalogueV2.decode(Data(json.utf8))

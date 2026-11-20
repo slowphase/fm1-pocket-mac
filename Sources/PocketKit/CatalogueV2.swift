@@ -32,6 +32,9 @@ public struct CatalogueV2: Decodable, Equatable {
             public var date: String?
             public var environment: String?
             public var outcome: String?
+            public var speed: Double?
+            /// true when this build was not run itself, only the representative sample
+            public var sample: Bool?
         }
         public var sha256: String?
         public var runtime: String?
@@ -46,9 +49,22 @@ public struct CatalogueV2: Decodable, Equatable {
         public enum State: String, Codable, Sendable {
             case playable, experimental, unsupported, sourceOnly = "source-only"
         }
+        /// How a Mac status was established.
+        public enum Verification: String, Codable, Sendable {
+            /// this exact build ran on macOS in the app's engine
+            case macos
+            /// passed the app's engine on Linux; a representative sample passed on macOS with the same engine version
+            case representative
+            /// the app's engine on Linux only
+            case linux
+            case none
+        }
         public var state: State
         public var reason: String?
         public var tested: Test?
+        public var verification: Verification?
+        /// "may-stutter" when the build ran slower than real time in the app's engine
+        public var performance: String?
 
         public init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -56,11 +72,21 @@ public struct CatalogueV2: Decodable, Equatable {
             state = (try? c.decode(State.self, forKey: .state)) ?? .sourceOnly
             reason = try c.decodeIfPresent(String.self, forKey: .reason)
             tested = try? c.decodeIfPresent(Test.self, forKey: .tested)
+            verification = try? c.decodeIfPresent(Verification.self, forKey: .verification)
+            performance = try? c.decodeIfPresent(String.self, forKey: .performance)
         }
-        public init(state: State, reason: String? = nil, tested: Test? = nil) {
-            self.state = state; self.reason = reason; self.tested = tested
+        public init(state: State, reason: String? = nil, tested: Test? = nil, verification: Verification? = nil, performance: String? = nil) {
+            self.state = state; self.reason = reason; self.tested = tested; self.verification = verification; self.performance = performance
         }
-        enum CodingKeys: String, CodingKey { case state, reason, tested }
+        enum CodingKeys: String, CodingKey { case state, reason, tested, verification, performance }
+
+        /// the verification level, worked out from the test record for catalogues that predate the field
+        public var macVerification: Verification {
+            if let v = verification { return v }
+            guard let m = tested?.macos else { return tested == nil ? .none : .linux }
+            return m.outcome != nil ? .macos : .representative
+        }
+        public var mayStutter: Bool { performance == "may-stutter" || (reason ?? "").contains("may stutter") }
     }
 
     public struct Restriction: Codable, Equatable, Sendable {
