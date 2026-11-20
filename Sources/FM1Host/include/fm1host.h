@@ -73,6 +73,24 @@ uint32_t fm1h_flash_dirty(fm1h *h);
 size_t fm1h_flash_copy(fm1h *h, int sync, uint8_t *out, size_t cap);
 void fm1h_shutdown(fm1h *h);
 
+/* ---- optional extras a firmware may export (each returns "none" when it does not) ---- */
+
+/* sim1: what each encoder role is tied to right now (docs/FIRMWARE-INTERFACE.md in FM-1 Pocket Player) */
+typedef struct { int32_t value, lo, hi; char name[32]; char text[32]; } fm1h_ctl;
+int fm1h_sim1(fm1h *h);                                /* the sim1 version, 0 without it */
+int fm1h_ctl_info(fm1h *h, int role, fm1h_ctl *out);   /* -1 none, 0 a relative encoder, 1 a value to set outright */
+void fm1h_ctl_set(fm1h *h, int role, int value);
+int32_t fm1h_accent(fm1h *h);                          /* 0xRRGGBB, or -1 */
+int32_t fm1h_link_bytes(fm1h *h);                      /* bytes the last frame sent to the panel, or -1 */
+int fm1h_master(fm1h *h);                              /* the MASTER pot as the panel holds it, 0..1023 */
+/* live labels (FM1VST): 49 slots, 0..7 the knob roles and MASTER, 8..21 the buttons, 22..37 the white keys,
+   38..48 the black keys. The epoch is 0 when there are none and changes when any label changes. */
+uint32_t fm1h_labels_epoch(fm1h *h);
+int fm1h_label(fm1h *h, int slot, char *out, int cap); /* -1 not given, else the length ("" = no job here) */
+int fm1h_stats(fm1h *h, uint32_t *shed, uint32_t *cpu);/* 1 if the firmware reports them */
+/* bytes of the screen that changed at the last fm1h_screen_rgba (whole 480-byte rows), for the link meter */
+uint32_t fm1h_screen_changed_bytes(fm1h *h);
+
 /* 0 running; 0x1xx the firmware called exit(xx); 0x1ff a trap; 0x1fe out of memory */
 int fm1h_halted(fm1h *h);
 const char *fm1h_error(fm1h *h);

@@ -54,6 +54,19 @@ public final class StateStore {
         return files.sorted { date($0) > date($1) }.map { String($0.dropLast(6)) }
     }
 
+    /// a save by its key (as `savedKeys` lists them)
+    public func load(id: String, key: String) -> Data? {
+        guard !key.isEmpty, !key.contains("/"), !key.hasPrefix(".") else { return nil }
+        return load(dir(id).appendingPathComponent(key + ".flash"))
+    }
+
+    /// Deletes this build's save and its backup. Only for an explicit request ("Erase Saved Settings").
+    public func erase(id: String, version: String, sha256: String) throws {
+        let u = url(id: id, version: version, sha256: sha256)
+        let fm = FileManager.default
+        for f in [u, u.appendingPathExtension("prev")] where fm.fileExists(atPath: f.path) { try fm.removeItem(at: f) }
+    }
+
     private func load(_ u: URL) -> Data? {
         if let d = try? Data(contentsOf: u), !d.isEmpty { return d }
         if let d = try? Data(contentsOf: u.appendingPathExtension("prev")), !d.isEmpty { return d }
