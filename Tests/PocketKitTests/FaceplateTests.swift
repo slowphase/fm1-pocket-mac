@@ -72,7 +72,7 @@ final class FaceplateTests: XCTestCase {
         let png = Data([0x89, 0x50, 0x4e, 0x47, 1, 2, 3])
         let f = try RFM1File(wasm(custom: [
             ("rfm1", manifest),
-            ("rfm1.skin", Data(#"{"skin":1,"dim":0.9,"theme":{"led":"#ff8800","body":"#101010","knob":"bad"}}"#.utf8)),
+            ("rfm1.skin", Data(##"{"skin":1,"dim":0.9,"theme":{"led":"#ff8800","body":"#101010","knob":"bad"}}"##.utf8)),
             ("rfm1.skin.background", png),
         ]))
         let skin = try XCTUnwrap(f.skin)
