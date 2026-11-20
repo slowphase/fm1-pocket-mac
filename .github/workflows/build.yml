@@ -57,6 +57,10 @@ jobs:
       - name: Test the native firmware host (C, h1)
         run: make -C Tests/ctest test | tee host-test.log
 
+      - name: Show how wasm3 is compiled (debug)
+        run: |
+          swift build --target CWasm3 -v 2>&1 | grep -m1 "m3_exec.c" | tr ' ' '\n' | grep -E '^-(O|g|f|D|U)' | sort -u | tr '\n' ' '; echo
+
       - name: Run the Swift tests
         run: |
           set -o pipefail

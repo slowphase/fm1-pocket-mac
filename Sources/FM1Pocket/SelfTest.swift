@@ -26,10 +26,14 @@ enum SelfTest {
             let a = core.pull(frames: 22050)
             let rms = (a.reduce(0) { $0 + Double($1 * $1) } / Double(a.count)).squareRoot()
             let wall = Date().timeIntervalSince(start)
-            ok = !core.isHalted && lit > 0 && rms > 0.001
+            // steady-state speed: 10 s of device time with the chord held, pulled in 512-frame buffers like Core Audio
+            var buf = [Float](repeating: 0, count: 1024)
+            let t0 = Date()
+            for _ in 0..<(441000 / 512) { buf.withUnsafeMutableBufferPointer { core.pull($0.baseAddress!, frames: 512) } }
+            let speed = 10.0 / max(Date().timeIntervalSince(t0), 0.001)
+            ok = !core.isHalted && lit > 0 && rms > 0.001 && speed > 1.5
             r = ["firmware": "\(file.name) \(file.version)", "halted": core.haltCode, "litPixels": lit,
-                 "playedRms": rms, "deviceMs": core.deviceMilliseconds, "seconds": wall,
-                 "speed": Double(core.deviceMilliseconds) / 1000 / max(wall, 0.001)]
+                 "playedRms": rms, "bootSeconds": wall, "speedXRealtime": speed]
         } catch {
             r["error"] = error.localizedDescription
         }
