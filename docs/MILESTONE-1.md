@@ -42,7 +42,7 @@ Speed below means: a fresh boot, the default preset, a three-note chord held, te
 
 ### On GitHub's Apple Silicon Mac (macOS 15.8, Xcode 16.4, Swift 6.1, a 3-core virtual M1)
 
-From the first green builds (runs 1 and 2 of **Build Mac app**):
+From the first green builds (runs 1 to 3 of **Build Mac app**):
 
 - **C host test:** h1 0.2.1 loads in 6 ms, boots, draws its home screen (12,486 lit pixels), plays the chord
   (RMS 0.11 against 0.0007 silent), redraws on input, and returns its 1 MiB flash image.
@@ -52,7 +52,7 @@ From the first green builds (runs 1 and 2 of **Build Mac app**):
   last good copy; and catalogue decoding, including fields the app does not know yet.
 - **Live catalogue:** the real published catalogue (95 firmwares) downloaded; its smallest firmware (FiMba-1 0.7.0)
   downloaded, checksum-verified and booted without stopping.
-- **Packaged app self-test:** the built `.app` boots its bundled h1, draws and plays: h1 runs at **3.5x real time**.
+- **Packaged app self-test:** the built `.app` boots its bundled h1, draws and plays. h1 runs at **about 3x real time** there (2.8x to 3.5x across builds; the C and Swift tests agree).
 - **DMG:** 837 KB, ad-hoc signed, `hdiutil verify` valid.
 
 ### In the development sandbox (Linux, 2-core x86 cloud VM)
@@ -69,7 +69,7 @@ The C host test on h1 and six firmwares from RemoteFM1FW's release:
 | ChoralRoot 0.42 | yes | 9.1x |
 | AMB-1 1.3.2 (generative) | yes | 13.0x |
 
-GitHub's virtual M1 ran h1 at roughly 0.75x the sandbox's speed, which puts GR!MM at about 1.8x there. An M5's cores
+GitHub's virtual M1 ran h1 at roughly 0.7x the sandbox's speed, which puts GR!MM at about 1.7x there. An M5's cores
 are much faster than either, so all seven should have comfortable headroom on your Mac, but GR!MM is the one to try
 first if anything stutters.
 
@@ -81,7 +81,7 @@ first if anything stutters.
 - **MIDI from a real controller.** The firmware side is tested; the Mac's CoreMIDI input is not built yet
   (Milestone 3).
 - **Every catalogue firmware.** Seven families are proven; the live check boots one catalogue firmware per build.
-- **GR!MM-class heavy firmware on your Mac.** The heaviest of the seven (2.4x on the sandbox, about 1.8x estimated on
+- **GR!MM-class heavy firmware on your Mac.** The heaviest of the seven (2.4x on the sandbox, about 1.7x estimated on
   GitHub's Mac). An M5 should have plenty of headroom, but it needs a listen.
 
 ## Problems to solve later
