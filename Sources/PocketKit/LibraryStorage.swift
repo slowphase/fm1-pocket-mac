@@ -12,6 +12,7 @@ import Foundation
 ///         firmware/<id>/<sha256>.rfm1      verified firmware builds, named by their content hash
 ///         shots/<name>.png                 screenshots, named as the catalogue names them
 ///         tmp/                             downloads in progress
+///         generated/<sha>.png              screenshots the app made itself (built-in h1, imports)
 ///       State/                             user: saved settings (flash images), see StateStore
 ///       Imported/                          user: imported .rfm1 files
 ///       UserData/                          user: favourites and other small preferences
@@ -28,6 +29,8 @@ public struct LibraryPaths: Sendable {
     public var firmware: URL { managed.appendingPathComponent("firmware", isDirectory: true) }
     public var shots: URL { managed.appendingPathComponent("shots", isDirectory: true) }
     public var tmp: URL { managed.appendingPathComponent("tmp", isDirectory: true) }
+    /// screenshots the app makes itself (built-in and imported firmware); cleanup never looks here
+    public var generated: URL { managed.appendingPathComponent("generated", isDirectory: true) }
     public var legacyCatalogue: URL { root.appendingPathComponent("Catalogue", isDirectory: true) }
 
     public var state: URL { root.appendingPathComponent("State", isDirectory: true) }

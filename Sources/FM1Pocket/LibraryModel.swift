@@ -31,16 +31,23 @@ struct LibraryItem: Identifiable, Hashable {
     let download: Download
     let downloading: Bool
     let lastError: String?
+    var isNew = false
+    var isBeta = false
+    /// no longer in Pocket's catalogue (kept because it was downloaded)
+    var isWithdrawn = false
+    var added: String?
+    var updated: String?
+    var previousVersion: String?
 
     var isBuiltin: Bool { if case .builtin = source { return true } else { return false } }
 
-    static func builtinH1() -> LibraryItem? {
+    static func builtinH1(screenshot: URL? = nil) -> LibraryItem? {
         guard let url = Bundle.main.url(forResource: "h1", withExtension: "rfm1"),
               let data = try? Data(contentsOf: url), let f = try? RFM1File(data) else { return nil }
         return LibraryItem(source: .builtin(url), id: "builtin:" + f.id, name: f.name, version: f.version,
                            authors: f.authors.joined(separator: ", "), category: "Built in", tag: "Built into this app",
                            about: "Jake Handy's h1, built into the app so there is always something to play, even offline.",
-                           license: f.license, sourceURL: f.sourceURL, imageURL: nil, screenshotFile: nil, size: data.count,
+                           license: f.license, sourceURL: f.sourceURL, imageURL: nil, screenshotFile: screenshot, size: data.count,
                            download: .installed, downloading: false, lastError: nil)
     }
 
@@ -67,10 +74,41 @@ struct LibraryItem: Identifiable, Hashable {
                   category: e.category, tag: e.tag, about: e.about, license: e.license, sourceURL: src,
                   imageURL: e.image.flatMap { URL(string: $0, relativeTo: base)?.absoluteURL }, screenshotFile: s.screenshotFile,
                   size: e.size, download: dl, downloading: s.downloading, lastError: s.lastError)
+        isBeta = e.beta
+        added = e.added
+        updated = e.updated
+        if let p = s.previous, p.sha256 != e.sha256 { previousVersion = p.version }
     }
+
+    /// a firmware Pocket no longer lists, from what the library kept about it
+    init?(withdrawn r: FirmwareRecord, paths: LibraryPaths) {
+        guard let e = r.entry, let cur = r.current else { return nil }
+        let shot = cur.screenshot.map { paths.screenshotFile($0) }.flatMap { FileManager.default.fileExists(atPath: $0.path) ? $0 : nil }
+        self.init(source: .catalogue(e), id: "cat:" + e.id, name: e.name, version: cur.version, authors: e.authorLine,
+                  category: e.category, tag: e.tag, about: e.about, license: e.license, sourceURL: e.source,
+                  imageURL: nil, screenshotFile: shot, size: cur.size, download: .installed, downloading: false, lastError: nil)
+        isWithdrawn = true
+        added = e.added
+        updated = e.updated
+        previousVersion = r.previous?.version
+    }
+
+    /// a short download state, for the list view's Status column
+    var statusText: String {
+        if downloading { return "Downloading" }
+        switch download {
+        case .installed: return isBuiltin ? "Built in" : "Downloaded"
+        case .olderInstalled: return "Update pending"
+        case .notDownloaded: return lastError == nil ? "Not downloaded" : "Failed"
+        }
+    }
+
+    var byline: String { [version, authors].filter { !$0.isEmpty }.joined(separator: " · ") }
+    var searchFields: [String] { [name, version, authors, about, tag, category] }
 
     var downloadText: String {
         if downloading { return "Downloading…" }
+        if isWithdrawn { return "Downloaded (no longer in the Pocket catalogue)" }
         switch download {
         case .installed: return isBuiltin ? "Built in" : "Downloaded"
         case .olderInstalled(let v): return "Version \(v) downloaded; the update is not downloaded yet"
@@ -90,42 +128,189 @@ struct PlayableFirmware {
     var version: String
 }
 
+/// The library window's sections.
+enum SidebarItem: Hashable {
+    case all, favourites, recent, new, withdrawn
+    case category(String)
+
+    var key: String {
+        switch self {
+        case .all: return "all"
+        case .favourites: return "favourites"
+        case .recent: return "recent"
+        case .new: return "new"
+        case .withdrawn: return "withdrawn"
+        case .category(let c): return "category:" + c
+        }
+    }
+    init(key: String) {
+        switch key {
+        case "favourites": self = .favourites
+        case "recent": self = .recent
+        case "new": self = .new
+        case "withdrawn": self = .withdrawn
+        default: self = key.hasPrefix("category:") ? .category(String(key.dropFirst(9))) : .all
+        }
+    }
+    var title: String {
+        switch self {
+        case .all: return "All Firmware"
+        case .favourites: return "Favourites"
+        case .recent: return "Recently Played"
+        case .new: return "New"
+        case .withdrawn: return "No Longer Listed"
+        case .category(let c): return c
+        }
+    }
+}
+
+enum ViewMode: String, CaseIterable { case icons, list }
+
+enum SortKey: String, CaseIterable, Identifiable {
+    case name, author, category, added
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .name: return "Name"
+        case .author: return "Author"
+        case .category: return "Category"
+        case .added: return "Date Added"
+        }
+    }
+}
+
 @MainActor
 final class LibraryModel: ObservableObject {
     @Published private(set) var items: [LibraryItem] = []
+    @Published private(set) var withdrawnItems: [LibraryItem] = []
     @Published private(set) var status = ""
     @Published private(set) var isRefreshing = false
     @Published var selection: LibraryItem.ID?
     @Published var search = ""
+    @Published var section: SidebarItem = .all { didSet { defaults.set(section.key, forKey: "library.section") } }
+    @Published var viewMode: ViewMode = .icons { didSet { defaults.set(viewMode.rawValue, forKey: "library.viewMode") } }
+    @Published var sort: SortKey = .name { didSet { defaults.set(sort.rawValue, forKey: "library.sort") } }
+    @Published private(set) var favourites: Set<String> = []
+    @Published private(set) var recent: [String: Date] = [:]
 
     /// the firmware store: catalogue, downloads, cache, cleanup (PocketKit/FirmwareLibrary.swift)
     let library = FirmwareLibrary()
+    private let defaults = UserDefaults.standard
+    private lazy var favouritesStore = FavouritesStore(paths: library.paths)
+    private lazy var recentStore = RecentStore(paths: library.paths)
     private var started = false
     private var reloadPending = false
     private var lastSync = ""
+    private var builtinShot: URL?
 
-    var filtered: [LibraryItem] {
-        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
-        guard !q.isEmpty else { return items }
-        return items.filter {
-            $0.name.lowercased().contains(q) || $0.authors.lowercased().contains(q) || $0.tag.lowercased().contains(q)
-                || $0.category.lowercased().contains(q)
+    init() {
+        section = SidebarItem(key: defaults.string(forKey: "library.section") ?? "all")
+        viewMode = ViewMode(rawValue: defaults.string(forKey: "library.viewMode") ?? "") ?? .icons
+        sort = SortKey(rawValue: defaults.string(forKey: "library.sort") ?? "") ?? .name
+        selection = defaults.string(forKey: "library.selection")
+    }
+
+    // MARK: what the browser shows
+
+    /// the current section, searched and sorted
+    var visible: [LibraryItem] {
+        var list: [LibraryItem]
+        switch section {
+        case .all: list = items
+        case .favourites: list = (items + withdrawnItems).filter { favourites.contains($0.id) }
+        case .recent: list = (items + withdrawnItems).filter { recent[$0.id] != nil }
+        case .new: list = items.filter(\.isNew)
+        case .withdrawn: list = withdrawnItems
+        case .category(let c): list = items.filter { $0.category == c }
+        }
+        let q = search.trimmingCharacters(in: .whitespaces)
+        if !q.isEmpty { list = list.filter { LibrarySearch.matches(q, fields: $0.searchFields) } }
+        if section == .recent && q.isEmpty {
+            return list.sorted { (recent[$0.id] ?? .distantPast) > (recent[$1.id] ?? .distantPast) }
+        }
+        return list.sorted { a, b in
+            if a.isBuiltin != b.isBuiltin { return a.isBuiltin }
+            if !q.isEmpty {
+                let ra = LibrarySearch.rank(name: a.name, query: q), rb = LibrarySearch.rank(name: b.name, query: q)
+                if ra != rb { return ra < rb }
+            }
+            switch sort {
+            case .name: break
+            case .author:
+                let c = a.authors.localizedCaseInsensitiveCompare(b.authors)
+                if c != .orderedSame { return c == .orderedAscending }
+            case .category:
+                let c = a.category.localizedCaseInsensitiveCompare(b.category)
+                if c != .orderedSame { return c == .orderedAscending }
+            case .added:
+                let x = a.added ?? "", y = b.added ?? ""
+                if x != y { return x > y }
+            }
+            return a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
         }
     }
 
-    var categories: [String] {
-        var seen: [String] = []
-        for i in filtered where !seen.contains(i.category) { seen.append(i.category) }
-        return seen.sorted { a, b in a == "Built in" ? true : (b == "Built in" ? false : a < b) }
+    /// the catalogue's categories, alphabetically
+    var categoryNames: [String] {
+        Array(Set(items.filter { !$0.isBuiltin }.map(\.category))).sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
     }
 
-    func item(_ id: LibraryItem.ID?) -> LibraryItem? { items.first { $0.id == id } }
+    func count(_ s: SidebarItem) -> Int {
+        switch s {
+        case .all: return items.count
+        case .favourites: return (items + withdrawnItems).filter { favourites.contains($0.id) }.count
+        case .recent: return (items + withdrawnItems).filter { recent[$0.id] != nil }.count
+        case .new: return items.filter(\.isNew).count
+        case .withdrawn: return withdrawnItems.count
+        case .category(let c): return items.filter { $0.category == c }.count
+        }
+    }
+
+    func select(_ id: LibraryItem.ID?) {
+        selection = id
+        defaults.set(id, forKey: "library.selection")
+    }
+
+    // MARK: favourites and recents (user-owned, in UserData/)
+
+    func isFavourite(_ item: LibraryItem) -> Bool { favourites.contains(item.id) }
+
+    func toggleFavourite(_ item: LibraryItem) {
+        if favourites.contains(item.id) { favourites.remove(item.id) } else { favourites.insert(item.id) }
+        try? favouritesStore.save(favourites)
+    }
+
+    func notePlayed(_ item: LibraryItem) {
+        if let r = try? recentStore.note(item.id) { recent = r }
+    }
+
+    /// downloads a firmware now, ahead of background downloads
+    func download(_ item: LibraryItem) {
+        guard case .catalogue(let e) = item.source else { return }
+        let lib = library
+        Task { _ = try? await lib.ensureInstalled(e, priority: .interactive) }
+    }
+
+    func item(_ id: LibraryItem.ID?) -> LibraryItem? { (items + withdrawnItems).first { $0.id == id } }
 
     /// Shows the cached library at once, then synchronises in the background.
     func start() {
         guard !started else { return }
         started = true
+        favourites = favouritesStore.load()
+        recent = recentStore.load()
         let lib = library
+        // h1 is built in, so the catalogue has no picture of it: make one the way Pocket makes its own
+        if let h1 = Bundle.main.url(forResource: "h1", withExtension: "rfm1") {
+            let paths = lib.paths
+            Task.detached(priority: .utility) {
+                guard let data = try? Data(contentsOf: h1), let shot = ScreenshotMaker.cachedScreenshot(for: data, paths: paths) else { return }
+                await MainActor.run {
+                    self.builtinShot = shot
+                    self.scheduleReload()
+                }
+            }
+        }
         Task {
             await lib.setOnChange { [weak self] in
                 Task { @MainActor in self?.scheduleReload() }
@@ -178,10 +363,17 @@ final class LibraryModel: ObservableObject {
     private func reload() async {
         let snap = await library.snapshot()
         var list: [LibraryItem] = []
-        if let h1 = LibraryItem.builtinH1() { list.append(h1) }
-        list += snap.entries.map { LibraryItem($0, base: library.base) }
+        if let h1 = LibraryItem.builtinH1(screenshot: builtinShot) { list.append(h1) }
+        for e in snap.entries {
+            var it = LibraryItem(e, base: library.base)
+            it.isNew = NewBadge.isNew(added: e.entry.added, since: snap.catalogueSince)
+            list.append(it)
+        }
         items = list
-        if selection == nil || item(selection) == nil { selection = list.first?.id }
+        withdrawnItems = snap.withdrawn.compactMap { LibraryItem(withdrawn: $0, paths: library.paths) }
+        if section == .withdrawn && withdrawnItems.isEmpty { section = .all }
+        if case .category(let c) = section, !categoryNames.contains(c), !list.isEmpty { section = .all }
+        if selection == nil || item(selection) == nil { select(visible.first?.id ?? list.first?.id) }
 
         let total = snap.entries.count
         let have = snap.entries.filter { $0.availability == .installed }.count

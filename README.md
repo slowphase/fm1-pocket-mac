@@ -7,8 +7,9 @@ It reads FM-1 Pocket Player's published firmware catalogue and runs the same `.r
 browser, no web view, no Electron. The firmware runs in a small WebAssembly interpreter (wasm3) inside the app, and
 its sound goes through Core Audio.
 
-**Status: Milestone 1 (technical proof of concept).** See [docs/MILESTONE-1.md](docs/MILESTONE-1.md) for what works,
-what has been tested and what is next.
+**Status:** Milestone 1 (proof of concept), the firmware library sync, and Milestone 2 (the library window) are done.
+The FM-1 faceplate player is next (Milestone 3). See [docs/MILESTONE-1.md](docs/MILESTONE-1.md) and
+[docs/STORAGE.md](docs/STORAGE.md).
 
 ## Getting the app
 
@@ -25,11 +26,16 @@ Versioned DMGs can also be published under **Releases** (see below).
 
 ## Using it
 
-- The sidebar lists every firmware in the catalogue, plus h1, which is built in so there is always something to play
-  offline. Search with the field at the top of the sidebar.
-- Select a firmware and press **Play** (or ⌘↩). The first play downloads it; after that it works offline.
-- Computer keys, as in Pocket Player: **A W S E D R F G Y H U J K O L P ; [ '** play notes, **Z / X** change octave,
-  **← →** presets, **↑ ↓** algorithm, **, .** select, **1–4** knobs (hold Shift to turn down).
+- **The library** works like Finder. The sidebar has All Firmware, Favourites, Recently Played, New (added to
+  Pocket in the last 14 days) and the catalogue's categories. Show firmware as icons (⌘1) or a sortable list (⌘2),
+  and search with the field in the toolbar ("kwa" finds K-WA SUB). Click a firmware to see its details; double-click,
+  or press ⌘↩, to play it. Right-click for more.
+- **Favourites:** the star in the details pane, the list's ★ column, the right-click menu, or ⌘D.
+- **The player** opens in its own window. Closing it stops the sound. h1 is built in, so there is always something to
+  play, even offline.
+- Computer keys in the player window, as in Pocket Player: **A W S E D R F G Y H U J K O L P ; [ '** play notes,
+  **Z / X** change octave, **← →** presets, **↑ ↓** algorithm, **, .** select, **1–4** knobs (hold Shift to turn
+  down).
 - The library downloads every approved firmware and screenshot automatically and works offline afterwards. Each
   firmware keeps its current and previous build. **FM-1 Pocket › Check for Firmware Updates…** syncs by hand and
   **Clean Up Old Downloads** removes downloads no longer kept. Your saved settings are never touched. Details:

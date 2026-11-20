@@ -92,6 +92,8 @@ public actor FirmwareLibrary {
         public var withdrawn: [FirmwareRecord]
         public var imports: [InstalledBuild]
         public var catalogueUpdated: String?
+        /// the catalogue's `since` (its first day), for the "new" badge
+        public var catalogueSince: String?
         public var registryLoad: RegistryLoad
     }
 
@@ -108,7 +110,7 @@ public actor FirmwareLibrary {
         }
         let withdrawn = registry.firmwares.values.filter { $0.status == .withdrawn }.sorted { $0.id < $1.id }
         return Snapshot(entries: out, withdrawn: withdrawn, imports: registry.imports, catalogueUpdated: catalogue?.updated,
-                        registryLoad: registryLoad)
+                        catalogueSince: catalogue?.since, registryLoad: registryLoad)
     }
 
     public func localScreenshot(for e: CatalogueEntry) -> URL? {
@@ -480,7 +482,7 @@ public actor FirmwareLibrary {
         for url in Self.files(under: paths.firmware) where !counted.contains(url.standardizedFileURL.path) {
             u.awaitingCleanup += size(url)
         }
-        u.screenshotsAndMetadata = Self.total(paths.shots) + size(paths.catalogue) + size(paths.registry) + size(paths.registryBackup)
+        u.screenshotsAndMetadata = Self.total(paths.shots) + Self.total(paths.generated) + size(paths.catalogue) + size(paths.registry) + size(paths.registryBackup)
         u.savedStates = Self.total(paths.state) + Self.total(paths.userData)
         u.imported = Self.total(paths.imported)
         u.temporary = Self.total(paths.tmp) + Self.total(paths.legacyCatalogue)
