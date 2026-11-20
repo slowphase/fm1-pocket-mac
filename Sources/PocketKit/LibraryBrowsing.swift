@@ -4,9 +4,11 @@ import ImageIO
 
 /// Search as FM-1 Pocket Player's picker does it: every word must appear somewhere in the firmware's text, and
 /// punctuation is ignored, so "kwa" finds K-WA SUB and "fm1" finds FM-1. Names that match come first.
+/// One addition to Pocket's rules: "!" counts as an "i", so "grimm" finds GR!MM.
 public enum LibrarySearch {
     static func bare(_ s: String) -> String {
-        String(s.lowercased().unicodeScalars.filter { ("a"..."z").contains($0) || ("0"..."9").contains($0) }.map(Character.init))
+        String(s.lowercased().replacingOccurrences(of: "!", with: "i").unicodeScalars
+            .filter { ("a"..."z").contains($0) || ("0"..."9").contains($0) }.map(Character.init))
     }
 
     public static func matches(_ query: String, fields: [String]) -> Bool {

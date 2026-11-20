@@ -19,7 +19,7 @@ final class BrowsingTests: XCTestCase {
         XCTAssertTrue(LibrarySearch.matches("fm1", fields: ["FM-1 SID"]))
         XCTAssertTrue(LibrarySearch.matches("synth", fields: ksub), "categories are searched")
         XCTAssertFalse(LibrarySearch.matches("grimm", fields: ksub))
-        XCTAssertTrue(LibrarySearch.matches("grimm", fields: ["GR!MM"]))
+        XCTAssertTrue(LibrarySearch.matches("grimm", fields: ["GR!MM"]), "! reads as i")
     }
 
     func testNamesThatMatchComeFirst() {
