@@ -91,7 +91,7 @@ final class PlayerModel: ObservableObject {
         }
     }
 
-    static let defaultInk = Color(red: 0xc8 / 255, green: 0xff / 255, blue: 0x4a / 255)
+    nonisolated static let defaultInk = Color(red: 0xc8 / 255, green: 0xff / 255, blue: 0x4a / 255)
 
     private var core: FirmwareCore?
     private let coreBox = CoreBox()
@@ -298,7 +298,7 @@ final class PlayerModel: ObservableObject {
     }
 
     /// the version a StateStore build key was saved with ("3.4@1a2b..." -> "3.4")
-    static func version(ofKey key: String) -> String { key.split(separator: "@").first.map(String.init) ?? key }
+    nonisolated static func version(ofKey key: String) -> String { key.split(separator: "@").first.map(String.init) ?? key }
 
     // MARK: - the frame loop
 
@@ -386,7 +386,7 @@ final class PlayerModel: ObservableObject {
         if next != controls { controls = next }
     }
 
-    static func image(_ rgba: [UInt8]) -> CGImage? {
+    nonisolated static func image(_ rgba: [UInt8]) -> CGImage? {
         let n = FirmwareCore.screenSize
         guard rgba.count == n * n * 4, let provider = CGDataProvider(data: Data(rgba) as CFData) else { return nil }
         return CGImage(width: n, height: n, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: n * 4,
@@ -395,10 +395,10 @@ final class PlayerModel: ObservableObject {
                        provider: provider, decode: nil, shouldInterpolate: false, intent: .defaultIntent)
     }
 
-    static func color(rgb: UInt32) -> Color {
+    nonisolated static func color(rgb: UInt32) -> Color {
         Color(red: Double((rgb >> 16) & 0xff) / 255, green: Double((rgb >> 8) & 0xff) / 255, blue: Double(rgb & 0xff) / 255)
     }
-    static func color(hex: String) -> Color? {
+    nonisolated static func color(hex: String) -> Color? {
         guard hex.count == 7, hex.hasPrefix("#"), let v = UInt32(hex.dropFirst(), radix: 16) else { return nil }
         return color(rgb: v)
     }
@@ -467,10 +467,10 @@ final class PlayerModel: ObservableObject {
 
     /// The same layout as FM-1 Pocket Player: A W S E D … play keys (from F), Z/X octave, arrows and , . for the
     /// main encoders, 1–4 (Shift: down) for the knobs. Physical key codes, so it works on any keyboard layout.
-    static let keyMap: [UInt16: Int] = [0: 0, 13: 1, 1: 2, 14: 3, 2: 4, 15: 5, 3: 6, 5: 7, 16: 8, 4: 9, 32: 10, 38: 11,
+    nonisolated static let keyMap: [UInt16: Int] = [0: 0, 13: 1, 1: 2, 14: 3, 2: 4, 15: 5, 3: 6, 5: 7, 16: 8, 4: 9, 32: 10, 38: 11,
                                         40: 12, 31: 13, 37: 14, 35: 15, 41: 16, 33: 17, 39: 18]
     /// the computer key printed on each piano key
-    static let keyLetters: [Int: String] = [0: "A", 1: "W", 2: "S", 3: "E", 4: "D", 5: "R", 6: "F", 7: "G", 8: "Y", 9: "H",
+    nonisolated static let keyLetters: [Int: String] = [0: "A", 1: "W", 2: "S", 3: "E", 4: "D", 5: "R", 6: "F", 7: "G", 8: "Y", 9: "H",
                                             10: "U", 11: "J", 12: "K", 13: "O", 14: "L", 15: "P", 16: ";", 17: "[", 18: "'"]
 
     private func installKeyboard() {

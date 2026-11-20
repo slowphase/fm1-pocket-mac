@@ -238,51 +238,79 @@ private struct Dial: View {
 
     private let sweep = Double.pi * 0.75
 
+    /// where the mark points, in radians from straight up
+    private var angleNow: Double {
+        guard state.absolute else { return angle }
+        let span = Double(state.hi - state.lo)
+        let t: Double = span > 0 ? Double(state.value - state.lo) / span : 0
+        return -sweep + t * 2 * sweep
+    }
+
     var body: some View {
-        let t = state.hi > state.lo ? Double(state.value - state.lo) / Double(state.hi - state.lo) : 0
-        let a = state.absolute ? -sweep + t * 2 * sweep : angle
-        Canvas { ctx, size in
-            let u = size.width / 64                              // the SVG's 64-unit box
-            let c = CGPoint(x: size.width / 2, y: size.height / 2)
-            func arc(_ from: Double, _ to: Double) -> Path {
-                var p = Path()
-                p.addArc(center: c, radius: 27 * u, startAngle: .radians(from - .pi / 2), endAngle: .radians(to - .pi / 2), clockwise: false)
-                return p
-            }
-            if state.absolute {
-                ctx.stroke(arc(-sweep, sweep), with: .color(Face.hex(0x0a0a0b)), style: StrokeStyle(lineWidth: 5 * u, lineCap: .round))
-                if a > -sweep + 0.001 {
-                    ctx.stroke(arc(-sweep, a), with: .color(player.ink), style: StrokeStyle(lineWidth: 5 * u, lineCap: .round))
-                }
-            }
-            let body = Path(ellipseIn: CGRect(x: c.x - 21 * u, y: c.y - 21 * u, width: 42 * u, height: 42 * u))
-            ctx.fill(body, with: .radialGradient(Gradient(colors: [Face.hex(0x5a5a62), Face.hex(0x26262b)]),
-                                                 center: CGPoint(x: c.x - 7 * u, y: c.y - 9 * u), startRadius: 0, endRadius: 33 * u))
-            ctx.stroke(body, with: .color(dragging ? player.ink : .black), lineWidth: 1.5 * u)
-            var mark = Path()
-            mark.move(to: CGPoint(x: c.x + sin(a) * 8 * u, y: c.y - cos(a) * 8 * u))
-            mark.addLine(to: CGPoint(x: c.x + sin(a) * 18 * u, y: c.y - cos(a) * 18 * u))
-            ctx.stroke(mark, with: .color(player.ink), style: StrokeStyle(lineWidth: 3 * u, lineCap: .round))
+        let a = angleNow
+        let ink = player.ink
+        let absolute = state.absolute
+        let active = dragging
+        let sw = sweep
+        return Canvas { ctx, size in
+            Self.draw(ctx, size: size, angle: a, sweep: sw, absolute: absolute, active: active, ink: ink)
         }
         .frame(width: 64 * s, height: 64 * s)
         .contentShape(Circle())
-        .gesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { g in
-                    if !dragging { dragging = true; startValue = state.value; acc = 0 }
-                    let dy = -g.translation.height / s
-                    if state.absolute {
-                        let span = Double(state.hi - state.lo)
-                        let nv = max(state.lo, min(state.hi, Int((Double(startValue) + Double(dy) * span / 180).rounded())))
-                        if nv != state.value { player.setValue(role, nv) }
-                    } else {
-                        let steps = Int((dy - acc) / 8)
-                        if steps != 0 { acc += CGFloat(steps) * 8; player.turn(role, steps); angle += Double(steps) * .pi / 12 }
+        .gesture(drag)
+        .onHover { inside in if inside { NSCursor.resizeUpDown.push() } else { NSCursor.pop() } }
+    }
+
+    private var drag: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { g in
+                if !dragging { dragging = true; startValue = state.value; acc = 0 }
+                let dy: CGFloat = -g.translation.height / s
+                if state.absolute {
+                    let span = Double(state.hi - state.lo)
+                    let raw: Double = Double(startValue) + Double(dy) * span / 180
+                    let nv = max(state.lo, min(state.hi, Int(raw.rounded())))
+                    if nv != state.value { player.setValue(role, nv) }
+                } else {
+                    let steps = Int((dy - acc) / 8)
+                    if steps != 0 {
+                        acc += CGFloat(steps) * 8
+                        player.turn(role, steps)
+                        angle += Double(steps) * Double.pi / 12
                     }
                 }
-                .onEnded { _ in dragging = false }
-        )
-        .onHover { inside in if inside { NSCursor.resizeUpDown.push() } else { NSCursor.pop() } }
+            }
+            .onEnded { _ in dragging = false }
+    }
+
+    /// the knob as Pocket's SVG draws it, in a 64-unit box
+    private static func draw(_ ctx: GraphicsContext, size: CGSize, angle a: Double, sweep: Double, absolute: Bool,
+                             active: Bool, ink: Color) {
+        let u: CGFloat = size.width / 64
+        let c = CGPoint(x: size.width / 2, y: size.height / 2)
+        func arc(_ from: Double, _ to: Double) -> Path {
+            var p = Path()
+            p.addArc(center: c, radius: 27 * u, startAngle: .radians(from - Double.pi / 2),
+                     endAngle: .radians(to - Double.pi / 2), clockwise: false)
+            return p
+        }
+        func point(_ r: CGFloat) -> CGPoint {
+            CGPoint(x: c.x + CGFloat(sin(a)) * r * u, y: c.y - CGFloat(cos(a)) * r * u)
+        }
+        let line = StrokeStyle(lineWidth: 5 * u, lineCap: .round)
+        if absolute {
+            ctx.stroke(arc(-sweep, sweep), with: .color(Face.hex(0x0a0a0b)), style: line)
+            if a > -sweep + 0.001 { ctx.stroke(arc(-sweep, a), with: .color(ink), style: line) }
+        }
+        let rect = CGRect(x: c.x - 21 * u, y: c.y - 21 * u, width: 42 * u, height: 42 * u)
+        let knob = Path(ellipseIn: rect)
+        let shade = Gradient(colors: [Face.hex(0x5a5a62), Face.hex(0x26262b)])
+        ctx.fill(knob, with: .radialGradient(shade, center: CGPoint(x: c.x - 7 * u, y: c.y - 9 * u), startRadius: 0, endRadius: 33 * u))
+        ctx.stroke(knob, with: .color(active ? ink : Color.black), lineWidth: 1.5 * u)
+        var mark = Path()
+        mark.move(to: point(8))
+        mark.addLine(to: point(18))
+        ctx.stroke(mark, with: .color(ink), style: StrokeStyle(lineWidth: 3 * u, lineCap: .round))
     }
 }
 
@@ -296,16 +324,23 @@ private struct ControlSlider: View {
     @State private var jog: Double = 0                       // -12...12 while a relative slider is held
     @State private var sent = 0
 
+    /// 0...1 along the track
+    private var position: Double {
+        if !state.absolute { return (jog + 12) / 24 }
+        let span = Double(state.hi - state.lo)
+        return span > 0 ? Double(state.value - state.lo) / span : 0
+    }
+
     var body: some View {
         GeometryReader { geo in
-            let w = geo.size.width, thumb = 26 * s
-            let t: Double = state.absolute ? (state.hi > state.lo ? Double(state.value - state.lo) / Double(state.hi - state.lo) : 0) : (jog + 12) / 24
-            let x = thumb / 2 + CGFloat(t) * (w - thumb)
+            let w: CGFloat = geo.size.width
+            let thumb: CGFloat = 26 * s
+            let x: CGFloat = thumb / 2 + CGFloat(position) * (w - thumb)
             ZStack(alignment: .leading) {
                 Capsule().fill(Face.hex(0x0a0a0b)).frame(height: 10 * s)
                     .overlay(Capsule().stroke(Color.black, lineWidth: 1))
-                let from = state.absolute ? thumb / 2 : min(x, w / 2)
-                let to = state.absolute ? x : max(x, w / 2)
+                let from: CGFloat = state.absolute ? thumb / 2 : min(x, w / 2)
+                let to: CGFloat = state.absolute ? x : max(x, w / 2)
                 Capsule().fill(player.ink).frame(width: max(0, to - from), height: 10 * s).offset(x: from)
                 Circle()
                     .fill(RadialGradient(colors: [Face.hex(0x5a5a62), Face.hex(0x26262b)], center: UnitPoint(x: 0.35, y: 0.3), startRadius: 0, endRadius: thumb * 0.7))
@@ -319,9 +354,11 @@ private struct ControlSlider: View {
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { g in
-                        let p = Double(max(0, min(1, (g.location.x - thumb / 2) / max(1, w - thumb))))
+                        let along: CGFloat = (g.location.x - thumb / 2) / max(1, w - thumb)
+                        let p = Double(max(0, min(1, along)))
                         if state.absolute {
-                            let nv = state.lo + Int((p * Double(state.hi - state.lo)).rounded())
+                            let span = Double(state.hi - state.lo)
+                            let nv = state.lo + Int((p * span).rounded())
                             if nv != state.value { player.setValue(role, nv) }
                         } else {
                             jog = (p * 24 - 12).rounded()
@@ -431,9 +468,10 @@ private struct PanelButton: View {
         let i = Int(button.rawValue)
         let down = player.downButtons.contains(button.rawValue)
         let latched = player.latchedButtons.contains(button.rawValue)
-        let l = player.leds
-        let green = button == .play && (l?.playGreen ?? 0) > (l?.buttons[i] ?? 0)
-        let level = Double(green ? (l?.playGreen ?? 0) : (l?.buttons[i] ?? 0)) / 255
+        let lit: UInt8 = player.leds?.buttons[i] ?? 0
+        let greenLit: UInt8 = button == .play ? (player.leds?.playGreen ?? 0) : 0
+        let green = greenLit > lit
+        let level = Double(green ? greenLit : lit) / 255
         let led = green ? Face.playGreen : player.ink
         let name = player.buttonNames[i]
         VStack(spacing: 5 * s) {
@@ -453,10 +491,7 @@ private struct PanelButton: View {
         .padding(.bottom, 6 * s)
         .padding(.horizontal, 2 * s)
         .frame(maxWidth: .infinity, minHeight: 40 * s)
-        .background(
-            RoundedRectangle(cornerRadius: 8 * s)
-                .fill(down ? AnyShapeStyle(Face.hex(0x1d1d20)) : AnyShapeStyle(LinearGradient(colors: [Face.hex(0x303035), Face.hex(0x232327)], startPoint: .top, endPoint: .bottom)))
-        )
+        .background(RoundedRectangle(cornerRadius: 8 * s).fill(face(down)))
         .overlay(RoundedRectangle(cornerRadius: 8 * s).stroke(Color.black, lineWidth: 1))
         .overlay(RoundedRectangle(cornerRadius: 10 * s).stroke(latched ? player.ink : .clear, lineWidth: 2).padding(-3 * s))
         .shadow(color: .black.opacity(0.7), radius: 3 * s, y: 3 * s)
@@ -475,9 +510,21 @@ private struct PanelButton: View {
                     player.buttonReleased(button)
                 }
         )
-        .help(name == button.label || name == button.label.replacingOccurrences(of: "-", with: " −").replacingOccurrences(of: "+", with: " +") ? "Shift-click to hold it down" : "Printed \(button.label). Shift-click to hold it down.")
+        .help(helpText(name))
         .accessibilityLabel(name)
         .accessibilityAddTraits(.isButton)
+    }
+}
+
+extension PanelButton {
+    func face(_ down: Bool) -> AnyShapeStyle {
+        if down { return AnyShapeStyle(Face.hex(0x1d1d20)) }
+        return AnyShapeStyle(LinearGradient(colors: [Face.hex(0x303035), Face.hex(0x232327)], startPoint: .top, endPoint: .bottom))
+    }
+
+    func helpText(_ name: String) -> String {
+        let printed = button.label.replacingOccurrences(of: "-", with: " −").replacingOccurrences(of: "+", with: " +")
+        return name == button.label || name == printed ? "Shift-click to hold it down" : "Printed \(button.label). Shift-click to hold it down."
     }
 }
 
@@ -563,14 +610,23 @@ private struct KeyCap: View {
     let black: Bool
     let height: CGFloat
 
+    private var ledY: CGFloat { black ? 8.5 * s : height * 0.6 + 11.5 * s }
+
+    private var capStyle: AnyShapeStyle {
+        if black {
+            return AnyShapeStyle(LinearGradient(colors: [Face.hex(0x2a2a2e), Face.keyBlack], startPoint: .top, endPoint: .bottom))
+        }
+        let stops: [Gradient.Stop] = [.init(color: Face.hex(0xd9d9d2), location: 0), .init(color: Face.key, location: 0.3)]
+        return AnyShapeStyle(LinearGradient(stops: stops, startPoint: .top, endPoint: .bottom))
+    }
+
     var body: some View {
         let on = player.heldKeys.contains(key)
         let level = Double(player.leds?.keys[key] ?? 0) / 255
-        let shape = UnevenRoundedRectangle(bottomLeadingRadius: (black ? 5 : 6) * s, bottomTrailingRadius: (black ? 5 : 6) * s)
+        let r: CGFloat = (black ? 5 : 6) * s
+        let shape = UnevenRoundedRectangle(bottomLeadingRadius: r, bottomTrailingRadius: r)
         ZStack(alignment: .top) {
-            shape.fill(on ? AnyShapeStyle(player.ink) : (black
-                ? AnyShapeStyle(LinearGradient(colors: [Face.hex(0x2a2a2e), Face.keyBlack], startPoint: .top, endPoint: .bottom))
-                : AnyShapeStyle(LinearGradient(stops: [.init(color: Face.hex(0xd9d9d2), location: 0), .init(color: Face.key, location: 0.3)], startPoint: .top, endPoint: .bottom))))
+            shape.fill(on ? AnyShapeStyle(player.ink) : capStyle)
             shape.stroke(Color.black, lineWidth: 1)
             // the LED: below the black keys on a white key, near the top of a black one
             GeometryReader { g in
@@ -580,7 +636,7 @@ private struct KeyCap: View {
                         .shadow(color: on ? .clear : player.ink.opacity(level), radius: 5 * s)
                 }
                 .frame(width: g.size.width * 0.6, height: 5 * s)
-                .position(x: g.size.width / 2, y: black ? 8.5 * s : height * 0.6 + 11.5 * s)
+                .position(x: g.size.width / 2, y: ledY)
             }
             if let letter = PlayerModel.keyLetters[key] {
                 VStack {
