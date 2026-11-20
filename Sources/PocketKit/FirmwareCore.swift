@@ -24,7 +24,7 @@ public final class FirmwareCore: @unchecked Sendable {
     public static let screenSize = 240
     public static let keyCount = 27
 
-    private let h: OpaquePointer
+    let h: OpaquePointer
 
     public init(bytes: Data) throws {
         var err = [CChar](repeating: 0, count: 400)
@@ -118,5 +118,78 @@ public final class FirmwareCore: @unchecked Sendable {
         let cap = buf.count
         _ = buf.withUnsafeMutableBufferPointer { fm1h_log_take(h, $0.baseAddress, cap) }
         return String(cString: buf)
+    }
+}
+
+// MARK: - optional extras (sim1, live labels, stats)
+
+extension FirmwareCore {
+    /// What an encoder role is tied to right now, for firmware with the sim1 extension.
+    public struct Control: Equatable, Sendable {
+        /// true: a value a slider or knob may set outright; false: a relative encoder (name and text still show)
+        public var absolute: Bool
+        public var value: Int
+        public var lo: Int
+        public var hi: Int
+        public var name: String
+        public var text: String
+
+        public init(absolute: Bool, value: Int, lo: Int, hi: Int, name: String, text: String) {
+            self.absolute = absolute; self.value = value; self.lo = lo; self.hi = hi; self.name = name; self.text = text
+        }
+    }
+
+    /// the sim1 version, 0 without it
+    public var sim1Version: Int { Int(fm1h_sim1(h)) }
+
+    public func control(_ role: FM1Encoder) -> Control? {
+        var c = fm1h_ctl()
+        let r = fm1h_ctl_info(h, role.rawValue, &c)
+        guard r >= 0 else { return nil }
+        func str<T>(_ t: T) -> String {
+            withUnsafeBytes(of: t) { raw in
+                let bytes = raw.bindMemory(to: UInt8.self)
+                let end = bytes.firstIndex(of: 0) ?? bytes.count
+                return String(decoding: bytes[0..<end], as: UTF8.self)
+            }
+        }
+        return Control(absolute: r == 1, value: Int(c.value), lo: Int(c.lo), hi: Int(c.hi), name: str(c.name), text: str(c.text))
+    }
+
+    public func setControl(_ role: FM1Encoder, to value: Int) { fm1h_ctl_set(h, role.rawValue, Int32(clamping: value)) }
+
+    /// the firmware's accent colour right now (0xRRGGBB), if it gives one
+    public var accent: UInt32? {
+        let a = fm1h_accent(h)
+        return a < 0 ? nil : UInt32(a) & 0xffffff
+    }
+    /// bytes the last frame sent to the panel, if the firmware reports it
+    public var linkBytes: Int? {
+        let b = fm1h_link_bytes(h)
+        return b < 0 ? nil : Int(b)
+    }
+    /// bytes of the screen that changed at the last `screen(into:)`
+    public var screenChangedBytes: Int { Int(fm1h_screen_changed_bytes(h)) }
+    /// the MASTER pot (0...1023) as the panel holds it
+    public var master: Int { Int(fm1h_master(h)) }
+
+    /// 0 when the firmware gives no live labels; changes whenever one changes
+    public var labelsEpoch: UInt32 { fm1h_labels_epoch(h) }
+
+    /// The 49 live labels: 0..7 the knob roles and MASTER, 8..21 the buttons, 22..37 the white keys, 38..48 the
+    /// black keys. nil = not given, "" = no job right now.
+    public func labels() -> [String?] {
+        var buf = [CChar](repeating: 0, count: 20)
+        let cap = Int32(buf.count)
+        return (0..<49).map { i in
+            let n = buf.withUnsafeMutableBufferPointer { fm1h_label(h, Int32(i), $0.baseAddress, cap) }
+            return n < 0 ? nil : String(cString: buf)
+        }
+    }
+
+    /// the firmware's own CPU figure (percent) and shed count, if it reports them
+    public func stats() -> (cpu: Int, shed: Int)? {
+        var shed: UInt32 = 0, cpu: UInt32 = 0
+        return fm1h_stats(h, &shed, &cpu) != 0 ? (Int(cpu), Int(shed)) : nil
     }
 }

@@ -14,6 +14,23 @@ public struct RFM1File {
     public var authors: [String]
     public var credits: String
     public var licenses: [License]
+    public var skin: Skin?
+    /// the manifest's optional fields
+    public var glueURL: String?
+    public var builtBy: String?
+
+    /// A firmware's own look (`rfm1.skin`): an image behind the faceplate and an accent colour.
+    public struct Skin: Equatable {
+        /// how much of the faceplate colour goes over the image, 0...0.8
+        public var dim: Double
+        /// the LED / accent colour, "#RRGGBB"
+        public var led: String?
+        public var body: String?
+        public var background: Data?
+        public var backgroundLandscape: Data?
+        /// the image for a wide faceplate: the landscape one if there is one
+        public var wideImage: Data? { backgroundLandscape ?? background }
+    }
 
     public init(_ bytes: Data) throws {
         let b = [UInt8](bytes)
@@ -70,5 +87,20 @@ public struct RFM1File {
             j += 1
         }
         licenses = lic
+        glueURL = m["glue_url"] as? String
+        builtBy = m["built_by"] as? String
+        if let s = custom["rfm1.skin"], let j = (try? JSONSerialization.jsonObject(with: s)) as? [String: Any] {
+            let theme = j["theme"] as? [String: Any]
+            func color(_ k: String) -> String? {
+                guard let v = theme?[k] as? String, v.count == 7, v.hasPrefix("#"), UInt32(v.dropFirst(), radix: 16) != nil else { return nil }
+                return v
+            }
+            let bg = custom["rfm1.skin.background"].flatMap { $0.count < 4 * 1024 * 1024 ? $0 : nil }
+            let wide = custom["rfm1.skin.background.landscape"].flatMap { $0.count < 4 * 1024 * 1024 ? $0 : nil }
+            let dim = min(0.8, max(0, (j["dim"] as? Double) ?? 0))
+            skin = Skin(dim: dim, led: color("led"), body: color("body"), background: bg, backgroundLandscape: wide)
+        } else {
+            skin = nil
+        }
     }
 }

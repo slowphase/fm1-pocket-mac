@@ -71,6 +71,22 @@ int main(int argc, char **argv) {
     char log[512];
     fm1h_log_take(h, log, sizeof log);
 
+    /* the optional extras, where the firmware has them */
+    if (fm1h_sim1(h)) {
+        fm1h_ctl c;
+        for (int r = 0; r < FM1H_NROLES; r++) if (fm1h_ctl_info(h, r, &c) >= 0)
+            printf("  sim1 role %d: %s %s [%d..%d] = %d (%s)\n", r, c.name, c.text, c.lo, c.hi, c.value, fm1h_ctl_info(h, r, &c) ? "absolute" : "relative");
+        printf("  accent %06x\n", fm1h_accent(h));
+    }
+    if (fm1h_labels_epoch(h)) {
+        char lb[20];
+        printf("  labels (epoch %u):", fm1h_labels_epoch(h));
+        for (int i = 8; i < 22; i++) { int n = fm1h_label(h, i, lb, sizeof lb); printf(" [%s]", n < 0 ? "-" : lb); }
+        printf("\n");
+    }
+    { uint32_t shed = 0, cpu = 0; if (fm1h_stats(h, &shed, &cpu)) printf("  stats: cpu %u%%, shed %u\n", cpu, shed); }
+    printf("  master %d, screen changed %u bytes\n", fm1h_master(h), fm1h_screen_changed_bytes(h));
+
     int ok = !fm1h_halted(h) && lit > 0 && writes2 > writes && (played > 0.001 || idle > 0.001);   /* run.js plus: it makes sound */
     printf("%s halted=%d litPixels=%u lcdWrites=[%u,%u] idleRms=%.4f playedRms=%.4f flash=%zu deviceMs=%u speed=%.1fx realtime%s%s\n",
            ok ? "ok  " : "FAIL", fm1h_halted(h), lit, writes, writes2, idle, played, fl, fm1h_device_ms(h), speed,

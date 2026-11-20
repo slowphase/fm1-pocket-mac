@@ -32,10 +32,13 @@ static const char *LABELS[FM1H_NBUTTONS] = { "FX", "SEL", "ENV", "LFO", "EDIT", 
     "PLAY", "REC", "OCT-", "OCT+" };
 
 enum { F_VERSION, F_GET, F_LAYOUT, F_ALLOC, F_OPTIONS, F_BOOT_OPTIONS, F_INIT, F_TICK, F_FRAME, F_IDLE, F_AUDIO,
-       F_MIDI_IN, F_FLASH_STAGE, F_FLASH, F_FLASH_DIRTY, F_FLASH_SYNC, F_SHUTDOWN, F_INITIALIZE, F_COUNT };
+       F_MIDI_IN, F_FLASH_STAGE, F_FLASH, F_FLASH_DIRTY, F_FLASH_SYNC, F_SHUTDOWN, F_INITIALIZE,
+       F_SIM1_VERSION, F_SIM1_CTL, F_SIM1_CTL_SET, F_SIM1_ACCENT, F_SIM1_LINK, F_LABELS_EPOCH, F_LABEL, F_STATS, F_COUNT };
 static const char *FNAMES[F_COUNT] = { "rfm1_version", "rfm1_get", "rfm1_layout", "rfm1_alloc", "rfm1_options",
     "rfm1_boot_options", "rfm1_init", "rfm1_tick", "rfm1_frame", "rfm1_idle", "rfm1_audio", "rfm1_midi_in",
-    "rfm1_flash_stage", "rfm1_flash", "rfm1_flash_dirty", "rfm1_flash_sync", "rfm1_shutdown", "_initialize" };
+    "rfm1_flash_stage", "rfm1_flash", "rfm1_flash_dirty", "rfm1_flash_sync", "rfm1_shutdown", "_initialize",
+    "rfm1_sim1_version", "rfm1_sim1_ctl", "rfm1_sim1_ctl_set", "rfm1_sim1_accent", "rfm1_sim1_link_bytes",
+    "rfm1_labels_epoch", "rfm1_label", "rfm1_stats" };
 /* exports a module must have (memory is checked separately) */
 static const int REQUIRED[] = { F_VERSION, F_GET, F_LAYOUT, F_ALLOC, F_OPTIONS, F_INIT, F_TICK, F_FRAME, F_IDLE,
     F_AUDIO, F_FLASH_STAGE, F_FLASH, F_FLASH_DIRTY };
@@ -64,7 +67,10 @@ struct fm1h {
 
     uint32_t ms;
     uint64_t blocks;
-    uint32_t abuf;
+    uint32_t abuf, ctlbuf, statbuf;
+    int sim1;
+    uint8_t prev_lcd[FM1H_SCREEN_W * FM1H_SCREEN_H * 2];
+    uint32_t changed_bytes;
     float ring[RING];
     uint64_t rw, rr;
 };
@@ -307,6 +313,8 @@ fm1h *fm1h_create(const uint8_t *wasm, size_t len, char *err, size_t errlen) {
         h->button_names[i] = s;
     }
     if (!h->panel || !inmem(h, h->panel, LAYOUT[0])) return bail(h, err, errlen, "The module has no panel.");
+    h->sim1 = h->fn[F_SIM1_VERSION] ? CALL0(h, F_SIM1_VERSION) : 0;
+    if (h->halted) return bail(h, err, errlen, "The firmware stopped while starting.");
     return h;
 }
 
@@ -461,6 +469,11 @@ uint32_t fm1h_screen_rgba(fm1h *h, uint8_t *out) {
     w = rd32(h, pp(h, P_LCD_WRITES));
     if (inmem(h, pp(h, P_LCD), n * 2)) {
         const uint8_t *s = mem(h, NULL) + pp(h, P_LCD);
+        uint32_t rows = 0, y;
+        for (y = 0; y < FM1H_SCREEN_H; y++) {
+            if (memcmp(s + y * 480, h->prev_lcd + y * 480, 480)) { rows++; memcpy(h->prev_lcd + y * 480, s + y * 480, 480); }
+        }
+        h->changed_bytes = rows * 480;
         for (i = 0; i < n; i++) {
             uint16_t px = (uint16_t)((s[2 * i] << 8) | s[2 * i + 1]);
             uint8_t r = (px >> 11) & 31, g = (px >> 5) & 63, b = px & 31;
@@ -526,3 +539,92 @@ size_t fm1h_log_take(fm1h *h, char *out, size_t cap) {
     pthread_mutex_unlock(&h->lock);
     return n;
 }
+
+/* ---- optional extras ---- */
+int fm1h_sim1(fm1h *h) { return h->sim1; }
+
+int fm1h_ctl_info(fm1h *h, int role, fm1h_ctl *out) {
+    int r = -1;
+    if (!h->sim1 || !h->fn[F_SIM1_CTL] || role < 0 || role >= FM1H_NROLES || !out) return -1;
+    pthread_mutex_lock(&h->lock);
+    if (!h->ctlbuf) h->ctlbuf = (uint32_t)CALL1(h, F_ALLOC, 76);
+    if (h->ctlbuf && inmem(h, h->ctlbuf, 76)) {
+        memset(mem(h, NULL) + h->ctlbuf, 0, 76);
+        int abs = CALL2(h, F_SIM1_CTL, role, (int32_t)h->ctlbuf);
+        if (!h->halted && inmem(h, h->ctlbuf, 76)) {
+            const uint8_t *b = mem(h, NULL) + h->ctlbuf;
+            memcpy(&out->value, b, 4);
+            memcpy(&out->lo, b + 4, 4);
+            memcpy(&out->hi, b + 8, 4);
+            memcpy(out->name, b + 12, 32);
+            memcpy(out->text, b + 44, 32);
+            out->name[31] = 0;
+            out->text[31] = 0;
+            r = abs ? 1 : 0;
+        }
+    }
+    pthread_mutex_unlock(&h->lock);
+    return r;
+}
+void fm1h_ctl_set(fm1h *h, int role, int value) {
+    if (!h->sim1 || !h->fn[F_SIM1_CTL_SET] || role < 0 || role >= FM1H_NROLES) return;
+    pthread_mutex_lock(&h->lock);
+    CALL2(h, F_SIM1_CTL_SET, role, value);
+    pthread_mutex_unlock(&h->lock);
+}
+int32_t fm1h_accent(fm1h *h) {
+    if (!h->sim1 || !h->fn[F_SIM1_ACCENT]) return -1;
+    pthread_mutex_lock(&h->lock);
+    int32_t a = h->halted ? -1 : CALL0(h, F_SIM1_ACCENT);
+    pthread_mutex_unlock(&h->lock);
+    return a;
+}
+int32_t fm1h_link_bytes(fm1h *h) {
+    if (!h->sim1 || !h->fn[F_SIM1_LINK]) return -1;
+    pthread_mutex_lock(&h->lock);
+    int32_t a = h->halted ? -1 : CALL0(h, F_SIM1_LINK);
+    pthread_mutex_unlock(&h->lock);
+    return a;
+}
+int fm1h_master(fm1h *h) {
+    pthread_mutex_lock(&h->lock);
+    int v = (int32_t)rd32(h, pp(h, P_MASTER));
+    pthread_mutex_unlock(&h->lock);
+    return v;
+}
+uint32_t fm1h_labels_epoch(fm1h *h) {
+    if (!h->fn[F_LABELS_EPOCH] || !h->fn[F_LABEL]) return 0;
+    pthread_mutex_lock(&h->lock);
+    uint32_t e = (uint32_t)CALL0(h, F_LABELS_EPOCH);
+    pthread_mutex_unlock(&h->lock);
+    return e;
+}
+int fm1h_label(fm1h *h, int slot, char *out, int cap) {
+    if (!h->fn[F_LABEL] || slot < 0 || slot >= 49 || !out || cap < 1) return -1;
+    pthread_mutex_lock(&h->lock);
+    uint32_t p = (uint32_t)CALL1(h, F_LABEL, slot), n, size;
+    int r = -1;
+    uint8_t *m = mem(h, &size);
+    if (p && m && p < size) {
+        for (n = 0; p + n < size && n < 16 && n < (uint32_t)cap - 1 && m[p + n]; n++) out[n] = (char)m[p + n];
+        out[n] = 0;
+        r = (int)n;
+    }
+    pthread_mutex_unlock(&h->lock);
+    return r;
+}
+int fm1h_stats(fm1h *h, uint32_t *shed, uint32_t *cpu) {
+    if (!h->fn[F_STATS]) return 0;
+    int ok = 0;
+    pthread_mutex_lock(&h->lock);
+    if (!h->statbuf) h->statbuf = (uint32_t)CALL1(h, F_ALLOC, 8);
+    if (h->statbuf) {
+        CALL2(h, F_STATS, (int32_t)h->statbuf, (int32_t)(h->statbuf + 4));
+        if (shed) *shed = rd32(h, h->statbuf);
+        if (cpu) *cpu = rd32(h, h->statbuf + 4);
+        ok = !h->halted;
+    }
+    pthread_mutex_unlock(&h->lock);
+    return ok;
+}
+uint32_t fm1h_screen_changed_bytes(fm1h *h) { return h->changed_bytes; }
