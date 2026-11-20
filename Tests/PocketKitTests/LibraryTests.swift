@@ -642,7 +642,9 @@ final class LibraryStorageTests: XCTestCase {
         _ = await relaunched.cleanUp()
         XCTAssertTrue(exists(paths.firmwareFile(id: "alpha", sha256: a.sha)))
         XCTAssertTrue(exists(paths.firmwareFile(id: "beta", sha256: b.sha)))
-        XCTAssertNoThrow(try JSONDecoder().decode(Registry.self, from: Data(contentsOf: paths.registry)), "the registry is whole again")
+        let dec = JSONDecoder()
+        dec.dateDecodingStrategy = .iso8601
+        XCTAssertNoThrow(try dec.decode(Registry.self, from: Data(contentsOf: paths.registry)), "the registry is whole again")
     }
 
     func testSchedulerPassesSlotsInOrderAndPromotes() async {
