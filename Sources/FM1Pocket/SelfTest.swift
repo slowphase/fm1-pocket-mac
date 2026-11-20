@@ -66,7 +66,7 @@ enum SelfTest {
                 }
                 return (s / Double(max(n, 1))).squareRoot()
             }
-            _ = rms(3)
+            _ = rms(8)              // past a splash screen or a slow start (ChoralRoot needs more than 3 s)
             var px: [UInt8] = []
             core.screen(into: &px)
             var lit = 0
