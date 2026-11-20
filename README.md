@@ -30,7 +30,10 @@ Versioned DMGs can also be published under **Releases** (see below).
 - Select a firmware and press **Play** (or ⌘↩). The first play downloads it; after that it works offline.
 - Computer keys, as in Pocket Player: **A W S E D R F G Y H U J K O L P ; [ '** play notes, **Z / X** change octave,
   **← →** presets, **↑ ↓** algorithm, **, .** select, **1–4** knobs (hold Shift to turn down).
-- **FM-1 Pocket › Check for Firmware Updates…** fetches the catalogue again (it is also checked at every launch).
+- The library downloads every approved firmware and screenshot automatically and works offline afterwards. Each
+  firmware keeps its current and previous build. **FM-1 Pocket › Check for Firmware Updates…** syncs by hand and
+  **Clean Up Old Downloads** removes downloads no longer kept. Your saved settings are never touched. Details:
+  [docs/STORAGE.md](docs/STORAGE.md).
 
 ## How it is built
 
@@ -38,7 +41,7 @@ Versioned DMGs can also be published under **Releases** (see below).
 | --- | --- |
 | `Sources/CWasm3` | wasm3 v0.5.0 (MIT), the WebAssembly interpreter |
 | `Sources/FM1Host` | C: runs one `.rfm1` on wasm3. A port of Pocket Player's `src/rfm1.js` (same boot, clock, panel and audio) |
-| `Sources/PocketKit` | Swift: the catalogue client (with SHA-256 checks and an offline cache), the firmware wrapper, Core Audio output, saved settings |
+| `Sources/PocketKit` | Swift: the firmware library (sync, SHA-256-checked downloads, offline cache, two-build retention, safe cleanup), the firmware wrapper, Core Audio output, saved settings |
 | `Sources/FM1Pocket` | the SwiftUI app |
 | `Tests/` | Swift tests (`PocketKitTests`) and a plain C test of the host (`ctest`) |
 | `scripts/` | `build-app.sh` (assemble and ad-hoc sign the .app), `make-dmg.sh` |
