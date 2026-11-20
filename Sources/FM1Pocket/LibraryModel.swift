@@ -155,8 +155,8 @@ struct LibraryItem: Identifiable, Hashable {
             if let m = emuTested?.machine, m.contains("Darwin") { verification = .macos }
         }
         listened = s.emu?.listened ?? []
-        preferredEngine = s.emu?.preferredMac?.engine
-        preferredReason = s.emu?.preferredMac?.reason
+        preferredEngine = s.preferredEngine
+        preferredReason = s.preferredReason
     }
 
     /// a firmware the expanded catalogue lists that this app cannot download: shown with why, never played

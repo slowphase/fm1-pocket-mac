@@ -107,6 +107,9 @@ public actor FirmwareLibrary {
         public var hubURL: String?
         /// the emulator engine's view of this firmware (catalog-v2.json's emu block), when the catalogue has one
         public var emu: CatalogueV2.Emu?
+        /// the engine recommended on this Mac ("rfm1" or "fm1-emu"), and why
+        public var preferredEngine: String?
+        public var preferredReason: String?
     }
 
     public struct Snapshot: Equatable, Sendable {
@@ -136,7 +139,8 @@ public actor FirmwareLibrary {
             out.append(Entry(entry: e, availability: avail, downloading: downloadingIDs.contains(e.id), lastError: rec?.lastError,
                              current: builds.first, previous: builds.count > 1 ? builds[1] : nil,
                              screenshotFile: localScreenshot(for: e), mac: e.isPackage ? d?.emu?.mac : d?.mac,
-                             makers: d?.makers ?? [], hubURL: d?.hubURL, emu: d?.emu))
+                             makers: d?.makers ?? [], hubURL: d?.hubURL, emu: d?.emu,
+                             preferredEngine: d?.preferredMacEngine, preferredReason: d?.preferredMacReason))
         }
         let withdrawn = registry.firmwares.values.filter { $0.status == .withdrawn }.sorted { $0.id < $1.id }
         return Snapshot(entries: out, withdrawn: withdrawn, imports: registry.imports, catalogueUpdated: catalogue?.updated,

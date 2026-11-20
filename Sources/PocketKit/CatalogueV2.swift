@@ -246,11 +246,25 @@ public struct CatalogueV2: Decodable, Equatable {
                                   size: p.size ?? 0, added: download?.added, updated: download?.updated, image: download?.image,
                                   remoteURL: p.url)
         }
-        /// the engine the catalogue recommends on the Mac, among those the app can run here
+        /// the engine the catalogue recommends on the Mac, among those the app can run here. The catalogue's choice is
+        /// made from Apple Silicon measurements; on an Intel Mac the emulator is much slower (a median 1.55x real time
+        /// against 3x), so there the .rfm1 build comes first unless the package was measured fast enough on Intel too.
         public var preferredMacEngine: String? {
             let have = (macDownloadable ? ["rfm1"] : []) + ((emu?.macPlayable ?? false) ? ["fm1-emu"] : [])
+            #if arch(x86_64)
+            if have.count > 1, (emu?.macTested?.intelSpeed ?? 0) < 1.2 { return "rfm1" }
+            #endif
             if let p = emu?.preferredMac?.engine, have.contains(p) { return p }
             return have.first
+        }
+        /// why, for the details pane
+        public var preferredMacReason: String? {
+            #if arch(x86_64)
+            if preferredMacEngine == "rfm1", emu?.preferredMac?.engine == "fm1-emu" {
+                return "On an Intel Mac the emulator runs too slowly for this firmware, so its .rfm1 build comes first."
+            }
+            #endif
+            return emu?.preferredMac?.reason
         }
     }
 
