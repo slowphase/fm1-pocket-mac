@@ -37,27 +37,41 @@ clock, same panel offsets, same layout checks.
 
 ## Evidence so far
 
-### Measured in the development sandbox (Linux, 2-core x86 cloud VM, much slower than an M5)
+Speed below means: a fresh boot, the default preset, a three-note chord held, ten seconds of device time pulled in
+512-frame buffers the way Core Audio asks for it. Anything above 1x plays without dropouts; the margin is headroom.
 
-The C host test (`Tests/ctest`, the same checks as Pocket's `tests/run.js`) on h1 and six firmwares from
-RemoteFM1FW's release:
+### On GitHub's Apple Silicon Mac (macOS 15.8, Xcode 16.4, Swift 6.1, a 3-core virtual M1)
 
-| Firmware | Boots | Draws | Sound | Reacts to input | Speed |
-| --- | --- | --- | --- | --- | --- |
-| h1 0.2.1 | yes | yes | yes | yes | 7.0x real time |
-| Felucca 1.8.2 | yes | yes | yes | yes | 13.3x |
-| GR!MM 2.0.2 | yes | yes | yes | yes | 2.4x |
-| SLOOP 2.8.5 | yes | yes | yes | yes | 10.9x |
-| SLOOP 3 3.4.0 | yes | yes | yes | yes | 11.5x |
-| ChoralRoot 0.42 | yes | yes | yes | yes | 8.7x |
-| AMB-1 1.3.2 | yes | yes | yes (generative) | yes | 10.8x |
+From the first green builds (runs 1 and 2 of **Build Mac app**):
 
-h1 also played a MIDI note-on. Screens were saved and inspected: each shows the firmware's real home screen.
+- **C host test:** h1 0.2.1 loads in 6 ms, boots, draws its home screen (12,486 lit pixels), plays the chord
+  (RMS 0.11 against 0.0007 silent), redraws on input, and returns its 1 MiB flash image.
+- **Swift tests:** 11 run, 0 failures (one, the live check, runs in its own step). They cover h1's boot, screen,
+  sound, buttons, encoders and MIDI note-on; saved settings round-tripping and staying apart by version;
+  checksum-verified downloads (a wrong checksum is refused and never stored); a failed catalogue update keeping the
+  last good copy; and catalogue decoding, including fields the app does not know yet.
+- **Live catalogue:** the real published catalogue (95 firmwares) downloaded; its smallest firmware (FiMba-1 0.7.0)
+  downloaded, checksum-verified and booted without stopping.
+- **Packaged app self-test:** the built `.app` boots its bundled h1, draws and plays: h1 runs at **3.5x real time**.
+- **DMG:** 837 KB, ad-hoc signed, `hdiutil verify` valid.
 
-### On GitHub's Apple Silicon Mac
+### In the development sandbox (Linux, 2-core x86 cloud VM)
 
-See the latest **Build Mac app** run's summary: the C host test, the Swift tests (including h1's speed on that Mac),
-the live-catalogue check and the packaged app's self-test.
+The C host test on h1 and six firmwares from RemoteFM1FW's release:
+
+| Firmware | Boots, draws, sounds, reacts | Speed |
+| --- | --- | --- |
+| h1 0.2.1 | yes (MIDI note-on too) | 4.5x real time |
+| Felucca 1.8.2 | yes | 15.8x |
+| GR!MM 2.0.2 | yes | 2.4x |
+| SLOOP 2.8.5 | yes | 18.0x |
+| SLOOP 3 3.4.0 | yes | 11.0x |
+| ChoralRoot 0.42 | yes | 9.1x |
+| AMB-1 1.3.2 (generative) | yes | 13.0x |
+
+GitHub's virtual M1 ran h1 at roughly 0.75x the sandbox's speed, which puts GR!MM at about 1.8x there. An M5's cores
+are much faster than either, so all seven should have comfortable headroom on your Mac, but GR!MM is the one to try
+first if anything stutters.
 
 ## What is still untested
 
@@ -67,8 +81,8 @@ the live-catalogue check and the packaged app's self-test.
 - **MIDI from a real controller.** The firmware side is tested; the Mac's CoreMIDI input is not built yet
   (Milestone 3).
 - **Every catalogue firmware.** Seven families are proven; the live check boots one catalogue firmware per build.
-- **GR!MM-class heavy firmware at small audio buffers.** It ran 2.4x real time on the slow sandbox; an M5 should be
-  several times faster, but this needs measuring on your Mac.
+- **GR!MM-class heavy firmware on your Mac.** The heaviest of the seven (2.4x on the sandbox, about 1.8x estimated on
+  GitHub's Mac). An M5 should have plenty of headroom, but it needs a listen.
 
 ## Problems to solve later
 

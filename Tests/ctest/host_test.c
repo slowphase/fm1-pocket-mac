@@ -54,11 +54,20 @@ int main(int argc, char **argv) {
     unsigned char *flash = malloc(fm1h_flash_size(h) + 1);
     size_t fl = fm1h_flash_copy(h, 1, flash, fm1h_flash_size(h));
 
-    /* speed: 10 s of device time with a chord held */
-    for (int i = 0; i < 3; i++) fm1h_key(h, chord[i], 1, 100);
-    double ts = now();
-    fm1h_run_ms(h, 10000);
-    double speed = 10.0 / (now() - ts);
+    /* speed: a fresh boot, the default preset, a chord held, 10 s of device time pulled in 512-frame buffers
+       (the same measurement as the Swift test and the app's self-test) */
+    fm1h *sp = fm1h_create(b, len, err, sizeof err);
+    double speed = 0;
+    if (sp) {
+        fm1h_boot(sp, NULL, 0);
+        fm1h_run_ms(sp, 1000);
+        for (int i = 0; i < 3; i++) fm1h_key(sp, chord[i], 1, 100);
+        double ts = now();
+        for (int i = 0; i < 441000 / 512; i++) fm1h_pull(sp, buf, 512);
+        speed = 10.0 / (now() - ts);
+        if (fm1h_halted(sp)) speed = 0;
+        fm1h_destroy(sp);
+    }
     char log[512];
     fm1h_log_take(h, log, sizeof log);
 
