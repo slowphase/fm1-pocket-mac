@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// Milestone 1's library: a plain native sidebar of firmware names (grouped by category, searchable) and a detail
@@ -67,8 +68,17 @@ private struct Row: View {
                     .lineLimit(1)
             }
             Spacer()
-            if loading { ProgressView().controlSize(.small) }
+            if loading || item.downloading { ProgressView().controlSize(.small) }
             else if playing { Image(systemName: "speaker.wave.2.fill").foregroundStyle(.tint) }
+            else if item.lastError != nil && item.download != .installed {
+                Image(systemName: "exclamationmark.triangle").foregroundStyle(.secondary).help(item.downloadText)
+            } else {
+                switch item.download {
+                case .installed: EmptyView()
+                case .olderInstalled: Image(systemName: "arrow.down.circle.dotted").foregroundStyle(.secondary).help(item.downloadText)
+                case .notDownloaded: Image(systemName: "arrow.down.circle").foregroundStyle(.secondary).help(item.downloadText)
+                }
+            }
         }
     }
 }
@@ -87,7 +97,9 @@ private struct DetailView: View {
                 HStack(alignment: .top, spacing: 20) {
                     if player.playingID != item.id {
                         Group {
-                            if let url = item.imageURL {
+                            if let file = item.screenshotFile, let img = NSImage(contentsOf: file) {
+                                Image(nsImage: img).resizable().interpolation(.none)        // cached: works offline
+                            } else if let url = item.imageURL {
                                 AsyncImage(url: url) { phase in
                                     if let img = phase.image { img.resizable().interpolation(.none) }
                                     else { Color.black }
@@ -116,7 +128,7 @@ private struct DetailView: View {
                             fact("Category", item.category)
                             fact("Licence", item.license)
                             fact("Size", ByteCountFormatter.string(fromByteCount: Int64(item.size), countStyle: .file))
-                            fact("Downloaded", library.isDownloaded(item) ? "Yes" : "Not yet")
+                            fact("Download", item.downloadText)
                             if let s = item.sourceURL, let u = URL(string: s) {
                                 GridRow {
                                     Text("Source").foregroundStyle(.secondary)

@@ -27,6 +27,7 @@ struct FM1PocketApp: App {
         .commands {
             CommandGroup(after: .appInfo) {
                 Button("Check for Firmware Updates…") { library.refresh() }
+                Button("Clean Up Old Downloads") { library.cleanUp() }
             }
             CommandMenu("Player") {
                 Button("Play Selected Firmware") {
