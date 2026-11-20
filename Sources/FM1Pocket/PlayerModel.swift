@@ -145,7 +145,7 @@ final class PlayerModel: ObservableObject {
     private func start(bytes: Data, sha256: String, item: LibraryItem, catalogueID: String?, library: FirmwareLibrary?,
                        fallback: Bool, saveCurrent: Bool, flash: Data? = nil) throws {
         // an .rfm1 is a WebAssembly module ("\0asm"); anything else is taken as an original .fwsc package for the
-        // emulator engine (evaluation)
+        // emulator engine
         let isRFM1 = bytes.prefix(4) == Data([0, 0x61, 0x73, 0x6d])
         stop(save: saveCurrent)
         let next: any PlayerEngine
@@ -187,7 +187,7 @@ final class PlayerModel: ObservableObject {
         info = FirmwareInfo(name: parsed?.name ?? next.name, version: next.version, authors: parsed?.authors ?? [],
                             license: parsed?.license ?? next.license, sourceURL: parsed?.sourceURL ?? next.sourceURL,
                             glueURL: parsed?.glueURL, builtBy: parsed?.builtBy,
-                            core: !isRFM1 ? "the original package on \(next.family) (emulator engine, evaluation)"
+                            core: !isRFM1 ? "the original package on \(next.family) (emulator engine; MIT is the emulator's licence, not the firmware's)"
                                 : "fm1core ABI \(next.abi)" + (next.family.isEmpty ? "" : ", \(next.family) family")
                                 + (next.sim1Version > 0 ? ", with the sim1 extension" : ""),
                             credits: parsed?.credits.isEmpty == false ? parsed!.credits : next.credits,

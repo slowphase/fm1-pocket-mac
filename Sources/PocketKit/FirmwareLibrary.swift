@@ -29,14 +29,19 @@ public actor FirmwareLibrary {
     private var syncing = false
     private var onChange: (@Sendable () -> Void)?
 
+    /// emu blocks for a catalogue that does not publish them yet (test builds only; see CatalogueV2.withPreview)
+    private let emuPreview: Data?
+
     public init(paths: LibraryPaths = LibraryPaths(), base: URL = CatalogueService.defaultBase,
-                fetcher: HTTPFetching = URLSessionFetcher(), scheduler: DownloadScheduler = DownloadScheduler(limit: 2)) {
+                fetcher: HTTPFetching = URLSessionFetcher(), scheduler: DownloadScheduler = DownloadScheduler(limit: 2),
+                emuPreview: Data? = nil) {
         self.paths = paths
         self.base = base
         self.fetcher = fetcher
         self.scheduler = scheduler
         self.store = RegistryStore(paths: paths)
-        let v2 = Self.readCachedV2(paths)
+        self.emuPreview = emuPreview
+        let v2 = Self.readCachedV2(paths)?.withPreview(emuPreview)
         let v2cat = v2.flatMap { try? $0.macCatalogue() }
         let cat = v2cat ?? Self.readCachedCatalogue(paths)
         self.catalogue = cat
@@ -100,6 +105,8 @@ public actor FirmwareLibrary {
         public var mac: CatalogueV2.Status?
         public var makers: [CatalogueV2.Maker] = []
         public var hubURL: String?
+        /// the emulator engine's view of this firmware (catalog-v2.json's emu block), when the catalogue has one
+        public var emu: CatalogueV2.Emu?
     }
 
     public struct Snapshot: Equatable, Sendable {
@@ -125,10 +132,11 @@ public actor FirmwareLibrary {
             let rec = registry.firmwares[e.id]
             let builds = (rec?.builds ?? []).filter { fm.fileExists(atPath: managedURL($0).path) }
             let avail: Availability = builds.first?.sha256 == e.sha256 ? .installed : (builds.isEmpty ? .notDownloaded : .olderInstalled)
-            let d = discovery?.entry(e.id)
+            let d = discovery?.entry(e.baseID)
             out.append(Entry(entry: e, availability: avail, downloading: downloadingIDs.contains(e.id), lastError: rec?.lastError,
                              current: builds.first, previous: builds.count > 1 ? builds[1] : nil,
-                             screenshotFile: localScreenshot(for: e), mac: d?.mac, makers: d?.makers ?? [], hubURL: d?.hubURL))
+                             screenshotFile: localScreenshot(for: e), mac: e.isPackage ? d?.emu?.mac : d?.mac,
+                             makers: d?.makers ?? [], hubURL: d?.hubURL, emu: d?.emu))
         }
         let withdrawn = registry.firmwares.values.filter { $0.status == .withdrawn }.sorted { $0.id < $1.id }
         return Snapshot(entries: out, withdrawn: withdrawn, imports: registry.imports, catalogueUpdated: catalogue?.updated,
@@ -168,7 +176,7 @@ public actor FirmwareLibrary {
         let fm = FileManager.default
         let v2url = try url(for: "catalog-v2.json")
         if let got = try? await fetcher.fetch(v2url), got.1 == 200,
-           let v2 = try? CatalogueV2.decode(got.0), let cat = try? v2.macCatalogue() {
+           let v2 = (try? CatalogueV2.decode(got.0))?.withPreview(emuPreview), let cat = try? v2.macCatalogue() {
             try fm.createDirectory(at: paths.managed, withIntermediateDirectories: true)
             try got.0.write(to: paths.catalogueV2, options: .atomic)
             return (cat, v2)
@@ -205,7 +213,12 @@ public actor FirmwareLibrary {
         report.withdrawn = applyListing(fresh)
         changed()
 
-        let entries = fresh.firmwares
+        // a firmware with both a build and an original package: only the engine the catalogue prefers is downloaded in
+        // the background; the other comes when it is chosen (and stays once it is there)
+        let entries = fresh.firmwares.filter { e in
+            guard let alt = discovery?.alternative(for: e.id), registry.firmwares[e.id]?.current == nil else { return true }
+            return !alt
+        }
         let results: [(String, String?, Bool)] = await withTaskGroup(of: (String, String?, Bool).self) { group in
             for e in entries {
                 group.addTask {
@@ -307,7 +320,14 @@ public actor FirmwareLibrary {
     }
 
     private func download(_ e: CatalogueEntry, priority: DownloadScheduler.Priority) async throws -> InstalledBuild {
-        let source = try url(for: e.file)
+        // an original package comes from its maker's release, never from Pocket or the Hub; the hash decides
+        let source: URL
+        if e.isPackage {
+            guard let u = e.makerURL else { throw PocketError.badFirmware("\(e.name): the maker's package link is not usable.") }
+            source = u
+        } else {
+            source = try url(for: e.file)
+        }
         let granted = await scheduler.acquire(tag: e.sha256, priority: priority)
         let result: Result<(Data, Int), Error>
         do { result = .success(try await fetcher.fetch(source)) } catch { result = .failure(error) }

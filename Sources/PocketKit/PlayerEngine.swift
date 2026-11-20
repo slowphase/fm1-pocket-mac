@@ -1,6 +1,6 @@
 import Foundation
 
-/// What the player needs from an engine. Two engines (evaluation):
+/// What the player needs from an engine. Two engines:
 ///   FirmwareCore  an .rfm1 build on the native wasm3 host (Sources/FM1Host), the app's engine since Milestone 1;
 ///   EmuCore       an author's original .fwsc package on upstream fm1-emu (Sources/CFM1Emu, MIT).
 /// Saved settings are kept apart per engine: StateStore keys an emulator save as "fm1-emu+VERSION@SHA12", so an

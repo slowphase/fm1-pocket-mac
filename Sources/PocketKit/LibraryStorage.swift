@@ -41,7 +41,10 @@ public struct LibraryPaths: Sendable {
     public var userData: URL { root.appendingPathComponent("UserData", isDirectory: true) }
 
     /// `firmware/<id>/<sha256>.rfm1`, relative to `managed`. Both parts must already be validated.
-    public static func firmwareRelativePath(id: String, sha256: String) -> String { "firmware/\(id)/\(sha256).rfm1" }
+    /// An original package (an id ending in `.fwsc`) keeps its own extension: `firmware/<id>.fwsc/<sha256>.fwsc`.
+    public static func firmwareRelativePath(id: String, sha256: String) -> String {
+        "firmware/\(id)/\(sha256)" + (id.hasSuffix(CatalogueEntry.packageSuffix) ? ".fwsc" : ".rfm1")
+    }
 
     public func firmwareFile(id: String, sha256: String) -> URL {
         managed.appendingPathComponent(Self.firmwareRelativePath(id: id, sha256: sha256))
@@ -249,14 +252,15 @@ public struct RegistryStore {
         for id in ids where SafeName.isID(id) {
             let dir = paths.firmware.appendingPathComponent(id, isDirectory: true)
             var found: [InstalledBuild] = []
+            let ext = id.hasSuffix(CatalogueEntry.packageSuffix) ? ".fwsc" : ".rfm1"
             for name in (try? fm.contentsOfDirectory(atPath: dir.path)) ?? [] {
-                guard name.hasSuffix(".rfm1") else { continue }
+                guard name.hasSuffix(ext) else { continue }
                 let sha = String(name.dropLast(5))
                 let url = dir.appendingPathComponent(name)
                 guard SafeName.isSHA256(sha), let data = try? Data(contentsOf: url), sha256Hex(data) == sha else { continue }
                 let date = (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? Date.distantPast
                 let e = listed[id]
-                let manifest = try? RFM1File(data)
+                let manifest = ext == ".rfm1" ? try? RFM1File(data) : nil
                 let version = e?.sha256 == sha ? e!.version : (manifest?.version ?? "")
                 found.append(InstalledBuild(id: id, name: e?.name ?? manifest?.name ?? id, version: version, sha256: sha,
                                             file: LibraryPaths.firmwareRelativePath(id: id, sha256: sha), size: data.count,
@@ -300,5 +304,27 @@ public struct FavouritesStore {
     public func save(_ ids: Set<String>) throws {
         try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
         try JSONEncoder().encode(ids.sorted()).write(to: file, options: .atomic)
+    }
+}
+
+// MARK: - Engine choices (user-owned)
+
+/// The engine the user picked for a firmware that runs on both ("rfm1" or "fm1-emu"), by firmware id, in
+/// `UserData/engines.json`. Only choices that differ from the catalogue's recommendation are kept. Sync and cleanup
+/// never touch it.
+public struct EngineChoiceStore {
+    public let file: URL
+
+    public init(paths: LibraryPaths = LibraryPaths()) { file = paths.userData.appendingPathComponent("engines.json") }
+
+    public func load() -> [String: String] {
+        guard let d = try? Data(contentsOf: file), let m = try? JSONDecoder().decode([String: String].self, from: d) else { return [:] }
+        return m.filter { $0.value == "rfm1" || $0.value == "fm1-emu" }
+    }
+    public func save(_ m: [String: String]) throws {
+        try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let enc = JSONEncoder()
+        enc.outputFormatting = [.sortedKeys, .prettyPrinted]
+        try enc.encode(m).write(to: file, options: .atomic)
     }
 }

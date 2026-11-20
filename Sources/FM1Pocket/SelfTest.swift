@@ -45,7 +45,7 @@ enum SelfTest {
         return ok ? 0 : 1
     }
 
-    /// `FM1Pocket --selftest-fwsc PACKAGE.fwsc [result.json]` (evaluation): the same checks on the emulator engine,
+    /// `FM1Pocket --selftest-fwsc PACKAGE.fwsc [result.json]`: the same checks on the emulator engine,
     /// with an original package: boots, draws, sounds from keys / MIDI / PLAY, keeps up, and a save survives a reboot.
     static func runPackage(_ pkg: String, writingTo path: String?) -> Int32 {
         var r: [String: Any] = ["package": pkg, "engine": "fm1-emu \(EmuCore.upstreamCommit.prefix(7))"]

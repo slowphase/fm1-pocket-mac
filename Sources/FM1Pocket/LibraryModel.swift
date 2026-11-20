@@ -8,7 +8,7 @@ struct LibraryItem: Identifiable, Hashable {
         case catalogue(CatalogueEntry)
         /// listed in the expanded catalogue but not downloadable in this app (its id)
         case listed(String)
-        /// an original .fwsc package opened from disk, played on the emulator engine (evaluation)
+        /// an original .fwsc package opened from disk, played on the emulator engine
         case package(URL)
     }
 
@@ -20,7 +20,7 @@ struct LibraryItem: Identifiable, Hashable {
     }
 
     let source: Source
-    let id: String
+    var id: String
     let name: String
     let version: String
     let authors: String
@@ -53,6 +53,24 @@ struct LibraryItem: Identifiable, Hashable {
     /// The Firmware Hub's page for it
     var hubURL: String?
 
+    // MARK: engines
+    /// the engine this item plays on: "rfm1" (its .rfm1 build) or "fm1-emu" (the maker's original package)
+    var engine = "rfm1"
+    /// the engines this firmware can run on in this app (two when there is a choice)
+    var engines: [String] = []
+    /// the catalogue's recommendation, and why
+    var preferredEngine: String?
+    var preferredReason: String?
+    /// the other engine's download state, for the details pane
+    var otherDownloadText: String?
+    /// the emulator's automated check on macOS (machine, engine commit, speed): an automated boot check, not a listen
+    var emuTested: CatalogueV2.Emu.Tested?
+    /// real listening tests recorded for this firmware (by hand), kept apart from the automated checks
+    var listened: [CatalogueV2.Emu.Listened] = []
+    var hasEngineChoice: Bool { engines.count > 1 }
+
+    static func engineName(_ e: String) -> String { e == "fm1-emu" ? "Original package (emulator)" : ".rfm1 build" }
+
     var isBuiltin: Bool { if case .builtin = source { return true } else { return false } }
     var isListedOnly: Bool { if case .listed = source { return true } else { return false } }
     var isPackage: Bool { if case .package = source { return true } else { return false } }
@@ -61,11 +79,14 @@ struct LibraryItem: Identifiable, Hashable {
     static func package(_ url: URL) -> LibraryItem {
         let stem = url.deletingPathExtension().lastPathComponent
         let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
-        return LibraryItem(source: .package(url), id: "fwsc:" + stem, name: stem, version: "", authors: "",
-                           category: "Packages", tag: "Original package, emulator engine (evaluation)",
-                           about: "An FM-1 update package opened from disk, running on fm1-emu (Joakim Eriksson, MIT).",
+        var it = LibraryItem(source: .package(url), id: "fwsc:" + stem, name: stem, version: "", authors: "",
+                           category: "Packages", tag: "Original package, emulator engine",
+                           about: "An FM-1 update package opened from disk, running on fm1-emu (Joakim Eriksson; MIT is the emulator's licence, not the firmware's).",
                            license: "", sourceURL: nil, imageURL: nil, screenshotFile: nil, size: size,
                            download: .installed, downloading: false, lastError: nil)
+        it.engine = "fm1-emu"
+        it.engines = ["fm1-emu"]
+        return it
     }
     /// the only kind of item that can be played: built in, or downloadable from the catalogue
     var canPlay: Bool { !isListedOnly }
@@ -126,6 +147,16 @@ struct LibraryItem: Identifiable, Hashable {
         mayStutter = s.mac?.mayStutter ?? false
         makers = s.makers
         hubURL = s.hubURL
+        if e.isPackage {
+            id = "cat:" + e.baseID
+            engine = "fm1-emu"
+            emuTested = s.emu?.macTested
+            // the emulator's runs are per package, on macOS Apple Silicon: an individual automated check
+            if let m = emuTested?.machine, m.contains("Darwin") { verification = .macos }
+        }
+        listened = s.emu?.listened ?? []
+        preferredEngine = s.emu?.preferredMac?.engine
+        preferredReason = s.emu?.preferredMac?.reason
     }
 
     /// a firmware the expanded catalogue lists that this app cannot download: shown with why, never played
@@ -269,9 +300,12 @@ final class LibraryModel: ObservableObject {
     @Published private(set) var recent: [String: Date] = [:]
 
     /// the firmware store: catalogue, downloads, cache, cleanup (PocketKit/FirmwareLibrary.swift)
-    let library = FirmwareLibrary()
+    let library = FirmwareLibrary(emuPreview: Bundle.main.url(forResource: "emu-preview", withExtension: "json").flatMap { try? Data(contentsOf: $0) })
     private let defaults = UserDefaults.standard
     private lazy var favouritesStore = FavouritesStore(paths: library.paths)
+    private lazy var engineStore = EngineChoiceStore(paths: library.paths)
+    /// the engine picked per firmware id where it differs from the catalogue's recommendation (UserData/engines.json)
+    @Published private(set) var engineChoices: [String: String] = [:]
     private lazy var recentStore = RecentStore(paths: library.paths)
     private var started = false
     private var reloadPending = false
@@ -359,6 +393,16 @@ final class LibraryModel: ObservableObject {
         try? favouritesStore.save(favourites)
     }
 
+    /// Plays this firmware on the other engine from now on (a choice kept per firmware; picking the recommended engine
+    /// again clears it). Each engine keeps its own saved settings.
+    func setEngine(_ engine: String, for item: LibraryItem) {
+        guard item.engines.contains(engine), item.id.hasPrefix("cat:") else { return }
+        let id = String(item.id.dropFirst(4))
+        if engine == (item.preferredEngine ?? "rfm1") { engineChoices[id] = nil } else { engineChoices[id] = engine }
+        try? engineStore.save(engineChoices)
+        Task { await reload() }
+    }
+
     func notePlayed(_ item: LibraryItem) {
         if let r = try? recentStore.note(item.id) { recent = r }
     }
@@ -378,6 +422,7 @@ final class LibraryModel: ObservableObject {
         started = true
         favourites = favouritesStore.load()
         recent = recentStore.load()
+        engineChoices = engineStore.load()
         let lib = library
         // h1 is built in, so the catalogue has no picture of it: make one the way Pocket makes its own
         if let h1 = Bundle.main.url(forResource: "h1", withExtension: "rfm1") {
@@ -439,13 +484,31 @@ final class LibraryModel: ObservableObject {
         }
     }
 
-    private func reload() async {
+    func reload() async {
         let snap = await library.snapshot()
         var list: [LibraryItem] = []
         if let h1 = LibraryItem.builtinH1(screenshot: builtinShot) { list.append(h1) }
+        // one item per firmware: its .rfm1 build and/or its original package (`<id>.fwsc`), playing on the engine the
+        // user picked, else the one the catalogue recommends
+        var builds: [String: LibraryItem] = [:], packages: [String: LibraryItem] = [:], order: [String] = []
         for e in snap.entries {
             var it = LibraryItem(e, base: library.base)
             it.isNew = NewBadge.isNew(added: e.entry.added, since: snap.catalogueSince)
+            let base = e.entry.baseID
+            if !order.contains(base) { order.append(base) }
+            if e.entry.isPackage { packages[base] = it } else { builds[base] = it }
+        }
+        for base in order {
+            let b = builds[base], p = packages[base]
+            let engines = (b == nil ? [] : ["rfm1"]) + (p == nil ? [] : ["fm1-emu"])
+            let preferred = (b ?? p)?.preferredEngine
+            let want = engineChoices[base] ?? preferred ?? "rfm1"
+            guard var it = (want == "fm1-emu" ? p ?? b : b ?? p) else { continue }
+            it.engines = engines
+            if engines.count > 1 { it.otherDownloadText = (it.engine == "fm1-emu" ? b : p)?.downloadText }
+            if it.engine == "fm1-emu", let b {      // the build's picture, dates and badges describe the same firmware
+                it.isNew = b.isNew; it.added = b.added; it.updated = b.updated
+            }
             list.append(it)
         }
         items = list

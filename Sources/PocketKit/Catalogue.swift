@@ -40,20 +40,36 @@ public struct CatalogueEntry: Codable, Equatable, Hashable, Identifiable {
     public var updated: String?
     /// relative to the catalogue's folder, e.g. `shots/amb-8a5014a6.png`
     public var image: String?
+    /// For an original package (an id ending in `.fwsc`, from catalog-v2.json's emu block): the maker's own release
+    /// asset, downloaded from there (The Firmware Hub's rule) and checked against `sha256`; `file` is then only its name.
+    public var remoteURL: String?
 
     enum CodingKeys: String, CodingKey {
         case id, name, version, authors, category, tag, about, license, source, commit, glue, builtBy, abi, beta, file,
-             sha256, size, added, updated, image
+             sha256, size, added, updated, image, remoteURL
+    }
+
+    /// the suffix of a package variant's id: `felucca.fwsc` is felucca's original package
+    public static let packageSuffix = ".fwsc"
+    public var isPackage: Bool { id.hasSuffix(Self.packageSuffix) }
+    /// the firmware's own id (without `.fwsc`)
+    public var baseID: String { isPackage ? String(id.dropLast(Self.packageSuffix.count)) : id }
+    /// the maker's URL for a package, when it is a plain https URL on GitHub (where makers release)
+    public var makerURL: URL? {
+        guard let s = remoteURL, let u = URL(string: s), u.scheme == "https",
+              let h = u.host?.lowercased(), h == "github.com" || h.hasSuffix(".githubusercontent.com") else { return nil }
+        return u
     }
 
     public init(id: String, name: String, version: String, authors: [String] = [], category: String = "Other",
                 tag: String = "", about: String = "", license: String, source: String? = nil, commit: String? = nil,
                 glue: String? = nil, builtBy: String? = nil, abi: Int? = nil, beta: Bool = false, file: String,
-                sha256: String, size: Int, added: String? = nil, updated: String? = nil, image: String? = nil) {
+                sha256: String, size: Int, added: String? = nil, updated: String? = nil, image: String? = nil, remoteURL: String? = nil) {
         self.id = id; self.name = name; self.version = version; self.authors = authors; self.category = category
         self.tag = tag; self.about = about; self.license = license; self.source = source; self.commit = commit
         self.glue = glue; self.builtBy = builtBy; self.abi = abi; self.beta = beta; self.file = file
         self.sha256 = sha256; self.size = size; self.added = added; self.updated = updated; self.image = image
+        self.remoteURL = remoteURL
     }
 
     public init(from decoder: Decoder) throws {
@@ -78,6 +94,7 @@ public struct CatalogueEntry: Codable, Equatable, Hashable, Identifiable {
         added = try c.decodeIfPresent(String.self, forKey: .added)
         updated = try c.decodeIfPresent(String.self, forKey: .updated)
         image = try c.decodeIfPresent(String.self, forKey: .image)
+        remoteURL = try c.decodeIfPresent(String.self, forKey: .remoteURL)
     }
 
     public var authorLine: String { authors.joined(separator: ", ") }

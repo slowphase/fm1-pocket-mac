@@ -535,7 +535,9 @@ private struct DetailView: View {
                     fact("Added", day(item.added))
                     if item.updated != item.added { fact("Updated", day(item.updated)) }
                     fact("Download", item.downloadText)
+                    engineRow
                     if let st = item.macState, !item.isListedOnly { fact("On this Mac", compatibility(st)) }
+                    testRows
                     if let p = item.previousVersion { fact("Previous", "Version \(p) is kept too") }
                     if let r = library.recent[item.id] {
                         fact("Last played", RelativeDateTimeFormatter().localizedString(for: r, relativeTo: Date()))
@@ -562,6 +564,53 @@ private struct DetailView: View {
         case .experimental: return (item.mayStutter ? "Experimental, may stutter: " : "Experimental: ") + how
         case .unsupported: return "Not supported: " + how
         case .sourceOnly: return "Source only"
+        case .unavailable: return "Not available"
+        }
+    }
+
+    /// the engine line: which engine plays it, and a quiet switch where both can
+    @ViewBuilder private var engineRow: some View {
+        if item.engines.count > 1 {
+            GridRow {
+                Text("Engine").foregroundStyle(.secondary)
+                Menu {
+                    ForEach(item.engines, id: \.self) { e in
+                        Button {
+                            let replay = player.playingID == item.id
+                            library.setEngine(e, for: item)
+                            if replay {
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 300_000_000)
+                                    if let next = library.item(item.id) { player.play(next, library: library) }
+                                }
+                            }
+                        } label: {
+                            Text(LibraryItem.engineName(e) + (e == item.preferredEngine ? " (recommended)" : ""))
+                        }
+                        .disabled(e == item.engine)
+                    }
+                } label: {
+                    Text(LibraryItem.engineName(item.engine) + (item.engine == item.preferredEngine ? "" : " (your choice)"))
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+                .help((item.preferredReason ?? "") + " Each engine keeps its own saved settings.")
+            }
+        } else if item.engine == "fm1-emu" {
+            fact("Engine", LibraryItem.engineName(item.engine))
+        }
+    }
+
+    /// automated checks and listening tests, kept apart
+    @ViewBuilder private var testRows: some View {
+        if item.engine == "fm1-emu", let t = item.emuTested {
+            fact("Automated check", [t.machine.map { "on " + $0 }, t.speed.map { String(format: "%.1fx real time", $0) },
+                                     t.engine].compactMap { $0 }.joined(separator: ", ") + " (a scripted boot check; nobody listened)")
+        }
+        if item.engine == "fm1-emu" || !item.listened.isEmpty {
+            let mine = item.listened.filter { ($0.engine ?? "fm1-emu") == item.engine }
+            fact("Listening test", mine.isEmpty ? "None recorded yet" :
+                 mine.map { [$0.verdict, $0.who, $0.date, $0.machine].compactMap { $0 }.joined(separator: ", ") }.joined(separator: "; "))
         }
     }
 

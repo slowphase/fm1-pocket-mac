@@ -54,8 +54,23 @@ jobs:
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "Version $V, build ${{ github.run_number }}"
 
-      - name: Build upstream fm1-emu's engine (evaluation; universal static library)
+      - name: Build upstream fm1-emu's engine (universal static library)
         run: scripts/build-emu.sh
+
+      - name: Is the emulator pin one that passed Pocket's upgrade check?
+        # Emu/Cargo.toml pins fm1-emu for this app, independently of FM-1 Pocket Player's pin; a pin should only move to
+        # a commit listed in fm1-pocket-player's pocket/emu/verified.json (upgrade check + listening test). A warning, not a failure.
+        run: |
+          pin=$(sed -n 's/.*fm1-emu.*rev *= *"\([0-9a-f]*\)".*/\1/p' Emu/Cargo.toml | head -1)
+          for ref in main emu-eval; do
+            if curl -fsSL "https://raw.githubusercontent.com/slowphase/fm1-pocket-player/$ref/pocket/emu/verified.json" -o verified.json; then break; fi
+          done
+          if [ ! -s verified.json ]; then echo "::warning::Could not read Pocket's verified.json"; exit 0; fi
+          if python3 -c "import json,sys;sys.exit(0 if any(c['commit'].startswith('$pin') for c in json.load(open('verified.json'))['commits']) else 1)"; then
+            echo "fm1-emu pin $pin is in Pocket's verified list" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::fm1-emu pin $pin is not in Pocket's verified list: run Pocket's emulator upgrade check first" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Original packages for the emulator self-test (makers' releases, SHA-256 checked)
         run: |

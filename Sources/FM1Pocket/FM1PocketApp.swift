@@ -45,12 +45,12 @@ struct FM1PocketApp: App {
                 Divider()
             }
             CommandMenu("Firmware") {
-                // evaluation: an author's original update package on the emulator engine (fm1-emu)
+                // an author's original update package on the emulator engine (fm1-emu)
                 Button("Open Firmware Package (.fwsc)…") {
                     let panel = NSOpenPanel()
                     panel.allowedContentTypes = [.init(filenameExtension: "fwsc") ?? .data]
                     panel.allowsMultipleSelection = false
-                    panel.message = "Choose an FM-1 update package (.fwsc) to play on the emulator engine (evaluation)."
+                    panel.message = "Choose an FM-1 update package (.fwsc) to play on the emulator engine."
                     if panel.runModal() == .OK, let url = panel.url { player.play(.package(url), library: library) }
                 }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
