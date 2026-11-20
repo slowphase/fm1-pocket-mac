@@ -10,14 +10,14 @@ final class LibraryCountsTests: XCTestCase {
     private let sha = String(repeating: "a", count: 64)
 
     private func entry(_ id: String, installed: Bool, prefer: String? = nil) -> FirmwareLibrary.Entry {
-        let e = CatalogueEntry(id: id, name: id.capitalized, version: "1", file: "fw/\(id).rfm1", sha256: sha, size: 1)
+        let e = CatalogueEntry(id: id, name: id.capitalized, version: "1", license: "MIT", file: "fw/\(id).rfm1", sha256: sha, size: 1)
         let b = InstalledBuild(id: id, name: id, version: "1", sha256: sha, file: "f", size: 1, installedAt: Date(), origin: .catalogue)
         return FirmwareLibrary.Entry(entry: e, availability: installed ? .installed : .notDownloaded, downloading: false,
                                      lastError: nil, current: installed ? b : nil, previous: nil, screenshotFile: nil, mac: nil,
                                      preferredEngine: prefer)
     }
     private func withdrawn(_ id: String) -> FirmwareRecord {
-        let e = CatalogueEntry(id: id, name: id.capitalized, version: "1", file: "fw/\(id).rfm1", sha256: sha, size: 1)
+        let e = CatalogueEntry(id: id, name: id.capitalized, version: "1", license: "MIT", file: "fw/\(id).rfm1", sha256: sha, size: 1)
         let b = InstalledBuild(id: id, name: id, version: "1", sha256: sha, file: "f", size: 1, installedAt: Date(), origin: .catalogue)
         return FirmwareRecord(id: id, builds: [b], status: .withdrawn, entry: e)
     }
@@ -46,5 +46,11 @@ final class LibraryCountsTests: XCTestCase {
         XCTAssertEqual(r.items.count, 3)
         XCTAssertEqual(LibraryCounts(items: r.items, more: [], withdrawn: []).readyOffline, 1)
         XCTAssertEqual(LibraryCounts.baseID("alpha.fwsc"), "alpha")
+        // confidence is counted on each firmware's chosen engine, never upgraded from automated to listened
+        var items = m.items
+        items[0].confidence = CatalogueV2.Confidence(level: .listened)
+        items[1].confidence = CatalogueV2.Confidence(level: .knownIssue, note: "x")
+        XCTAssertEqual(LibraryCounts.confidenceLine(items), "Listened to: 1 · automated checks only: 1 · known issues: 1")
+        XCTAssertEqual(items[2].confidenceText, "Automated checks only (nobody has listened yet)")
     }
 }

@@ -8,8 +8,15 @@
  },
  "firmwares": {
   "386dx": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Ran at 1.11x real time on macOS Apple Silicon: it may stutter.",
@@ -51,8 +58,15 @@
    "hubVersion": "2.0"
   },
   "adrift": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Ran at 1.13x real time on macOS Apple Silicon: it may stutter.",
@@ -93,8 +107,15 @@
    "hubVersion": "0.4.0"
   },
   "aetherfm1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.61x real time.",
      "state": "playable",
@@ -135,8 +156,15 @@
    "hubVersion": "2.0.4"
   },
   "agtdeck": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Ran, but made no sound in the scripted session (keys, MIDI, PLAY).",
      "state": "experimental",
@@ -172,8 +200,15 @@
    "hubVersion": "0.6.3"
   },
   "aisling": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.88x real time.",
      "state": "playable",
@@ -214,8 +249,15 @@
    "hubVersion": "1.5"
   },
   "aislingfx1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Ran, but made no sound in the scripted session (keys, MIDI, PLAY).",
      "state": "experimental",
@@ -251,8 +293,19 @@
    "hubVersion": "1.1"
   },
   "amb": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "listened",
+      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-20 (FM-1 Pocket 0.1.0 build 34)."
+     },
+     "rfm1": {
+      "level": "listened",
+      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-20 (FM-1 Pocket 0.1.0 build 34)."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.53x real time.",
      "state": "playable",
@@ -290,11 +343,50 @@
      }
     }
    },
-   "hubVersion": "1.3.2"
+   "hubVersion": "1.3.2",
+   "listened": [
+    {
+     "app": "FM-1 Pocket 0.1.0 build 34",
+     "area": "sound",
+     "build": "a949a6a2a1ced8b3857d156ad0409a55e6ba53bbdd4094d0a38f2779364064f3",
+     "date": "2026-11-20",
+     "engine": "fm1-emu",
+     "firmware": "amb",
+     "machine": "MacBook (Apple M5)",
+     "notes": "Played and controlled correctly; switching engines worked.",
+     "player": "mac",
+     "verdict": "good",
+     "who": "Dean"
+    },
+    {
+     "app": "FM-1 Pocket 0.1.0 build 34",
+     "area": "sound",
+     "build": "8a5014a6dbb556774efe0faac6ed46c7da2cc2d8c257723d027364b491242936",
+     "date": "2026-11-20",
+     "engine": "rfm1",
+     "firmware": "amb",
+     "machine": "MacBook (Apple M5)",
+     "notes": "Played after switching to the .rfm1 build.",
+     "player": "mac",
+     "verdict": "good",
+     "who": "Dean"
+    }
+   ]
   },
   "amenity": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 6.43x real time.",
      "state": "playable",
@@ -332,8 +424,15 @@
    "hubVersion": "2.1.1"
   },
   "andromeda": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.14x real time.",
      "state": "playable",
@@ -372,8 +471,19 @@
    "hubVersion": "1.8.2-an2-r5"
   },
   "arcticscream": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.69x real time.",
      "state": "playable",
@@ -413,8 +523,15 @@
    "hubVersion": "2.1.4"
   },
   "arcturus": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.8x real time.",
      "state": "playable",
@@ -455,8 +572,15 @@
    "hubVersion": "1.7"
   },
   "argo": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.95x real time.",
      "state": "playable",
@@ -496,8 +620,15 @@
    "hubVersion": "1.8.5"
   },
   "arpwav09": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.43x real time.",
      "state": "playable",
@@ -536,8 +667,15 @@
    "hubVersion": "1.0.5"
   },
   "artihive": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.95x real time.",
      "state": "playable",
@@ -576,8 +714,15 @@
    "hubVersion": "2.0.4"
   },
   "assid": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.25x real time.",
      "state": "playable",
@@ -618,8 +763,15 @@
    "hubVersion": "1.0"
   },
   "astra": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Ran at 1.06x real time on macOS Apple Silicon: it may stutter.",
@@ -661,8 +813,15 @@
    "hubVersion": "0.1"
   },
   "atek303": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.02x real time.",
      "state": "playable",
@@ -703,8 +862,15 @@
    "hubVersion": "1.2"
   },
   "atlatl": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.81x real time.",
      "state": "playable",
@@ -744,8 +910,15 @@
    "hubVersion": "1.2"
   },
   "atlatltheatltuner": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Ran, but made no sound in the scripted session (keys, MIDI, PLAY).",
      "state": "experimental",
@@ -781,8 +954,15 @@
    "hubVersion": "0.8"
   },
   "audiorouter": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "known-issue",
+      "note": "Processes audio coming in over USB or Bluetooth; neither player has an audio input."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Processes audio coming in over USB or Bluetooth; neither player has an audio input.",
      "state": "experimental",
@@ -815,11 +995,34 @@
      }
     }
    },
-   "hubVersion": "0.6.1"
+   "hubVersion": "0.6.1",
+   "knownIssues": {
+    "mac": {
+     "fm1-emu": "Processes audio coming in over USB or Bluetooth; neither player has an audio input."
+    }
+   }
+  },
+  "aurora": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": null
   },
   "b1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 20.18x real time.",
      "state": "playable",
@@ -858,8 +1061,15 @@
    "hubVersion": "5.6"
   },
   "b3organ": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.37x real time.",
      "state": "playable",
@@ -899,8 +1109,15 @@
    "hubVersion": "0.5.1"
   },
   "bb1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.02x real time.",
      "state": "playable",
@@ -940,8 +1157,15 @@
    "hubVersion": "2.3-hub.1"
   },
   "beetle": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "known-issue",
+      "note": "A tracker: nothing plays until a song is written or loaded."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "A tracker: nothing plays until a song is written or loaded.",
      "state": "experimental",
@@ -974,11 +1198,23 @@
      }
     }
    },
-   "hubVersion": "1.8.3"
+   "hubVersion": "1.8.3",
+   "knownIssues": {
+    "mac": {
+     "fm1-emu": "A tracker: nothing plays until a song is written or loaded."
+    }
+   }
   },
   "beetleblue": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "known-issue",
+      "note": "A drum tracker: nothing plays until a pattern is written."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "A drum tracker: nothing plays until a pattern is written.",
      "state": "experimental",
@@ -1011,11 +1247,23 @@
      }
     }
    },
-   "hubVersion": "1.3.1"
+   "hubVersion": "1.3.1",
+   "knownIssues": {
+    "mac": {
+     "fm1-emu": "A drum tracker: nothing plays until a pattern is written."
+    }
+   }
   },
   "beiwagen": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Ran, but made no sound in the scripted session (keys, MIDI, PLAY).",
      "state": "experimental",
@@ -1051,8 +1299,19 @@
    "hubVersion": "0.2"
   },
   "berlinan": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.29x real time.",
      "state": "playable",
@@ -1088,8 +1347,15 @@
    "hubVersion": "0.5.1"
   },
   "blop": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.18x real time.",
      "state": "playable",
@@ -1129,8 +1395,15 @@
    "hubVersion": "1.1.0"
   },
   "bluesbox": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.49x real time.",
      "state": "playable",
@@ -1171,8 +1444,15 @@
    "hubVersion": "2.2.1"
   },
   "bocjuhn": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.64x real time.",
      "state": "playable",
@@ -1213,8 +1493,15 @@
    "hubVersion": "1.0.0-rc10"
   },
   "bubba": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Ran, but made no sound in the scripted session (keys, MIDI, PLAY).",
      "state": "experimental",
@@ -1250,8 +1537,15 @@
    "hubVersion": "0.10.0-beta"
   },
   "bunker": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.13x real time.",
      "state": "playable",
@@ -1292,8 +1586,19 @@
    "hubVersion": "1.0.0"
   },
   "bytemania": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.92x real time.",
      "state": "playable",
@@ -1332,8 +1637,19 @@
    "hubVersion": "1.3.2"
   },
   "caravel": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.26x real time.",
      "state": "playable",
@@ -1372,9 +1688,27 @@
    },
    "hubVersion": "1.0.0"
   },
+  "carnacos": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": "0.9.6"
+  },
   "castletunia": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 5.22x real time.",
      "state": "playable",
@@ -1415,8 +1749,19 @@
    "hubVersion": "1.0.2"
   },
   "chimeravocal": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.57x real time.",
      "state": "playable",
@@ -1457,8 +1802,19 @@
    "hubVersion": "0.8.0"
   },
   "chipbox": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.63x real time.",
      "state": "playable",
@@ -1499,8 +1855,15 @@
    "hubVersion": "1.7.0-signatureshowcase"
   },
   "choppah": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 6.45x real time.",
      "state": "playable",
@@ -1541,8 +1904,19 @@
    "hubVersion": "1.4.1"
   },
   "choralroot": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.4x real time.",
      "state": "playable",
@@ -1581,8 +1955,15 @@
    "hubVersion": "0.42"
   },
   "chord": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.42x real time.",
      "state": "playable",
@@ -1623,8 +2004,15 @@
    "hubVersion": "0.3"
   },
   "clatter": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.81x real time.",
      "state": "playable",
@@ -1665,8 +2053,15 @@
    "hubVersion": "1.0.0"
   },
   "clavioline": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.36x real time.",
      "state": "playable",
@@ -1708,7 +2103,6 @@
   "clipper": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -1743,8 +2137,19 @@
    "hubVersion": "1.3.1"
   },
   "conductor": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.92x real time.",
      "state": "playable",
@@ -1784,8 +2189,15 @@
    "hubVersion": "1.0"
   },
   "coqui": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.74x real time.",
      "state": "playable",
@@ -1826,8 +2238,19 @@
    "hubVersion": "1.1.1"
   },
   "coralflower": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.41x real time.",
      "state": "playable",
@@ -1867,8 +2290,15 @@
    "hubVersion": "0.7.1"
   },
   "cord": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.65x real time.",
      "state": "playable",
@@ -1909,8 +2339,19 @@
    "hubVersion": "1.0.3"
   },
   "csfm1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.2x real time.",
      "state": "playable",
@@ -1948,8 +2389,19 @@
    "hubVersion": "0.19.0"
   },
   "ctl": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 11.83x real time.",
      "state": "playable",
@@ -1992,7 +2444,6 @@
   "cultbox": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -2028,8 +2479,15 @@
    "hubVersion": "1.2"
   },
   "cutador": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.3x real time.",
      "state": "playable",
@@ -2068,8 +2526,19 @@
    "hubVersion": "1.2.1"
   },
   "dabke": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.96x real time.",
      "state": "playable",
@@ -2110,8 +2579,15 @@
    "hubVersion": "0.18-beta"
   },
   "dark1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.31x real time.",
      "state": "playable",
@@ -2152,8 +2628,15 @@
    "hubVersion": "1.0.7"
   },
   "darkfunkdurcalsynt": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.78x real time.",
      "state": "playable",
@@ -2191,8 +2674,15 @@
    "hubVersion": "1.8.2-dfd10"
   },
   "dayvx": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.87x real time.",
      "state": "playable",
@@ -2232,8 +2722,15 @@
    "hubVersion": "0.1.1"
   },
   "deepfield": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.48x real time.",
      "state": "playable",
@@ -2274,8 +2771,15 @@
    "hubVersion": "1.11"
   },
   "delrio": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.08x real time.",
      "state": "playable",
@@ -2314,8 +2818,15 @@
    "hubVersion": "1.0.1"
   },
   "demake": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.82x real time.",
      "state": "playable",
@@ -2356,8 +2867,15 @@
    "hubVersion": "0.4.25"
   },
   "dfdacidengine": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.57x real time.",
      "state": "playable",
@@ -2397,8 +2915,15 @@
    "hubVersion": "1-v1.8.2-da1-r7"
   },
   "dinghy": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.88x real time.",
      "state": "playable",
@@ -2438,8 +2963,15 @@
    "hubVersion": "0.5"
   },
   "dp3oyb": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.46x real time.",
      "state": "playable",
@@ -2479,8 +3011,19 @@
    "hubVersion": "1.0.8"
   },
   "drift": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.3x real time.",
      "state": "playable",
@@ -2521,8 +3064,19 @@
    "hubVersion": "0.9.6"
   },
   "drumlab": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.61x real time.",
      "state": "playable",
@@ -2560,8 +3114,15 @@
    "hubVersion": "1.0.0-graduationday"
   },
   "drumtonic": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Ran, but made no sound in the scripted session (keys, MIDI, PLAY).",
      "state": "experimental",
@@ -2597,8 +3158,19 @@
    "hubVersion": "0.9.6"
   },
   "dub": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.56x real time.",
      "state": "playable",
@@ -2639,8 +3211,15 @@
    "hubVersion": "1.4.3"
   },
   "dubbox": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "known-issue",
+      "note": "Processes audio coming in over USB or Bluetooth; neither player has an audio input."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Processes audio coming in over USB or Bluetooth; neither player has an audio input.",
      "state": "experimental",
@@ -2673,11 +3252,38 @@
      }
     }
    },
-   "hubVersion": "1.0.9"
+   "hubVersion": "1.0.9",
+   "knownIssues": {
+    "mac": {
+     "fm1-emu": "Processes audio coming in over USB or Bluetooth; neither player has an audio input."
+    }
+   }
+  },
+  "dubwise": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": null
   },
   "duell": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Ran at 0.98x real time on macOS Apple Silicon: it may stutter.",
@@ -2711,15 +3317,26 @@
     "preferred": {
      "mac": {
       "engine": "rfm1",
-      "reason": "Only the .rfm1 build passed every automated check here."
+      "reason": "The original package did not pass every automated check here."
      }
     }
    },
    "hubVersion": "1.3.2"
   },
   "dungeontracker": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.47x real time.",
      "state": "playable",
@@ -2762,7 +3379,6 @@
   "dx747": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -2797,8 +3413,19 @@
    "hubVersion": "0.1"
   },
   "echofield": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.01x real time.",
      "state": "playable",
@@ -2839,8 +3466,15 @@
    "hubVersion": "0.2.15"
   },
   "elixir": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.6x real time.",
      "state": "playable",
@@ -2879,8 +3513,15 @@
    "hubVersion": "1.4.7"
   },
   "emb": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.49x real time.",
      "state": "playable",
@@ -2921,8 +3562,15 @@
    "hubVersion": "1.5.2"
   },
   "estampie": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.12x real time.",
      "state": "playable",
@@ -2963,8 +3611,19 @@
    "hubVersion": "0.3.8"
   },
   "etch": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.04x real time.",
      "state": "playable",
@@ -3002,7 +3661,6 @@
   "evilgenius": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -3040,7 +3698,6 @@
   "fartmachine": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -3075,8 +3732,19 @@
    "hubVersion": "1.1.0"
   },
   "felucca": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "known-issue",
+      "note": "Reported in a listening test (2026-11-20): Settings did not come back after relaunching. Investigation: Felucca keeps only user presets saved with SAVE, OCT+, OCT+ (it always starts on its first factory sound); its saves work through the app (automated). Save timing in the emulator integration was also fixed. Awaiting a retest."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.15x real time.",
      "state": "playable",
@@ -3108,16 +3776,43 @@
     },
     "preferred": {
      "mac": {
-      "engine": "fm1-emu",
-      "reason": "Both run well; the original package is the maker's own fingerprint-checked firmware."
+      "engine": "rfm1",
+      "reason": "The original package has a known issue."
      }
     }
    },
-   "hubVersion": "1.8.2"
+   "hubVersion": "1.8.2",
+   "knownIssues": {
+    "mac": {
+     "fm1-emu": "Reported in a listening test (2026-11-20): Settings did not come back after relaunching. Investigation: Felucca keeps only user presets saved with SAVE, OCT+, OCT+ (it always starts on its first factory sound); its saves work through the app (automated). Save timing in the emulator integration was also fixed. Awaiting a retest."
+    }
+   },
+   "listened": [
+    {
+     "app": "FM-1 Pocket 0.1.0 build 34",
+     "area": "saves",
+     "build": "770ea7c756088d08ac59a193f1ae78126476c3c8251a86938c837ead5ab0048a",
+     "date": "2026-11-20",
+     "engine": "fm1-emu",
+     "firmware": "felucca",
+     "machine": "MacBook (Apple M5)",
+     "notes": "Settings did not come back after relaunching. Investigation: Felucca keeps only user presets saved with SAVE, OCT+, OCT+ (it always starts on its first factory sound); its saves work through the app (automated). Save timing in the emulator integration was also fixed. Awaiting a retest.",
+     "player": "mac",
+     "verdict": "problems",
+     "who": "Dean"
+    }
+   ]
   },
   "felucca8": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.95x real time.",
      "state": "playable",
@@ -3157,8 +3852,15 @@
    "hubVersion": "1.8.5"
   },
   "fernbedienung": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Ran, but made no sound in the scripted session (keys, MIDI, PLAY).",
      "state": "experimental",
@@ -3194,8 +3896,19 @@
    "hubVersion": "1.1"
   },
   "fimba": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.84x real time.",
      "state": "playable",
@@ -3236,8 +3949,19 @@
    "hubVersion": "0.7.0"
   },
   "fizz": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.41x real time.",
      "state": "playable",
@@ -3276,8 +4000,15 @@
    "hubVersion": "0.13.0"
   },
   "floyd": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.78x real time.",
      "state": "playable",
@@ -3316,8 +4047,15 @@
    "hubVersion": "2.4"
   },
   "fm106": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.38x real time.",
      "state": "playable",
@@ -3357,8 +4095,15 @@
    "hubVersion": "1.02"
   },
   "fm1amy": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.78x real time.",
      "state": "playable",
@@ -3398,8 +4143,15 @@
    "hubVersion": "0.1.0"
   },
   "fm1dock": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.31x real time.",
      "state": "playable",
@@ -3439,8 +4191,15 @@
    "hubVersion": "0.9.0"
   },
   "fm1gm": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.06x real time.",
      "state": "playable",
@@ -3480,8 +4239,15 @@
    "hubVersion": "1.2.0"
   },
   "fm1midimania": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.45x real time.",
      "state": "playable",
@@ -3521,8 +4287,15 @@
    "hubVersion": "0.9.2"
   },
   "fm1quest": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.27x real time.",
      "state": "playable",
@@ -3562,8 +4335,15 @@
    "hubVersion": "43"
   },
   "fm1tonic": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.03x real time.",
      "state": "playable",
@@ -3602,8 +4382,15 @@
    "hubVersion": "1.7"
   },
   "fm1yoga": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.02x real time.",
      "state": "playable",
@@ -3644,8 +4431,15 @@
    "hubVersion": "1.0"
   },
   "fm1zx": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Ran, but made no sound in the scripted session (keys, MIDI, PLAY).",
      "state": "experimental",
@@ -3681,8 +4475,19 @@
    "hubVersion": "1.2.0"
   },
   "fmav1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.81x real time.",
      "state": "playable",
@@ -3724,7 +4529,6 @@
   "fmel1": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -3759,8 +4563,15 @@
    "hubVersion": "1.3"
   },
   "fmfam": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.43x real time.",
      "state": "playable",
@@ -3800,8 +4611,19 @@
    "hubVersion": "0.3.1"
   },
   "fmini": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.43x real time.",
      "state": "playable",
@@ -3840,8 +4662,19 @@
    "hubVersion": "2.6.0"
   },
   "fmkick": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.94x real time.",
      "state": "playable",
@@ -3882,8 +4715,19 @@
    "hubVersion": "0.5.1"
   },
   "fmlarynx": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 8.35x real time.",
      "state": "playable",
@@ -3924,8 +4768,15 @@
    "hubVersion": "0.4.2"
   },
   "fomajam": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.64x real time.",
      "state": "playable",
@@ -3966,8 +4817,19 @@
    "hubVersion": "0.1.12"
   },
   "fomni": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.84x real time.",
      "state": "playable",
@@ -4010,7 +4872,6 @@
   "frasil": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -4045,8 +4906,15 @@
    "hubVersion": "3.3.1"
   },
   "frodhes": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.11x real time.",
      "state": "playable",
@@ -4084,8 +4952,15 @@
    "hubVersion": "0.9.11"
   },
   "fumi": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.11x real time.",
      "state": "playable",
@@ -4125,8 +5000,15 @@
    "hubVersion": "1.1.1"
   },
   "gammawave": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.06x real time.",
      "state": "playable",
@@ -4167,8 +5049,15 @@
    "hubVersion": "1.2.1-GW"
   },
   "gator": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 7.51x real time.",
      "state": "playable",
@@ -4209,8 +5098,19 @@
    "hubVersion": "0.6"
   },
   "ghoulbox": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.74x real time.",
      "state": "playable",
@@ -4251,8 +5151,19 @@
    "hubVersion": "2.4"
   },
   "glitch": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.14x real time.",
      "state": "playable",
@@ -4293,8 +5204,19 @@
    "hubVersion": "2.0.2"
   },
   "golana": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.17x real time.",
      "state": "playable",
@@ -4333,8 +5255,15 @@
    "hubVersion": "1.3"
   },
   "golanadz": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.72x real time.",
      "state": "playable",
@@ -4373,8 +5302,19 @@
    "hubVersion": "0.1.0-beta"
   },
   "golf": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.98x real time.",
      "state": "playable",
@@ -4414,8 +5354,19 @@
    "hubVersion": "1.0"
   },
   "grimm": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.43x real time.",
      "state": "playable",
@@ -4456,8 +5407,19 @@
    "hubVersion": "2.0.2"
   },
   "guitchordi": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.84x real time.",
      "state": "playable",
@@ -4497,8 +5459,15 @@
    "hubVersion": "0.1.0-beta.1"
   },
   "guru600": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.29x real time.",
      "state": "playable",
@@ -4536,8 +5505,19 @@
    "hubVersion": "1.3.1"
   },
   "hadal1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Ran at 1.18x real time on macOS Apple Silicon: it may stutter.",
@@ -4572,15 +5552,26 @@
     "preferred": {
      "mac": {
       "engine": "rfm1",
-      "reason": "Only the .rfm1 build passed every automated check here."
+      "reason": "The original package did not pass every automated check here."
      }
     }
    },
    "hubVersion": "1.0.1"
   },
   "hawkchua": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.45x real time.",
      "state": "playable",
@@ -4619,8 +5610,15 @@
    "hubVersion": "2.1.7"
   },
   "hera": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.39x real time.",
      "state": "playable",
@@ -4660,8 +5658,19 @@
    "hubVersion": "1.1"
   },
   "hortator": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "known-issue",
+      "note": "Reported in a listening test (2026-11-20): No sound from the original package. Investigation: it starts with an empty pattern, so PLAY plays silence until steps are entered; with steps entered it plays through the app's own path (automated). Awaiting a listening retest."
+     },
+     "rfm1": {
+      "level": "listened",
+      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-20 (FM-1 Pocket 0.1.0 build 34)."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.99x real time.",
      "state": "playable",
@@ -4691,16 +5700,56 @@
     },
     "preferred": {
      "mac": {
-      "engine": "fm1-emu",
-      "reason": "Only the original package passed every automated check here."
+      "engine": "rfm1",
+      "reason": "The .rfm1 build is used first until a listening test confirms the original package in the app (its pattern starts empty, so PLAY is silent until steps are entered)."
      }
     }
    },
-   "hubVersion": "1.0.1"
+   "hubVersion": "1.0.1",
+   "knownIssues": {
+    "mac": {
+     "fm1-emu": "Reported in a listening test (2026-11-20): No sound from the original package. Investigation: it starts with an empty pattern, so PLAY plays silence until steps are entered; with steps entered it plays through the app's own path (automated). Awaiting a listening retest."
+    }
+   },
+   "listened": [
+    {
+     "app": "FM-1 Pocket 0.1.0 build 34",
+     "area": "sound",
+     "build": "88ad69dc04b65752bd176bdadec72119003f5223ad790d7ada5d8c4e3cbad1cd",
+     "date": "2026-11-20",
+     "engine": "rfm1",
+     "firmware": "hortator",
+     "machine": "MacBook (Apple M5)",
+     "notes": "Sounds when the .rfm1 build is chosen.",
+     "player": "mac",
+     "verdict": "good",
+     "who": "Dean"
+    },
+    {
+     "app": "FM-1 Pocket 0.1.0 build 34",
+     "area": "sound",
+     "build": "ac81af292e035ee0c4b8b7ab3a78b942e4f03deee31ae213a2613c743cd9110f",
+     "date": "2026-11-20",
+     "engine": "fm1-emu",
+     "firmware": "hortator",
+     "machine": "MacBook (Apple M5)",
+     "notes": "No sound from the original package. Investigation: it starts with an empty pattern, so PLAY plays silence until steps are entered; with steps entered it plays through the app's own path (automated). Awaiting a listening retest.",
+     "player": "mac",
+     "verdict": "problems",
+     "who": "Dean"
+    }
+   ]
   },
   "hortator-bt": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.49x real time.",
      "state": "playable",
@@ -4738,8 +5787,15 @@
    "hubVersion": "1.0.1"
   },
   "hungrytravis": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.61x real time.",
      "state": "playable",
@@ -4779,9 +5835,27 @@
    },
    "hubVersion": "2026.11.10"
   },
+  "hyp1": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": "1.5.70"
+  },
   "j6": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.61x real time.",
      "state": "playable",
@@ -4821,8 +5895,15 @@
    "hubVersion": "1.4.0"
   },
   "jam": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.83x real time.",
      "state": "playable",
@@ -4862,9 +5943,27 @@
    },
    "hubVersion": "1.2.0"
   },
+  "jamesos": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": null
+  },
   "jamtrack": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.87x real time.",
      "state": "playable",
@@ -4905,8 +6004,15 @@
    "hubVersion": "0.2.3"
   },
   "jangada": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.9x real time.",
      "state": "playable",
@@ -4945,9 +6051,27 @@
    },
    "hubVersion": "1.0.1"
   },
+  "jiant": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": "V10.7.58"
+  },
   "juicy": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.65x real time.",
      "state": "playable",
@@ -4988,7 +6112,6 @@
   "karma": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -5023,8 +6146,15 @@
    "hubVersion": "3.1.5"
   },
   "kawa": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.91x real time.",
      "state": "playable",
@@ -5062,8 +6192,15 @@
    "hubVersion": "0.9"
   },
   "keystepone": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 10.36x real time.",
      "state": "playable",
@@ -5104,8 +6241,15 @@
    "hubVersion": "0.5.42"
   },
   "kitten": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.25x real time.",
      "state": "playable",
@@ -5145,8 +6289,15 @@
    "hubVersion": "2.8-kitten.13"
   },
   "kittenrack": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.99x real time.",
      "state": "playable",
@@ -5185,8 +6336,15 @@
    "hubVersion": "1.5.0"
   },
   "kriechstrom": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.48x real time.",
      "state": "playable",
@@ -5227,8 +6385,19 @@
    "hubVersion": "0.5.2"
   },
   "kris_jangle": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.35x real time.",
      "state": "playable",
@@ -5269,8 +6438,15 @@
    "hubVersion": "0.15"
   },
   "kurzhaar": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.54x real time.",
      "state": "playable",
@@ -5310,8 +6486,19 @@
    "hubVersion": "1.1"
   },
   "kwasub": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.72x real time.",
      "state": "playable",
@@ -5353,7 +6540,6 @@
   "loafbreaker": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -5389,7 +6575,6 @@
   "loom": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -5422,8 +6607,15 @@
    "hubVersion": "0.17"
   },
   "loomfm1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.7x real time.",
      "state": "playable",
@@ -5463,8 +6655,15 @@
    "hubVersion": "0.1.0"
   },
   "loopheads": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.78x real time.",
      "state": "playable",
@@ -5504,8 +6703,15 @@
    "hubVersion": "0.1.2"
   },
   "lrry": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Ran at 0.83x real time on macOS Apple Silicon: it may stutter.",
@@ -5546,8 +6752,15 @@
    "hubVersion": "0.1.0-beta"
   },
   "lsdjburrito": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "known-issue",
+      "note": "Plays only an LSDJ song sent over USB from its web page, which neither player can do."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Plays only an LSDJ song sent over USB from its web page, which neither player can do.",
      "state": "experimental",
@@ -5580,11 +6793,23 @@
      }
     }
    },
-   "hubVersion": "0.9.97"
+   "hubVersion": "0.9.97",
+   "knownIssues": {
+    "mac": {
+     "fm1-emu": "Plays only an LSDJ song sent over USB from its web page, which neither player can do."
+    }
+   }
   },
   "makohai": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.86x real time.",
      "state": "playable",
@@ -5625,8 +6850,15 @@
    "hubVersion": "1.4"
   },
   "maku": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.58x real time.",
      "state": "playable",
@@ -5667,8 +6899,15 @@
    "hubVersion": "1.0"
   },
   "manifold": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.3x real time.",
      "state": "playable",
@@ -5709,8 +6948,15 @@
    "hubVersion": "1.0.6"
   },
   "manta": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.85x real time.",
      "state": "playable",
@@ -5751,8 +6997,19 @@
    "hubVersion": "1.1"
   },
   "matryoshka": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Ran at 0.93x real time on macOS Apple Silicon: it may stutter.",
@@ -5785,15 +7042,22 @@
     "preferred": {
      "mac": {
       "engine": "rfm1",
-      "reason": "Only the .rfm1 build passed every automated check here."
+      "reason": "The original package did not pass every automated check here."
      }
     }
    },
    "hubVersion": "1.22.0"
   },
   "mc1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.24x real time.",
      "state": "playable",
@@ -5834,8 +7098,19 @@
    "hubVersion": "1.2.0"
   },
   "melodee": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.24x real time.",
      "state": "playable",
@@ -5876,8 +7151,15 @@
    "hubVersion": "1.6.1"
   },
   "metronome": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.23x real time.",
      "state": "playable",
@@ -5915,8 +7197,15 @@
    "hubVersion": "0.3"
   },
   "midimon": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "known-issue",
+      "note": "A MIDI monitor: it shows MIDI, it does not make sound."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "A MIDI monitor: it shows MIDI, it does not make sound.",
      "state": "experimental",
@@ -5949,11 +7238,27 @@
      }
     }
    },
-   "hubVersion": "0.5"
+   "hubVersion": "0.5",
+   "knownIssues": {
+    "mac": {
+     "fm1-emu": "A MIDI monitor: it shows MIDI, it does not make sound."
+    }
+   }
   },
   "mightyarp": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.68x real time.",
      "state": "playable",
@@ -5993,8 +7298,15 @@
    "hubVersion": "1.5"
   },
   "mikufm": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.03x real time.",
      "state": "playable",
@@ -6035,8 +7347,15 @@
    "hubVersion": "0.9"
   },
   "min1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.13x real time.",
      "state": "playable",
@@ -6077,8 +7396,15 @@
    "hubVersion": "0.2.1"
   },
   "minigrain": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.11x real time.",
      "state": "playable",
@@ -6118,8 +7444,15 @@
    "hubVersion": "1.0.0"
   },
   "miniju08": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.34x real time.",
      "state": "playable",
@@ -6159,8 +7492,19 @@
    "hubVersion": "08-1.00"
   },
   "minitone": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.14x real time.",
      "state": "playable",
@@ -6200,8 +7544,19 @@
    "hubVersion": "1.0.5"
   },
   "mnm1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.19x real time.",
      "state": "playable",
@@ -6232,15 +7587,26 @@
     "preferred": {
      "mac": {
       "engine": "fm1-emu",
-      "reason": "Only the original package passed every automated check here."
+      "reason": "The .rfm1 build did not pass every automated check here."
      }
     }
    },
    "hubVersion": "1.0.1"
   },
   "modelar": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.37x real time.",
      "state": "playable",
@@ -6275,9 +7641,27 @@
    },
    "hubVersion": "0.3"
   },
+  "modularkoi": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": null
+  },
   "monk": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 5.15x real time.",
      "state": "playable",
@@ -6318,8 +7702,19 @@
    "hubVersion": "0.10"
   },
   "mono2k": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Ran at 1.11x real time on macOS Apple Silicon: it may stutter.",
@@ -6354,15 +7749,22 @@
     "preferred": {
      "mac": {
       "engine": "rfm1",
-      "reason": "Only the .rfm1 build passed every automated check here."
+      "reason": "The original package did not pass every automated check here."
      }
     }
    },
    "hubVersion": "1.12"
   },
   "monohull": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.04x real time.",
      "state": "playable",
@@ -6402,8 +7804,19 @@
    "hubVersion": "0.2.0"
   },
   "mope1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.49x real time.",
      "state": "playable",
@@ -6444,8 +7857,19 @@
    "hubVersion": "0.4.1"
   },
   "morse": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.91x real time.",
      "state": "playable",
@@ -6483,8 +7907,15 @@
    "hubVersion": "0.8"
   },
   "moss1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.2x real time.",
      "state": "playable",
@@ -6527,7 +7958,6 @@
   "mpyre": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -6558,8 +7988,19 @@
    "hubVersion": "1.0.3"
   },
   "mutabledreams": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.4x real time.",
      "state": "playable",
@@ -6600,8 +8041,15 @@
    "hubVersion": "2.3"
   },
   "mvance": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.15x real time.",
      "state": "playable",
@@ -6641,8 +8089,19 @@
    "hubVersion": "2.6.3"
   },
   "mvsynth2": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.82x real time.",
      "state": "playable",
@@ -6682,8 +8141,15 @@
    "hubVersion": "1.5.2"
   },
   "mycelium": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 5.54x real time.",
      "state": "playable",
@@ -6724,8 +8190,19 @@
    "hubVersion": "1.0-test"
   },
   "nachtfahrt": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.58x real time.",
      "state": "playable",
@@ -6766,8 +8243,15 @@
    "hubVersion": "1.0.2"
   },
   "nauclerus": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 5.38x real time.",
      "state": "playable",
@@ -6805,8 +8289,15 @@
    "hubVersion": "1.0.0"
   },
   "nccnovationcircuitcompan": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.18x real time.",
      "state": "playable",
@@ -6845,8 +8336,15 @@
    "hubVersion": "0.7"
   },
   "neon": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.99x real time.",
      "state": "playable",
@@ -6886,8 +8384,19 @@
    "hubVersion": "0.1"
   },
   "niagaradrift": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.41x real time.",
      "state": "playable",
@@ -6925,8 +8434,15 @@
    "hubVersion": "0.3.1"
   },
   "noizdemons": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.39x real time.",
      "state": "playable",
@@ -6966,8 +8482,19 @@
    "hubVersion": "666"
   },
   "obervave": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.0x real time.",
      "state": "playable",
@@ -7006,8 +8533,19 @@
    "hubVersion": "3.5.2"
   },
   "obssynth": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.46x real time.",
      "state": "playable",
@@ -7039,15 +8577,22 @@
     "preferred": {
      "mac": {
       "engine": "fm1-emu",
-      "reason": "Only the original package passed every automated check here."
+      "reason": "The .rfm1 build did not pass every automated check here."
      }
     }
    },
    "hubVersion": "0.2.0"
   },
   "ombak": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.86x real time.",
      "state": "playable",
@@ -7088,8 +8633,15 @@
    "hubVersion": "1.2"
   },
   "opn1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.49x real time.",
      "state": "playable",
@@ -7132,7 +8684,6 @@
   "orbit": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -7167,8 +8718,15 @@
    "hubVersion": "1.0.1B"
   },
   "orbita": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.08x real time.",
      "state": "playable",
@@ -7208,8 +8766,19 @@
    "hubVersion": "2.0.12"
   },
   "orgigs": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.97x real time.",
      "state": "playable",
@@ -7249,8 +8818,15 @@
    "hubVersion": "1.0.2"
   },
   "paperlagoon": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.65x real time.",
      "state": "playable",
@@ -7291,8 +8867,19 @@
    "hubVersion": "1.1"
   },
   "patchwerk": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.39x real time.",
      "state": "playable",
@@ -7331,8 +8918,19 @@
    "hubVersion": "1.0.3"
   },
   "penumbra": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.61x real time.",
      "state": "playable",
@@ -7373,8 +8971,19 @@
    "hubVersion": "1.8"
   },
   "perf1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.36x real time.",
      "state": "playable",
@@ -7415,8 +9024,19 @@
    "hubVersion": "0.17.0"
   },
   "pigeon": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.67x real time.",
      "state": "playable",
@@ -7452,8 +9072,15 @@
    "hubVersion": "0.5.0-beta.1"
   },
   "pingos1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Ran at 1.18x real time on macOS Apple Silicon: it may stutter.",
@@ -7495,8 +9122,15 @@
    "hubVersion": "1.0.0"
   },
   "piterfly": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.94x real time.",
      "state": "playable",
@@ -7536,8 +9170,15 @@
    "hubVersion": "1.2.5"
   },
   "playa": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Ran at 1.14x real time on macOS Apple Silicon: it may stutter.",
@@ -7578,8 +9219,15 @@
    "hubVersion": "0.1"
   },
   "plissken": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.23x real time.",
      "state": "playable",
@@ -7618,8 +9266,15 @@
    "hubVersion": "0.14"
   },
   "pocketband": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.4x real time.",
      "state": "playable",
@@ -7659,8 +9314,15 @@
    "hubVersion": "0.4"
   },
   "polly": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 9.61x real time.",
      "state": "playable",
@@ -7701,8 +9363,19 @@
    "hubVersion": "0.6.4"
   },
   "pond": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.81x real time.",
      "state": "playable",
@@ -7743,8 +9416,19 @@
    "hubVersion": "0.1.2"
   },
   "purplemonkey": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.91x real time.",
      "state": "playable",
@@ -7785,8 +9469,19 @@
    "hubVersion": "0.12"
   },
   "quantumgammawave": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.03x real time.",
      "state": "playable",
@@ -7825,8 +9520,15 @@
    "hubVersion": "1.5.15"
   },
   "quartet": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.68x real time.",
      "state": "playable",
@@ -7867,8 +9569,19 @@
    "hubVersion": "2.2"
   },
   "quartz": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.09x real time.",
      "state": "playable",
@@ -7908,8 +9621,15 @@
    "hubVersion": "0.8.2"
   },
   "rakt": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.46x real time.",
      "state": "playable",
@@ -7950,8 +9670,15 @@
    "hubVersion": "0.1.8"
   },
   "rambeaver": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.06x real time.",
      "state": "playable",
@@ -7991,8 +9718,19 @@
    "hubVersion": "745-hub"
   },
   "ravel": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.87x real time.",
      "state": "playable",
@@ -8031,8 +9769,19 @@
    "hubVersion": "1.42.0"
   },
   "remotefm1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 7.16x real time.",
      "state": "playable",
@@ -8074,7 +9823,6 @@
   "rhythmer": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -8108,8 +9856,15 @@
    "hubVersion": "0.1.1-beta3"
   },
   "rhytmsec1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.13x real time.",
      "state": "playable",
@@ -8150,7 +9905,6 @@
   "ruido": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
@@ -8187,8 +9941,19 @@
    "hubVersion": "0.7.1"
   },
   "rupture": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.67x real time.",
      "state": "playable",
@@ -8226,8 +9991,19 @@
    "hubVersion": "2.0.14"
   },
   "s1vave": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.13x real time.",
      "state": "playable",
@@ -8266,8 +10042,15 @@
    "hubVersion": "2.0.1"
   },
   "salt": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 5.26x real time.",
      "state": "playable",
@@ -8307,8 +10090,19 @@
    "hubVersion": "0.9-salt14"
   },
   "samsara": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.44x real time.",
      "state": "playable",
@@ -8349,8 +10143,15 @@
    "hubVersion": "1.0.0"
   },
   "sardine": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.83x real time.",
      "state": "playable",
@@ -8391,8 +10192,15 @@
    "hubVersion": "1.0.6"
   },
   "satie1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.23x real time.",
      "state": "playable",
@@ -8433,8 +10241,15 @@
    "hubVersion": "0.1.3-beta"
   },
   "scintilla": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.06x real time.",
      "state": "playable",
@@ -8474,8 +10289,15 @@
    "hubVersion": "0.3.2"
   },
   "shineon": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.05x real time.",
      "state": "playable",
@@ -8514,8 +10336,19 @@
    "hubVersion": "3.5"
   },
   "sid": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.37x real time.",
      "state": "playable",
@@ -8556,8 +10389,19 @@
    "hubVersion": "0.3"
   },
   "sid1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.74x real time.",
      "state": "playable",
@@ -8598,8 +10442,19 @@
    "hubVersion": "1.0.1"
   },
   "sidj": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "known-issue",
+      "note": "The original package has no songs: they are sent over USB from the maker's page, which the players cannot do."
+     },
+     "rfm1": {
+      "level": "listened",
+      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-20 (FM-1 Pocket 0.1.0 build 34)."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Its original package ships with no songs: they are sent over USB from its web page (thomasj.github.io/fm1-sidj), which neither player can do. The .rfm1 build carries songs of its own.",
      "state": "experimental",
@@ -8628,15 +10483,46 @@
     "preferred": {
      "mac": {
       "engine": "rfm1",
-      "reason": "Only the .rfm1 build passed every automated check here."
+      "reason": "The original package has a known issue."
      }
     }
    },
-   "hubVersion": "1.5.1"
+   "hubVersion": "1.5.1",
+   "knownIssues": {
+    "mac": {
+     "fm1-emu": "The original package has no songs: they are sent over USB from the maker's page, which the players cannot do."
+    }
+   },
+   "listened": [
+    {
+     "app": "FM-1 Pocket 0.1.0 build 34",
+     "area": "sound",
+     "build": "ef1ca2f8dcdcc7620dd70300b8ee08b39afd0bb4837758b1aaacb73e86585a4a",
+     "date": "2026-11-20",
+     "engine": "rfm1",
+     "firmware": "sidj",
+     "machine": "MacBook (Apple M5)",
+     "notes": "Sounds after PLAY. The keys make no sound, which fits the firmware (a SID tune player).",
+     "player": "mac",
+     "verdict": "good",
+     "who": "Dean"
+    }
+   ]
   },
   "sidou": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 8.94x real time.",
      "state": "playable",
@@ -8677,8 +10563,19 @@
    "hubVersion": "2.0.0"
   },
   "skiff": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.75x real time.",
      "state": "playable",
@@ -8720,7 +10617,6 @@
   "sloop": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -8754,9 +10650,27 @@
    },
    "hubVersion": "2.8.5"
   },
+  "sloop3": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": null
+  },
   "sloopbanks": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.2x real time.",
      "state": "playable",
@@ -8796,8 +10710,15 @@
    "hubVersion": "2.5-b28-test"
   },
   "sloopdub": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.84x real time.",
      "state": "playable",
@@ -8837,8 +10758,15 @@
    "hubVersion": "1.7"
   },
   "sloopdx": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.75x real time.",
      "state": "playable",
@@ -8878,8 +10806,19 @@
    "hubVersion": "4.0.1"
   },
   "smileyface": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.72x real time.",
      "state": "playable",
@@ -8918,8 +10857,15 @@
    "hubVersion": "1.3.0-tutorialtime"
   },
   "spampy": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.06x real time.",
      "state": "playable",
@@ -8958,9 +10904,31 @@
    },
    "hubVersion": "1.1-r058"
   },
+  "speak37": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": null
+  },
   "spellbox": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 5.05x real time.",
      "state": "playable",
@@ -9001,8 +10969,15 @@
    "hubVersion": "0.3"
   },
   "splitmilk": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.15x real time.",
      "state": "playable",
@@ -9042,8 +11017,15 @@
    "hubVersion": "1.0"
   },
   "sq80": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 7.33x real time.",
      "state": "playable",
@@ -9083,8 +11065,19 @@
    "hubVersion": "0.14.0"
   },
   "stallion": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 1.82x real time.",
      "state": "playable",
@@ -9124,8 +11117,19 @@
    "hubVersion": "1.1"
   },
   "sy1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.34x real time.",
      "state": "playable",
@@ -9165,8 +11169,15 @@
    "hubVersion": "0.5.0"
   },
   "tack": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.77x real time.",
      "state": "playable",
@@ -9205,8 +11216,15 @@
    "hubVersion": "0.15.0"
   },
   "tastywaves": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.72x real time.",
      "state": "playable",
@@ -9244,8 +11262,19 @@
    "hubVersion": "1.0.1"
   },
   "tekstuur": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.74x real time.",
      "state": "playable",
@@ -9286,8 +11315,19 @@
    "hubVersion": "2.0"
   },
   "tessera": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.48x real time.",
      "state": "playable",
@@ -9327,8 +11367,15 @@
    "hubVersion": "3.7.3"
   },
   "tether": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Ran, but made no sound in the scripted session (keys, MIDI, PLAY).",
      "state": "experimental",
@@ -9364,8 +11411,15 @@
    "hubVersion": "1.0"
   },
   "textura": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.67x real time.",
      "state": "playable",
@@ -9404,9 +11458,31 @@
    },
    "hubVersion": "0.2.9"
   },
+  "tonitor": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": "2026.11.10"
+  },
   "trapstationos": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.11x real time.",
      "state": "playable",
@@ -9445,8 +11521,19 @@
    "hubVersion": "1.1.0.2"
   },
   "trax": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.17x real time.",
      "state": "playable",
@@ -9487,8 +11574,15 @@
    "hubVersion": "0.9.5"
   },
   "trumpagotchi": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.86x real time.",
      "state": "playable",
@@ -9528,8 +11622,15 @@
    "hubVersion": "1.0.1"
   },
   "u0u": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 5.72x real time.",
      "state": "playable",
@@ -9569,8 +11670,15 @@
    "hubVersion": "0.3"
   },
   "unholy": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.37x real time.",
      "state": "playable",
@@ -9610,8 +11718,15 @@
    "hubVersion": "0.2.3"
   },
   "valle": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.0x real time.",
      "state": "playable",
@@ -9650,9 +11765,27 @@
    },
    "hubVersion": "0.9-alpha"
   },
+  "vector37": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": "0.3.2"
+  },
   "veffbox": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 4.68x real time.",
      "state": "playable",
@@ -9695,7 +11828,6 @@
   "vesper": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "performance": "may-stutter",
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
@@ -9732,8 +11864,15 @@
    "hubVersion": "2.0.2"
   },
   "vibe-link": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "known-issue",
+      "note": "Upstream fm1-emu holds it back: it shows its own crash screen a second or two after boot."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Upstream fm1-emu holds it back: it shows its own crash screen a second or two after boot.",
      "state": "experimental",
@@ -9766,11 +11905,34 @@
      }
     }
    },
-   "hubVersion": "0.4"
+   "hubVersion": "0.4",
+   "knownIssues": {
+    "mac": {
+     "fm1-emu": "Upstream fm1-emu holds it back: it shows its own crash screen a second or two after boot."
+    }
+   }
+  },
+  "viscera": {
+   "confidence": {
+    "mac": {
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
+   "hubVersion": null
   },
   "vnl1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.47x real time.",
      "state": "playable",
@@ -9808,8 +11970,15 @@
    "hubVersion": "0.9.2"
   },
   "wanderer": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 5.14x real time.",
      "state": "playable",
@@ -9850,8 +12019,15 @@
    "hubVersion": "1.4.0"
   },
   "waveloop": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.86x real time.",
      "state": "playable",
@@ -9893,7 +12069,6 @@
   "x0x": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -9926,8 +12101,15 @@
    "hubVersion": "1.2.2"
   },
   "x0xrmx": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.08x real time.",
      "state": "playable",
@@ -9965,8 +12147,15 @@
    "hubVersion": "1.1.0"
   },
   "xenolith": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.62x real time.",
      "state": "playable",
@@ -10007,8 +12196,15 @@
    "hubVersion": "1.0"
   },
   "xmod": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 7.67x real time.",
      "state": "playable",
@@ -10050,7 +12246,6 @@
   "yehnah": {
    "emu": {
     "excluded": "Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.",
-    "listened": [],
     "mac": {
      "reason": "Pocket does not distribute it (Marked \u2020 by RemoteFM1FW: contains material its licences don't let anyone freely redistribute.). Download it from the maker and open it from disk.",
      "state": "unavailable",
@@ -10084,8 +12279,19 @@
    "hubVersion": "0.1.0"
   },
   "zen1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     },
+     "rfm1": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 2.6x real time.",
      "state": "playable",
@@ -10126,8 +12332,15 @@
    "hubVersion": "1.2"
   },
   "zenith1": {
+   "confidence": {
+    "mac": {
+     "fm1-emu": {
+      "level": "automated",
+      "note": "Passed the automated checks only; nobody has listened to it in the app yet."
+     }
+    }
+   },
    "emu": {
-    "listened": [],
     "mac": {
      "reason": "Played the scripted session on macOS Apple Silicon at 3.72x real time.",
      "state": "playable",

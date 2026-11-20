@@ -113,6 +113,10 @@ public struct CatalogueV2: Decodable, Equatable {
             public var reason: String?
         }
         public struct Listened: Codable, Hashable, Sendable {
+            public var player: String?
+            public var build: String?
+            public var app: String?
+            public var area: String?
             public var engine: String?
             public var machine: String?
             public var who: String?
@@ -160,6 +164,23 @@ public struct CatalogueV2: Decodable, Equatable {
         }
     }
 
+    /// How sure Pocket is that a firmware works on one engine in this app: a person listened to that exact file in
+    /// the app (`listened`), it passed the automated checks only (`automated`), or it has a known problem
+    /// (`known-issue`). Automated results never count as listened.
+    public struct Confidence: Codable, Hashable, Sendable {
+        public enum Level: String, Codable, Sendable { case listened, automated, knownIssue = "known-issue" }
+        public var level: Level
+        public var note: String?
+        public init(level: Level, note: String? = nil) { self.level = level; self.note = note }
+        public init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            level = (try? c.decode(Level.self, forKey: .level)) ?? .automated
+            note = try? c.decodeIfPresent(String.self, forKey: .note)
+        }
+        enum CodingKeys: String, CodingKey { case level, note }
+    }
+    struct PerPlayer<T: Decodable>: Decodable { var mac: T? }
+
     public struct Restriction: Codable, Equatable, Sendable {
         public var code: String
         public var reason: String
@@ -193,9 +214,15 @@ public struct CatalogueV2: Decodable, Equatable {
         public var hubVersion: String?
         /// the emulator engine (the maker's original package), when the catalogue has it
         public var emu: Emu?
+        /// on the Mac, by engine ("rfm1", "fm1-emu"): how sure Pocket is, and known problems
+        public var confidence: [String: Confidence] = [:]
+        public var knownIssues: [String: String] = [:]
+        /// real listening tests in the apps (both engines, both players), recorded by hand
+        public var listened: [Emu.Listened] = []
 
         enum CodingKeys: String, CodingKey {
             case id, name, version, authors, makers, category, tag, about, license, source, beta, status, restriction, provenance, file, sha256, emu
+            case confidence, knownIssues, listened
         }
         struct Statuses: Decodable { var web: Status?; var mac: Status? }
         struct Provenance: Decodable {
@@ -229,6 +256,9 @@ public struct CatalogueV2: Decodable, Equatable {
             hubVersion = prov?.hub?.version
             download = c.contains(.file) && c.contains(.sha256) ? try? CatalogueEntry(from: decoder) : nil
             emu = try? c.decodeIfPresent(Emu.self, forKey: .emu)
+            confidence = (try? c.decodeIfPresent(PerPlayer<[String: Confidence]>.self, forKey: .confidence))?.mac ?? [:]
+            knownIssues = (try? c.decodeIfPresent(PerPlayer<[String: String]>.self, forKey: .knownIssues))?.mac ?? [:]
+            listened = (try? c.decodeIfPresent([Emu.Listened].self, forKey: .listened)) ?? []
         }
 
         /// Whether the Mac app may download and play its .rfm1 build: a build exists and the Mac status allows it.
@@ -307,12 +337,21 @@ public struct CatalogueV2: Decodable, Equatable {
         var c = self
         for i in c.firmwares.indices {
             guard let b = p.firmwares[c.firmwares[i].id], b.hubVersion == nil || b.hubVersion == c.firmwares[i].hubVersion else { continue }
-            c.firmwares[i].emu = b.emu
+            if let e = b.emu { c.firmwares[i].emu = e }
+            if let m = b.confidence?.mac { c.firmwares[i].confidence = m }
+            if let m = b.knownIssues?.mac { c.firmwares[i].knownIssues = m }
+            if let l = b.listened { c.firmwares[i].listened = l }
         }
         return c
     }
     struct EmuPreview: Decodable {
-        struct Item: Decodable { var hubVersion: String?; var emu: Emu }
+        struct Item: Decodable {
+            var hubVersion: String?
+            var emu: Emu?
+            var confidence: PerPlayer<[String: Confidence]>?
+            var knownIssues: PerPlayer<[String: String]>?
+            var listened: [Emu.Listened]?
+        }
         var firmwares: [String: Item]
     }
 

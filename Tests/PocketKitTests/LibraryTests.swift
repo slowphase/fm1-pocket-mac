@@ -645,10 +645,13 @@ final class LibrarySyncTests: XCTestCase {
     func testEmuPreviewFillsOnlyMissingBlocksForTheSameHubVersion() throws {
         let sha = String(repeating: "b", count: 64)
         let json = #"{"schema":2,"snapshot":"s","updated":"u","firmwares":[{"id":"x","name":"X","file":"fw/x.rfm1","sha256":"\#(String(repeating: "a", count: 64))","size":1,"status":{"web":{"state":"playable"},"mac":{"state":"playable"}},"provenance":{"hub":{"version":"2.0"}}},{"id":"y","name":"Y","status":{"mac":{"state":"source-only"}},"provenance":{"hub":{"version":"1.0"}}}]}"#
-        let preview = #"{"firmwares":{"x":{"hubVersion":"2.0","emu":{"package":{"url":"https://github.com/m/x/releases/download/v2/x.fwsc","sha256":"\#(sha)","version":"2.0"},"mac":{"state":"playable"},"preferred":{"mac":{"engine":"fm1-emu"}}}},"y":{"hubVersion":"0.9","emu":{"package":{"url":"https://github.com/m/y/releases/download/v1/y.fwsc","sha256":"\#(sha)"},"mac":{"state":"playable"}}}}}"#
+        let preview = #"{"firmwares":{"x":{"hubVersion":"2.0","emu":{"package":{"url":"https://github.com/m/x/releases/download/v2/x.fwsc","sha256":"\#(sha)","version":"2.0"},"mac":{"state":"playable"},"preferred":{"mac":{"engine":"fm1-emu"}}},"confidence":{"mac":{"fm1-emu":{"level":"listened","note":"n"},"rfm1":{"level":"known-issue","note":"k"}}},"listened":[{"firmware":"x","player":"mac","engine":"fm1-emu","verdict":"good"}]},"y":{"hubVersion":"0.9","emu":{"package":{"url":"https://github.com/m/y/releases/download/v1/y.fwsc","sha256":"\#(sha)"},"mac":{"state":"playable"}}}}}"#
         let c = try CatalogueV2.decode(Data(json.utf8)).withPreview(Data(preview.utf8))
         XCTAssertEqual(c.firmwares[0].emu?.package?.sha256, sha)
         XCTAssertNil(c.firmwares[1].emu, "a preview made for another Hub version is not used")
+        XCTAssertEqual(c.firmwares[0].confidence["fm1-emu"]?.level, .listened)
+        XCTAssertEqual(c.firmwares[0].confidence["rfm1"], CatalogueV2.Confidence(level: .knownIssue, note: "k"))
+        XCTAssertEqual(c.firmwares[0].listened.count, 1)
         XCTAssertEqual(c.firmwares[0].preferredMacEngine, "fm1-emu")
         XCTAssertEqual(c.alternative(for: "x"), true)
         XCTAssertEqual(c.alternative(for: "x.fwsc"), false)

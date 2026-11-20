@@ -65,8 +65,22 @@ struct LibraryItem: Identifiable, Hashable {
     var otherDownloadText: String?
     /// the emulator's automated check on macOS (machine, engine commit, speed): an automated boot check, not a listen
     var emuTested: CatalogueV2.Emu.Tested?
-    /// real listening tests recorded for this firmware (by hand), kept apart from the automated checks
+    /// real listening tests in this app for the file it plays now (by hand), kept apart from the automated checks
     var listened: [CatalogueV2.Emu.Listened] = []
+    /// how sure Pocket is of the engine it plays on now: a person listened, automated checks only, or a known issue
+    var confidence: CatalogueV2.Confidence?
+    /// the confidence as one short phrase, for the details pane and the footer's tally
+    var confidenceText: String {
+        if isBuiltin { return "Built in (checked by every build of the app)" }
+        if isPackage { return "Opened from disk: not checked" }
+        if isListedOnly { return "Not playable in this app" }
+        if isWithdrawn { return "No longer in the catalogue" }
+        switch confidence?.level {
+        case .listened: return "Listened to in this app"
+        case .knownIssue: return "Known issue"
+        case .automated, .none: return "Automated checks only (nobody has listened yet)"
+        }
+    }
     var hasEngineChoice: Bool { engines.count > 1 }
 
     static func engineName(_ e: String) -> String { e == "fm1-emu" ? "Original package (emulator)" : ".rfm1 build" }
@@ -154,7 +168,8 @@ struct LibraryItem: Identifiable, Hashable {
             // the emulator's runs are per package, on macOS Apple Silicon: an individual automated check
             if let m = emuTested?.machine, m.contains("Darwin") { verification = .macos }
         }
-        listened = s.emu?.listened ?? []
+        listened = s.listened
+        confidence = s.confidence
         preferredEngine = s.preferredEngine
         preferredReason = s.preferredReason
     }
@@ -506,6 +521,7 @@ final class LibraryModel: ObservableObject {
         // is downloaded; the other two match their sidebar sections.
         let counts = LibraryCounts(items: list, more: moreItems, withdrawn: withdrawnItems)
         var line = snap.entries.isEmpty ? "No catalogue downloaded yet" : counts.line
+        if !snap.entries.isEmpty { line += "\n" + LibraryCounts.confidenceLine(list) }
         if let u = snap.catalogueUpdated {
             let date = ISO8601DateFormatter.withFractions.date(from: u) ?? ISO8601DateFormatter().date(from: u)
             line += " · catalogue " + (date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .short) } ?? u)
@@ -600,6 +616,15 @@ struct LibraryCounts: Equatable {
 
     static func baseID(_ id: String) -> String {
         id.hasSuffix(CatalogueEntry.packageSuffix) ? String(id.dropLast(CatalogueEntry.packageSuffix.count)) : id
+    }
+
+    /// how sure we are of the library, on each firmware's chosen engine (the built-in h1 left out)
+    static func confidenceLine(_ items: [LibraryItem]) -> String {
+        let rated = items.filter { !$0.isBuiltin && !$0.isPackage }
+        let listened = rated.filter { $0.confidence?.level == .listened }.count
+        let issues = rated.filter { $0.confidence?.level == .knownIssue }.count
+        let automated = rated.count - listened - issues
+        return "Listened to: \(listened) · automated checks only: \(automated) · known issues: \(issues)"
     }
 
     var line: String {

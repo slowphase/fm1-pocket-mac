@@ -601,18 +601,19 @@ private struct DetailView: View {
         }
     }
 
-    /// automated checks and listening tests, kept apart
+    /// how sure we are, then the automated check and the listening tests behind it, kept apart
     @ViewBuilder private var testRows: some View {
+        fact("Confidence", item.confidenceText + (item.confidence?.level == .knownIssue ? ": " + (item.confidence?.note ?? "") : ""))
         if item.engine == "fm1-emu", let t = item.emuTested {
             fact("Automated check", [t.machine.map { "on " + $0 }, t.speed.map { String(format: "%.1fx real time", $0) },
                                      t.engine].compactMap { $0 }.joined(separator: ", ") + " (a scripted boot check; nobody listened)")
         }
-        if item.engine == "fm1-emu" || !item.listened.isEmpty {
-            let mine = item.listened.filter { ($0.engine ?? "fm1-emu") == item.engine }
-            fact("Listening test", mine.isEmpty ? "None recorded yet" :
-                 mine.map { [$0.verdict, $0.who, $0.date, $0.machine].compactMap { $0 }.joined(separator: ", ") }.joined(separator: "; "))
+        if !item.isBuiltin && !item.isPackage && !item.isListedOnly {
+            fact("Listening tests", item.listened.isEmpty ? "None for this file yet" :
+                 item.listened.map { [$0.verdict, $0.who, $0.date, $0.machine, $0.app].compactMap { $0 }.joined(separator: ", ") }.joined(separator: "; "))
         }
     }
+
 
     private func day(_ s: String?) -> String {
         guard let d = NewBadge.date(s) else { return "" }

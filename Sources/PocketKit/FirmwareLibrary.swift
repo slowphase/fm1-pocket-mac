@@ -110,6 +110,9 @@ public actor FirmwareLibrary {
         /// the engine recommended on this Mac ("rfm1" or "fm1-emu"), and why
         public var preferredEngine: String?
         public var preferredReason: String?
+        /// how sure Pocket is of this entry's engine on the Mac, and the listening tests behind it
+        public var confidence: CatalogueV2.Confidence?
+        public var listened: [CatalogueV2.Emu.Listened] = []
     }
 
     public struct Snapshot: Equatable, Sendable {
@@ -140,7 +143,9 @@ public actor FirmwareLibrary {
                              current: builds.first, previous: builds.count > 1 ? builds[1] : nil,
                              screenshotFile: localScreenshot(for: e), mac: e.isPackage ? d?.emu?.mac : d?.mac,
                              makers: d?.makers ?? [], hubURL: d?.hubURL, emu: d?.emu,
-                             preferredEngine: d?.preferredMacEngine, preferredReason: d?.preferredMacReason))
+                             preferredEngine: d?.preferredMacEngine, preferredReason: d?.preferredMacReason,
+                             confidence: d?.confidence[e.isPackage ? "fm1-emu" : "rfm1"],
+                             listened: (d?.listened ?? []).filter { ($0.player ?? "mac") == "mac" && $0.engine == (e.isPackage ? "fm1-emu" : "rfm1") }))
         }
         let withdrawn = registry.firmwares.values.filter { $0.status == .withdrawn }.sorted { $0.id < $1.id }
         return Snapshot(entries: out, withdrawn: withdrawn, imports: registry.imports, catalogueUpdated: catalogue?.updated,
