@@ -16,8 +16,12 @@ public final class AudioOutput {
 
     public var isRunning: Bool { engine.isRunning }
 
-    /// Mute keeps the firmware running (and its clock moving) but silences the output, as Pocket's mute does.
-    public func setMuted(_ m: Bool) { engine.mainMixerNode.outputVolume = m ? 0 : 1 }
+    /// Mute keeps the firmware running (and its clock moving) but silences the output, as Pocket's mute does. The
+    /// render callback writes silence from its next buffer on (the mixer's volume ramps, so it let a fraction through
+    /// for a while: the integration test measured 10 to 20% of the level 300 ms after muting).
+    public func setMuted(_ m: Bool) { mute.on = m }
+    private final class Flag: @unchecked Sendable { var on = false }
+    private let mute = Flag()
 
     public func start(_ core: any PlayerEngine) throws {
         stop()
@@ -28,6 +32,7 @@ public final class AudioOutput {
         buf.initialize(repeating: 0, count: Self.chunk * 2)
         scratch = buf
         let chunk = Self.chunk
+        let mute = self.mute
         let src = AVAudioSourceNode(format: format) { _, _, frameCount, abl -> OSStatus in
             let list = UnsafeMutableAudioBufferListPointer(abl)
             let total = Int(frameCount)
@@ -35,6 +40,7 @@ public final class AudioOutput {
             while done < total {
                 let n = min(total - done, chunk)
                 core.pull(buf, frames: n)
+                if mute.on { for i in 0..<(2 * n) { buf[i] = 0 } }
                 for ch in 0..<list.count {
                     guard let data = list[ch].mData else { continue }
                     let out = data.assumingMemoryBound(to: Float.self)

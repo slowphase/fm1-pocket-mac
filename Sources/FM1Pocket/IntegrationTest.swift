@@ -137,7 +137,10 @@ enum IntegrationTest {
             p.muted = true
             let muted = p.testRun(ms: 300)
             p.muted = false
+            let unmuted = p.testRun(ms: 200)
+            sound["muted"] = muted
             if sc.expect.contains("keys") && muted > silent { failures.append("mute left \(muted) RMS") }
+            if sc.expect.contains("keys") && unmuted <= silent { failures.append("no sound after unmuting") }
             for k in [7, 11, 14] { p.key(k, down: false) }
             _ = p.testRun(ms: 400)
             // a computer-keyboard chord (G J L: the same three keys), pressed between two audio buffers
