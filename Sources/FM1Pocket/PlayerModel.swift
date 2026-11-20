@@ -15,7 +15,8 @@ final class PlayerModel: ObservableObject {
     @Published var error: String?
 
     private var core: FirmwareCore?
-    private var flashID = "", flashVersion = ""
+    private var flashID = "", flashVersion = "", flashSHA = ""
+    private var activeIn: FirmwareLibrary?          // the library told this build is playing (so cleanup keeps it)
     private var flashSeen: UInt32 = 0
     private let audio = AudioOutput()
     private let states = StateStore()
@@ -32,17 +33,26 @@ final class PlayerModel: ObservableObject {
         Task {
             defer { loadingID = nil }
             do {
-                let bytes = try await library.bytes(for: item)
-                let next = try FirmwareCore(bytes: bytes)
+                let fw = try await library.playable(for: item)
+                let next = try FirmwareCore(bytes: fw.data)
                 stop()
-                let saved = states.load(id: next.id, version: next.version)
+                // saved settings belong to this exact build (id, version and content hash); never another build's
+                let saved = states.load(id: next.id, version: next.version, sha256: fw.sha256)
+                if let catID = fw.catalogueID {
+                    let mine = StateStore.buildKey(version: next.version, sha256: fw.sha256)
+                    let other = saved == nil ? states.savedKeys(id: next.id).first(where: { $0 != mine }) : nil
+                    await library.library.noteStateFromOtherBuild(id: catID, otherKey: other)
+                    await library.library.markActive(sha256: fw.sha256)
+                    activeIn = library.library
+                }
                 next.boot(flash: saved)
                 if next.isHalted { throw PocketError.badFirmware("\(item.name) stopped while starting: \(next.errorMessage)") }
                 core = next
                 flashID = next.id
                 flashVersion = next.version
+                flashSHA = fw.sha256
                 flashSeen = next.flashDirty
-                title = "\(item.name) \(item.version)"
+                title = "\(item.name) \(fw.version)" + (fw.isFallback ? " (previous download: the update could not be fetched)" : "")
                 buttonNames = FM1Button.allCases.map { next.buttonName($0) }
                 playingID = item.id
                 lastWrites = .max
@@ -59,6 +69,11 @@ final class PlayerModel: ObservableObject {
         saveFlash(sync: true)
         core?.shutdown()
         audio.stop()
+        if let lib = activeIn {
+            let sha = flashSHA
+            Task { await lib.markInactive(sha256: sha) }
+            activeIn = nil
+        }
         timer?.invalidate()
         timer = nil
         core = nil
@@ -75,7 +90,7 @@ final class PlayerModel: ObservableObject {
         let d = core.flashDirty
         if d == flashSeen && !sync { return }
         if let img = core.flashImage(sync: sync) {
-            do { try states.save(img, id: flashID, version: flashVersion) } catch { self.error = "Could not save settings: \(error.localizedDescription)" }
+            do { try states.save(img, id: flashID, version: flashVersion, sha256: flashSHA) } catch { self.error = "Could not save settings: \(error.localizedDescription)" }
         }
         flashSeen = core.flashDirty
     }

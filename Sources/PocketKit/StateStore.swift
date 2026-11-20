@@ -1,8 +1,14 @@
 import Foundation
 
-/// Each firmware's saved settings (its flash image), kept apart by firmware id and version:
-/// `<folder>/<id>/<version>.flash`. A write goes to a temporary file first and keeps the previous image as
-/// `.prev`, so a crash mid-write never loses the last good state.
+/// Each firmware's saved settings (its flash image). User-owned: library sync and cleanup never touch this folder.
+///
+/// Saves are kept apart by firmware id and by **build**: `<folder>/<id>/<version>@<sha256 prefix>.flash`. The
+/// content hash is part of the key because an author can rebuild a firmware without changing its version string,
+/// and a rebuild may store its settings differently. (The older `load/save(id:version:)` form, keyed by version
+/// alone, is kept for compatibility.)
+///
+/// A write goes to a temporary file first and keeps the previous image as `.prev`, so a crash mid-write never loses
+/// the last good state. Saves are never deleted, moved or copied between builds automatically.
 public final class StateStore {
     public let folder: URL
 
@@ -10,26 +16,51 @@ public final class StateStore {
         self.folder = folder
     }
 
-    private static func safe(_ s: String) -> String {
+    static func safe(_ s: String) -> String {
         let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "._-+"))
         let cleaned = String(s.unicodeScalars.map { allowed.contains($0) ? Character($0) : "_" })
         return cleaned.isEmpty || cleaned.hasPrefix(".") ? "_" + cleaned : cleaned
     }
 
-    public func url(id: String, version: String) -> URL {
-        folder.appendingPathComponent(Self.safe(id), isDirectory: true)
-            .appendingPathComponent(Self.safe(version.isEmpty ? "unversioned" : version) + ".flash")
+    /// the name a build's save goes under: `<version>@<first 12 hex digits of its SHA-256>`
+    public static func buildKey(version: String, sha256: String) -> String {
+        safe(version.isEmpty ? "unversioned" : version) + "@" + String(sha256.lowercased().prefix(12))
     }
 
-    public func load(id: String, version: String) -> Data? {
-        let u = url(id: id, version: version)
+    private func dir(_ id: String) -> URL { folder.appendingPathComponent(Self.safe(id), isDirectory: true) }
+
+    public func url(id: String, version: String) -> URL {
+        dir(id).appendingPathComponent(Self.safe(version.isEmpty ? "unversioned" : version) + ".flash")
+    }
+    public func url(id: String, version: String, sha256: String) -> URL {
+        dir(id).appendingPathComponent(Self.buildKey(version: version, sha256: sha256) + ".flash")
+    }
+
+    public func load(id: String, version: String) -> Data? { load(url(id: id, version: version)) }
+    public func load(id: String, version: String, sha256: String) -> Data? { load(url(id: id, version: version, sha256: sha256)) }
+    public func save(_ data: Data, id: String, version: String) throws { try save(data, to: url(id: id, version: version)) }
+    public func save(_ data: Data, id: String, version: String, sha256: String) throws {
+        try save(data, to: url(id: id, version: version, sha256: sha256))
+    }
+
+    /// The keys of every save this firmware has (build keys, or bare versions from the older form), newest first.
+    public func savedKeys(id: String) -> [String] {
+        let d = dir(id)
+        let names = (try? FileManager.default.contentsOfDirectory(atPath: d.path)) ?? []
+        let files = names.filter { $0.hasSuffix(".flash") }
+        func date(_ n: String) -> Date {
+            (try? d.appendingPathComponent(n).resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+        }
+        return files.sorted { date($0) > date($1) }.map { String($0.dropLast(6)) }
+    }
+
+    private func load(_ u: URL) -> Data? {
         if let d = try? Data(contentsOf: u), !d.isEmpty { return d }
         if let d = try? Data(contentsOf: u.appendingPathExtension("prev")), !d.isEmpty { return d }
         return nil
     }
 
-    public func save(_ data: Data, id: String, version: String) throws {
-        let u = url(id: id, version: version)
+    private func save(_ data: Data, to u: URL) throws {
         let fm = FileManager.default
         try fm.createDirectory(at: u.deletingLastPathComponent(), withIntermediateDirectories: true)
         if let old = try? Data(contentsOf: u), old == data { return }
