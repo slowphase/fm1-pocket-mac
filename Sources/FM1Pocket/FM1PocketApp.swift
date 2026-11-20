@@ -13,6 +13,10 @@ struct FM1PocketApp: App {
             let out = i + 2 < CommandLine.arguments.count ? CommandLine.arguments[i + 2] : nil
             exit(SelfTest.runPackage(CommandLine.arguments[i + 1], writingTo: out))
         }
+        if let i = CommandLine.arguments.firstIndex(of: "--integration"), i + 1 < CommandLine.arguments.count {
+            let out = i + 2 < CommandLine.arguments.count ? CommandLine.arguments[i + 2] : nil
+            exit(IntegrationTest.run(CommandLine.arguments[i + 1], writingTo: out))
+        }
         if let i = CommandLine.arguments.firstIndex(of: "--selftest") {
             let out = i + 1 < CommandLine.arguments.count ? CommandLine.arguments[i + 1] : nil
             exit(SelfTest.run(writingTo: out))

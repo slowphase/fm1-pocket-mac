@@ -67,8 +67,10 @@ public final class StateStore {
         for f in [u, u.appendingPathExtension("prev")] where fm.fileExists(atPath: f.path) { try fm.removeItem(at: f) }
     }
 
+    /// The save, or its backup when the save itself is missing or unreadable. A save that exists but is empty is
+    /// a real save (the emulator engine's "nothing differs from the package"): it is not replaced by an older backup.
     private func load(_ u: URL) -> Data? {
-        if let d = try? Data(contentsOf: u), !d.isEmpty { return d }
+        if let d = try? Data(contentsOf: u) { return d.isEmpty ? nil : d }
         if let d = try? Data(contentsOf: u.appendingPathExtension("prev")), !d.isEmpty { return d }
         return nil
     }

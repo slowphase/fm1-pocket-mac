@@ -200,6 +200,54 @@
    "license": "GPL-3.0",
    "url": "https://github.com/joakimeriksson/scintilla-fm1/releases/download/v0.3.2/scintilla-0.3.2.fwsc",
    "sha256": "cdc9a736308ff58c71a0de11da874091469a4a6c1758f66c55998456e5d7ebf5"
+  },
+  {
+   "hub": "atek303",
+   "name": "ATEK303",
+   "version": "1.2",
+   "license": "GPL-3.0",
+   "url": "https://github.com/animatek/FM1-Animatek/releases/download/atek303-v1.2/atek303-1.2.fwsc",
+   "sha256": "d7fe6293e45fa003c82c7017886e172f53bd64190100282a82e778f21faded6e"
+  },
+  {
+   "hub": "choppah",
+   "name": "CHOPPAH",
+   "version": "1.4.1",
+   "license": "MPL-2.0",
+   "url": "https://github.com/profikid/fm1-break-choppah/releases/download/v1.4.1/choppah-1.4.1.fwsc",
+   "sha256": "2633bafb066269b9591197ab4ff5c0881558e161568040f1b6d510032b8a89da"
+  },
+  {
+   "hub": "aetherfm1",
+   "name": "AETHER FM1",
+   "version": "2.0.4",
+   "license": "GPL-3.0",
+   "url": "https://github.com/jeanlucmouton30-jpg/AETHER-FM1/releases/download/v2.0.4/aether-fm1-2.0.4.fwsc",
+   "sha256": "9296a7ab5e2de5772e2a2d50d7362eda4cb224bb539ebcc9b6f96d67fa75a632"
+  },
+  {
+   "hub": "ambpond",
+   "name": "amb-pond",
+   "version": "0.1.2",
+   "license": "MPL-2.0",
+   "url": "https://github.com/superxor/amb-pond/releases/download/v0.1.2/pond-0.1.2.fwsc",
+   "sha256": "fb994f2903b7a26d0fff27fb7261c71654f3cc7a1812b7e040f155bd99bbffdc"
+  },
+  {
+   "hub": "cursedos",
+   "name": "cursed os",
+   "version": "0.19.0",
+   "license": "GPL-3.0",
+   "url": "https://github.com/cursedsound-music/CS_FM1/releases/download/v0.19.0/cursed-os-0.19.0.fwsc",
+   "sha256": "90f30f5c4d4039860553d15cc66dd97f09fea8e7bc3a15e22445b3e0c00ca7dd"
+  },
+  {
+   "hub": "amenity",
+   "name": "Amenity",
+   "version": "2.1.1",
+   "license": "GPL-3.0",
+   "url": "https://github.com/ejtb76/amenity/releases/download/v2.1.1/amenity-2.1.1.fwsc",
+   "sha256": "698cdcf3748190c93d4420f9492eb74d705c90233d69dd2e241dcefc971cb62b"
   }
  ]
 }

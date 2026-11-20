@@ -94,7 +94,7 @@ jobs:
       - name: Run the Swift tests
         run: |
           set -o pipefail
-          FM1_FWSC="$PWD/build/packages/felucca.fwsc" swift test 2>&1 | tee swift-test.log
+          FM1_FWSC="$PWD/build/packages/felucca.fwsc" FM1_FWSC_DIR="$PWD/build/packages" swift test 2>&1 | tee swift-test.log
 
       - name: Check the live Pocket catalogue (does not block the build)
         id: live
@@ -112,9 +112,9 @@ jobs:
       - name: Self-test the packaged app (boots h1 inside the .app)
         run: '"build/FM-1 Pocket.app/Contents/MacOS/FM1Pocket" --selftest build/selftest.json'
 
-      - name: Emulator engine self-test in the packaged app (evaluation; boot checks, nobody listens)
+      - name: Emulator engine self-test in the packaged app (engine boot checks, nobody listens)
         run: |
-          echo "## Emulator engine (fm1-emu, evaluation) on $(sysctl -n machdep.cpu.brand_string)" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Emulator engine (fm1-emu) on $(sysctl -n machdep.cpu.brand_string)" >> "$GITHUB_STEP_SUMMARY"
           echo "| Package | OK | Speed | Keys | MIDI | PLAY | Save round trip |" >> "$GITHUB_STEP_SUMMARY"
           echo "| --- | --- | --- | --- | --- | --- | --- |" >> "$GITHUB_STEP_SUMMARY"
           echo "=====RESULTS-BEGIN====="
@@ -131,6 +131,42 @@ jobs:
           done
           echo "]"
           echo "=====RESULTS-END====="
+
+      - name: .rfm1 builds for the integration test (FM-1 Pocket Player's published catalogue, SHA-256 checked)
+        run: |
+          mkdir -p build/rfm1
+          python3 - <<'PY'
+          import json, hashlib, urllib.request
+          base = "https://slowphase.github.io/fm1-pocket-player/data/"
+          ua = {"User-Agent": "FM-1 Pocket for macOS CI"}
+          cat = json.load(urllib.request.urlopen(urllib.request.Request(base + "catalog.json", headers=ua)))
+          for f in cat["firmwares"]:
+              if f["id"] not in ("felucca", "hortator", "amb"): continue
+              b = urllib.request.urlopen(urllib.request.Request(base + f["file"], headers=ua)).read()
+              ok = hashlib.sha256(b).hexdigest() == f["sha256"]
+              print(f["id"], f["version"], len(b), "ok" if ok else "SHA-256 MISMATCH")
+              if ok: open(f"build/rfm1/{f['id']}.rfm1", "wb").write(b)
+          PY
+
+      - name: App-level integration test (the app's controls, audio graph and saves; automated, nobody listens)
+        run: |
+          set +e
+          perl -e 'alarm 1500; exec @ARGV' "build/FM-1 Pocket.app/Contents/MacOS/FM1Pocket" --integration Tests/integration/scenarios.json build/integration.json > /dev/null
+          code=$?
+          echo "=====RESULTS-BEGIN====="; cat build/integration.json; echo "=====RESULTS-END====="
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          d = json.load(open("build/integration.json"))
+          print("## App-level integration test (automated; nobody listened)\n")
+          print("| Firmware | Engine | Kind | OK | Sound (RMS) | Save | Failures |")
+          print("| --- | --- | --- | --- | --- | --- | --- |")
+          for r in d.get("firmwares", []):
+              rms = ", ".join(f"{k} {v:.3f}" for k, v in sorted((r.get("rms") or {}).items()))
+              sv = r.get("save")
+              save = "" if sv is None else ("restored" if sv.get("sameFlashAfterRelaunch") else "NOT restored")
+              print(f"| {r.get('id')} | {r.get('engine','')} | {r.get('kind','')} | {r.get('ok')} | {rms} | {save} | {'; '.join(r.get('failures', []))} |")
+          PY
+          exit $code
 
       - name: Make the DMG
         env:

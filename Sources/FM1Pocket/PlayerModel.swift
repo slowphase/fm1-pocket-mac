@@ -102,8 +102,8 @@ final class PlayerModel: ObservableObject {
     private var flashID = "", flashVersion = "", flashSHA = ""
     private var flashSeen: UInt32 = 0
     private var activeIn: FirmwareLibrary?
-    private let audio = AudioOutput()
-    private let states = StateStore()
+    private let audio: AudioOutput
+    private let states: StateStore
     private let midi = MIDIInput()
     private var timer: Timer?
     private var lastWrites: UInt32 = .max
@@ -116,7 +116,11 @@ final class PlayerModel: ObservableObject {
     private var keyHeld: [UInt16: Int] = [:]
     private var keyCount: [Int: Int] = [:]
 
-    init() {
+    /// `states` and `audio` are only replaced by the integration test (SelfTest.runIntegration): a temporary save
+    /// folder, and Core Audio rendered offline instead of to a device. Everything else is the app's own path.
+    init(states: StateStore = StateStore(), audio: AudioOutput = AudioOutput()) {
+        self.states = states
+        self.audio = audio
         midi.onMessage = { [coreBox] s, d1, d2 in coreBox.core?.midi(s, d1, d2) }
         midi.onSourcesChanged = { [weak self] n in self?.midiSources = n }
     }
@@ -254,6 +258,35 @@ final class PlayerModel: ObservableObject {
         }
     }
 
+    // MARK: - the integration test's handles (SelfTest.runIntegration); the app never calls these
+
+    /// Starts `bytes` as Play does once the library has the file (the same `start`, saves and all).
+    func testStart(bytes: Data, sha256: String, item: LibraryItem) throws {
+        try start(bytes: bytes, sha256: sha256, item: item, catalogueID: nil, library: nil, fallback: false, saveCurrent: true)
+    }
+    /// `ms` of sound through the app's audio graph, rendered offline, with the 60 Hz timer's work in between, as
+    /// the app does while it plays. Returns the output's RMS.
+    func testRun(ms: Int) -> Double {
+        let ticks = max(1, ms * 60 / 1000)
+        var sum = 0.0, n = 0
+        for _ in 0..<ticks {
+            if let (s, k) = audio.renderOffline(frames: 735) { sum += s; n += k }
+            refresh()
+        }
+        return n == 0 ? 0 : (sum / Double(n)).squareRoot()
+    }
+    /// a MIDI message as CoreMIDI delivers it (through the same handler)
+    func testMIDI(_ s: UInt8, _ d1: UInt8, _ d2: UInt8) { midi.onMessage?(s, d1, d2) }
+    /// what the screen shows: a hash of its pixels
+    var testScreenHash: Int { var h = Hasher(); h.combine(pixels); return h.finalize() }
+    /// the save on disk for what runs now, if any
+    var testSavedFlash: Data? { states.load(id: flashID, version: flashVersion, sha256: flashSHA) }
+    var testEngine: String { core?.engine ?? "" }
+    /// the id the running firmware's settings are saved under, and what its flash holds now (finished writes)
+    var testSaveID: String { flashID }
+    var testCurrentFlash: Data? { core?.flashImage(sync: true) }
+    var testHalted: Bool { core?.isHalted ?? false }
+
     // MARK: - saved settings
 
     /// saves the firmware's flash when it changed (sync: ask the firmware to finish its writes first)
@@ -261,11 +294,13 @@ final class PlayerModel: ObservableObject {
         guard let core, !core.isHalted else { return }
         let d = core.flashDirty
         if d == flashSeen && !sync { return }
-        if let img = core.flashImage(sync: sync) {
-            do { try states.save(img, id: flashID, version: flashVersion, sha256: flashSHA) }
-            catch { self.error = "Could not save settings: \(error.localizedDescription)" }
-        }
-        flashSeen = core.flashDirty
+        // nil: the firmware is still writing (the emulator engine waits until it has finished); try again on a later
+        // tick, without marking the change as seen, or it would not be saved until the firmware writes again
+        guard let img = core.flashImage(sync: sync) else { return }
+        do {
+            try states.save(img, id: flashID, version: flashVersion, sha256: flashSHA)
+            flashSeen = core.flashDirty
+        } catch { self.error = "Could not save settings: \(error.localizedDescription)" }
     }
 
     /// Erase Saved Settings: delete this build's save and start it fresh.
@@ -501,16 +536,20 @@ final class PlayerModel: ObservableObject {
         if !ev.modifierFlags.intersection([.command, .control, .option]).isEmpty { return false }
         if ev.window?.firstResponder is NSText { return false }
         guard let w = playerWindow, ev.window === w else { return false }
-        let code = ev.keyCode
+        return computerKey(ev.keyCode, down: ev.type == .keyDown, isRepeat: ev.isARepeat, shift: ev.modifierFlags.contains(.shift))
+    }
+
+    /// One computer key (a physical key code), as the player window receives it.
+    func computerKey(_ code: UInt16, down: Bool, isRepeat: Bool = false, shift: Bool = false) -> Bool {
+        guard core != nil else { return false }
         if let k = Self.keyMap[code] {
-            if ev.type == .keyDown { if !ev.isARepeat && keyHeld[code] == nil { keyHeld[code] = k; key(k, down: true) } }
+            if down { if !isRepeat && keyHeld[code] == nil { keyHeld[code] = k; key(k, down: true) } }
             else if let held = keyHeld.removeValue(forKey: code) { key(held, down: false) }
             return true
         }
-        guard ev.type == .keyDown else { return false }
-        let shift = ev.modifierFlags.contains(.shift)
+        guard down else { return false }
         let repeats: Set<UInt16> = [126, 125, 47, 43, 18, 19, 20, 21]   // ↑ ↓ . , and 1-4 auto-repeat, as in Pocket
-        if ev.isARepeat && !repeats.contains(code) { return [6, 7, 124, 123].contains(code) }
+        if isRepeat && !repeats.contains(code) { return [6, 7, 124, 123].contains(code) }
         switch code {
         case 6: tap(.octDown)
         case 7: tap(.octUp)

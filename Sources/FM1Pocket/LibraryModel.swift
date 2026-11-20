@@ -456,9 +456,11 @@ final class LibraryModel: ObservableObject {
                 lastSync = "Offline: showing the downloaded library. (\(err))"
             } else {
                 var parts: [String] = []
-                if !r.installed.isEmpty { parts.append("\(r.installed.count) downloaded") }
-                if !r.failed.isEmpty { parts.append("\(r.failed.count) could not be downloaded") }
-                if !r.withdrawn.isEmpty { parts.append("\(r.withdrawn.count) withdrawn from the catalogue") }
+                // by firmware, not by file (an .rfm1 build and an original package of one firmware count once)
+                let firmwares = { (ids: [String]) in Set(ids.map(LibraryCounts.baseID)).count }
+                if !r.installed.isEmpty { parts.append("\(firmwares(r.installed)) downloaded") }
+                if !r.failed.isEmpty { parts.append("\(firmwares(Array(r.failed.keys))) could not be downloaded") }
+                if !r.withdrawn.isEmpty { parts.append("\(firmwares(r.withdrawn)) withdrawn from the catalogue") }
                 lastSync = parts.isEmpty ? "Up to date" : parts.joined(separator: ", ")
             }
             await reload()
@@ -486,33 +488,11 @@ final class LibraryModel: ObservableObject {
 
     func reload() async {
         let snap = await library.snapshot()
-        var list: [LibraryItem] = []
-        if let h1 = LibraryItem.builtinH1(screenshot: builtinShot) { list.append(h1) }
-        // one item per firmware: its .rfm1 build and/or its original package (`<id>.fwsc`), playing on the engine the
-        // user picked, else the one the catalogue recommends
-        var builds: [String: LibraryItem] = [:], packages: [String: LibraryItem] = [:], order: [String] = []
-        for e in snap.entries {
-            var it = LibraryItem(e, base: library.base)
-            it.isNew = NewBadge.isNew(added: e.entry.added, since: snap.catalogueSince)
-            let base = e.entry.baseID
-            if !order.contains(base) { order.append(base) }
-            if e.entry.isPackage { packages[base] = it } else { builds[base] = it }
-        }
-        for base in order {
-            let b = builds[base], p = packages[base]
-            let engines = (b == nil ? [] : ["rfm1"]) + (p == nil ? [] : ["fm1-emu"])
-            let preferred = (b ?? p)?.preferredEngine
-            let want = engineChoices[base] ?? preferred ?? "rfm1"
-            guard var it = (want == "fm1-emu" ? p ?? b : b ?? p) else { continue }
-            it.engines = engines
-            if engines.count > 1 { it.otherDownloadText = (it.engine == "fm1-emu" ? b : p)?.downloadText }
-            if it.engine == "fm1-emu", let b {      // the build's picture, dates and badges describe the same firmware
-                it.isNew = b.isNew; it.added = b.added; it.updated = b.updated
-            }
-            list.append(it)
-        }
+        let merged = Self.merged(snap, choices: engineChoices, base: library.base, paths: library.paths,
+                                 builtin: LibraryItem.builtinH1(screenshot: builtinShot))
+        let list = merged.items
         items = list
-        withdrawnItems = snap.withdrawn.compactMap { LibraryItem(withdrawn: $0, paths: library.paths) }
+        withdrawnItems = merged.withdrawn
         moreItems = snap.more.map { LibraryItem(listed: $0) }
         attribution = snap.attribution
         if section == .withdrawn && withdrawnItems.isEmpty { section = .all }
@@ -521,11 +501,11 @@ final class LibraryModel: ObservableObject {
         if case .category(let c) = section, !categoryNames.contains(c), !list.isEmpty { section = .all }
         if selection == nil || item(selection) == nil { select(visible.first?.id ?? list.first?.id) }
 
-        let total = snap.entries.count
-        let have = snap.entries.filter { $0.availability == .installed }.count
-        let busy = snap.entries.filter(\.downloading).count
-        var line = total == 0 ? "No catalogue downloaded yet" : "\(total) firmwares · \(have) downloaded"
-        if busy > 0 { line += " · downloading \(busy)" }
+        // The footer counts firmwares, never files: a firmware with both an .rfm1 build and an original package is one.
+        // "in the library" is All Firmware (the built-in h1 included); "ready offline" those whose chosen engine's file
+        // is downloaded; the other two match their sidebar sections.
+        let counts = LibraryCounts(items: list, more: moreItems, withdrawn: withdrawnItems)
+        var line = snap.entries.isEmpty ? "No catalogue downloaded yet" : counts.line
         if let u = snap.catalogueUpdated {
             let date = ISO8601DateFormatter.withFractions.date(from: u) ?? ISO8601DateFormatter().date(from: u)
             line += " · catalogue " + (date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .short) } ?? u)
@@ -533,6 +513,48 @@ final class LibraryModel: ObservableObject {
         if isRefreshing { line = "Checking for firmware updates… " + line }
         else if !lastSync.isEmpty { line = lastSync + " · " + line }
         status = line
+    }
+
+    /// One library item per firmware: its .rfm1 build and/or its original package (`<id>.fwsc`), on the engine the
+    /// user picked, else the one the catalogue recommends; and No Longer Listed, one item per firmware, only for
+    /// firmware the library no longer has on any engine (an original package whose emu entry went away while its
+    /// .rfm1 build is still listed is not a withdrawn firmware).
+    static func merged(_ snap: FirmwareLibrary.Snapshot, choices: [String: String], base: URL, paths: LibraryPaths,
+                       builtin: LibraryItem?) -> (items: [LibraryItem], withdrawn: [LibraryItem]) {
+        var list: [LibraryItem] = []
+        if let builtin { list.append(builtin) }
+        var builds: [String: LibraryItem] = [:], packages: [String: LibraryItem] = [:], order: [String] = []
+        for e in snap.entries {
+            var it = LibraryItem(e, base: base)
+            it.isNew = NewBadge.isNew(added: e.entry.added, since: snap.catalogueSince)
+            let b = e.entry.baseID
+            if !order.contains(b) { order.append(b) }
+            if e.entry.isPackage { packages[b] = it } else { builds[b] = it }
+        }
+        for id in order {
+            let b = builds[id], p = packages[id]
+            let engines = (b == nil ? [] : ["rfm1"]) + (p == nil ? [] : ["fm1-emu"])
+            let preferred = (b ?? p)?.preferredEngine
+            let want = choices[id] ?? preferred ?? "rfm1"
+            guard var it = (want == "fm1-emu" ? p ?? b : b ?? p) else { continue }
+            it.engines = engines
+            if engines.count > 1 { it.otherDownloadText = (it.engine == "fm1-emu" ? b : p)?.downloadText }
+            if it.engine == "fm1-emu", let b {      // the build's picture, dates and badges describe the same firmware
+                it.isNew = b.isNew; it.added = b.added; it.updated = b.updated
+            }
+            list.append(it)
+        }
+        var gone: [String: LibraryItem] = [:]
+        let listed = Set(list.map(\.id))
+        for r in snap.withdrawn {
+            guard var w = LibraryItem(withdrawn: r, paths: paths), let e = r.entry else { continue }
+            w.id = "cat:" + e.baseID
+            if e.isPackage { w.engine = "fm1-emu"; w.engines = ["fm1-emu"] } else { w.engines = ["rfm1"] }
+            if listed.contains(w.id) { continue }
+            if let have = gone[w.id], have.engine == "rfm1" { continue }      // both withdrawn: the build stands for it
+            gone[w.id] = w
+        }
+        return (list, gone.values.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending })
     }
 
     /// The firmware's bytes: bundled, or from the library (downloaded first, ahead of background downloads, if
@@ -561,4 +583,30 @@ extension ISO8601DateFormatter {
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return f
     }()
+}
+
+
+/// What the library footer says, counted by firmware (one per firmware id, whichever engines it has).
+struct LibraryCounts: Equatable {
+    var library = 0, readyOffline = 0, downloading = 0, more = 0, withdrawn = 0
+
+    init(items: [LibraryItem], more: [LibraryItem], withdrawn: [LibraryItem]) {
+        library = Set(items.map(\.id)).count
+        readyOffline = items.filter { $0.download == .installed && !$0.downloading }.count
+        downloading = items.filter(\.downloading).count
+        self.more = Set(more.map(\.id)).count
+        self.withdrawn = Set(withdrawn.map(\.id)).count
+    }
+
+    static func baseID(_ id: String) -> String {
+        id.hasSuffix(CatalogueEntry.packageSuffix) ? String(id.dropLast(CatalogueEntry.packageSuffix.count)) : id
+    }
+
+    var line: String {
+        var parts = ["\(library) firmware\(library == 1 ? "" : "s") in the library", "\(readyOffline) ready offline"]
+        if downloading > 0 { parts.append("downloading \(downloading)") }
+        if more > 0 { parts.append("\(more) more listed") }
+        if withdrawn > 0 { parts.append("\(withdrawn) no longer listed") }
+        return parts.joined(separator: " · ")
+    }
 }

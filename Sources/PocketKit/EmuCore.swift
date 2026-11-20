@@ -2,7 +2,7 @@ import CFM1Emu
 import Foundation
 
 /// An author's original FM-1 update package (.fwsc) running on upstream fm1-emu (joakimeriksson/fm1-emu, MIT), its
-/// own C functions linked unchanged (Sources/CFM1Emu). Evaluation engine beside FirmwareCore.
+/// own C functions linked unchanged (Sources/CFM1Emu). The second engine beside FirmwareCore.
 ///
 /// Upstream keeps one machine per process, so only one EmuCore may exist at a time: a new one takes the machine
 /// over, and every call on an older one does nothing. Calls are serialised with a lock, so the audio thread can
@@ -38,7 +38,22 @@ public final class EmuCore: @unchecked Sendable {
     private func render(_ n: Int) -> Int {
         let got = Int(fm1_render(UInt32(n), budget(n)))
         if got > 0 { playing = true }
+        // every scripted key event queued before this render has now been delivered (each is due "now")
+        pendingKeys.removeAll(keepingCapacity: true)
+        let rev = fm1_flash_revision()
+        if rev != lastFlashRevision { lastFlashRevision = rev; flashChangedMs = fm1_ms() }
         return got
+    }
+    /// Scripted key events not yet delivered. Upstream's script call replaces the whole queue, so each new event is
+    /// queued together with those still waiting; otherwise two keys pressed between two renders (a chord from the
+    /// computer keyboard) would lose the first, and a quick tap's release could overtake its press.
+    private var pendingKeys: [String] = []
+    /// the emulated time of the last flash write, so a save is only taken once the firmware has finished writing
+    private var flashChangedMs: UInt32 = 0
+    private func queueKey(_ event: String) {
+        pendingKeys.append(event)
+        let s = Array(pendingKeys.joined(separator: ",").utf8)
+        if let p = fm1_alloc(UInt32(s.count)) { p.update(from: s, count: s.count); _ = fm1_bench_script(p, UInt32(s.count)) }
     }
     private var masterValue = 512
     private var lastFlashRevision: UInt32 = 0
@@ -77,6 +92,8 @@ public final class EmuCore: @unchecked Sendable {
         }
         fm1_pot(UInt32(masterValue))
         lastFlashRevision = fm1_flash_revision()
+        flashChangedMs = 0
+        pendingKeys = []
     }
 
     public var isBooted: Bool { Self.lock.lock(); defer { Self.lock.unlock() }; return booted && mine }
@@ -141,13 +158,10 @@ public final class EmuCore: @unchecked Sendable {
     public func key(_ k: Int, down: Bool, velocity: Int) {
         guard k >= 0, k < FirmwareCore.keyCount else { return }
         locked(()) {
-            if down {
-                // the velocity goes through upstream's own input script (Action::KeyVel): its C API has no other way in
-                let s = Array("\(fm1_ms()):n\(k)@\(max(1, min(127, velocity)))".utf8)
-                if let p = fm1_alloc(UInt32(s.count)) { p.update(from: s, count: s.count); _ = fm1_bench_script(p, UInt32(s.count)) }
-            } else {
-                fm1_key(UInt32(14 + k), 0)
-            }
+            // presses and releases both go through upstream's input script, in order: the velocity has no other way
+            // in (Action::KeyVel), and a release sent directly could overtake a press still waiting in the script
+            let ms = fm1_ms()
+            queueKey(down ? "\(ms):\(14 + k)@\(max(1, min(127, velocity)))" : "\(ms):\(14 + k)^")
         }
     }
     public func button(_ b: FM1Button, down: Bool) { locked(()) { fm1_key(Self.matrixID(b), down ? 1 : 0) } }
@@ -211,8 +225,18 @@ public final class EmuCore: @unchecked Sendable {
     /// the largest save: every sector as a record (an imported settings file is checked against this)
     public var flashSize: Int { (Self.flashBytes / 4096) * (4096 + 4) }
     public var flashDirty: UInt32 { locked(0) { fm1_flash_revision() } }
+    /// The firmware has finished writing: no write in progress and none for 250 ms of emulated time (upstream's web
+    /// player waits the same before it keeps a save), so a save never holds a half-written sector.
+    private var flashQuiet: Bool { fm1_flash_busy() == 0 && fm1_ms() &- flashChangedMs >= 250 }
+    /// The save: `nil` while the firmware is still writing (unless `sync`). With `sync` (stopping, quitting,
+    /// switching), the emulated FM-1 runs on, silently, for up to 1.5 s of its time until its writes finish.
     public func flashImage(sync: Bool) -> Data? {
         locked(nil) {
+            if !flashQuiet {
+                guard sync else { return nil }
+                var waited = 0
+                while !flashQuiet && waited < 1500 { _ = render(441); waited += 10 }
+            }
             guard let now = fm1_flash(), let base = fm1_flash_base() else { return nil }
             let len = Int(fm1_flash_len())
             var out = Data()
