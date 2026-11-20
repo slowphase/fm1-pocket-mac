@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct FM1PocketApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var library = LibraryModel()
     @StateObject private var player = PlayerModel()
 
@@ -32,6 +33,7 @@ struct FM1PocketApp: App {
                 Button("Clean Up Old Downloads") { library.cleanUp() }
             }
             SidebarCommands()
+            ShowWindowCommands()
             CommandGroup(before: .sidebar) {
                 Button("as Icons") { library.viewMode = .icons }.keyboardShortcut("1", modifiers: .command)
                 Button("as List") { library.viewMode = .list }.keyboardShortcut("2", modifiers: .command)
@@ -69,7 +71,7 @@ struct FM1PocketApp: App {
                 .environmentObject(library)
                 .environmentObject(player)
         }
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
         .defaultPosition(.center)
     }
 }
@@ -82,6 +84,7 @@ struct PlayerWindow: View {
         Group {
             if player.playingID != nil {
                 PlayerView().padding(20)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if player.loadingID != nil {
                 ProgressView("Starting…").frame(width: 420, height: 300)
             } else {
@@ -91,21 +94,89 @@ struct PlayerWindow: View {
             }
         }
         .navigationTitle(player.playingID == nil ? "Player" : player.title)
-        .background(WindowFinder { player.playerWindow = $0 })
+        .background(WindowFrameKeeper(name: "FM1Pocket.Player") { player.playerWindow = $0 })
         .onDisappear { player.stop() }
     }
 }
 
-/// Hands back the NSWindow a SwiftUI view lives in.
-struct WindowFinder: NSViewRepresentable {
-    let found: (NSWindow?) -> Void
+/// View › Show Library (⌘0) and Show Player (⌥⌘P): either window can be closed and brought back.
+struct ShowWindowCommands: Commands {
+    @Environment(\.openWindow) private var openWindow
 
-    func makeNSView(context: Context) -> NSView {
-        let v = NSView()
-        DispatchQueue.main.async { [weak v] in found(v?.window) }
+    var body: some Commands {
+        CommandGroup(before: .sidebar) {
+            Button("Show Library") { openWindow(id: "library") }
+                .keyboardShortcut("0", modifiers: .command)
+            Button("Show Player") { openWindow(id: "player") }
+                .keyboardShortcut("p", modifiers: [.command, .option])
+            Divider()
+        }
+    }
+}
+
+/// Keeps the app running when its windows are closed, and brings the library back when the Dock icon is clicked.
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag { Self.perform(menuItem: "Show Library", in: NSApp.mainMenu) }
+        return true
+    }
+
+    /// runs a menu command by its title (SwiftUI's menu items are ordinary AppKit menu items)
+    @discardableResult
+    static func perform(menuItem title: String, in menu: NSMenu?) -> Bool {
+        guard let menu else { return false }
+        for (i, item) in menu.items.enumerated() {
+            if item.title == title, item.isEnabled {
+                menu.performActionForItem(at: i)
+                return true
+            }
+            if perform(menuItem: title, in: item.submenu) { return true }
+        }
+        return false
+    }
+}
+
+/// Makes a window remember its position and size (on whichever screen it was left), via AppKit's frame autosave.
+/// A remembered position that is no longer on any screen (a monitor was unplugged) is ignored. Also hands back the
+/// window, for code that needs it.
+struct WindowFrameKeeper: NSViewRepresentable {
+    let name: String
+    var found: ((NSWindow?) -> Void)?
+
+    init(name: String, found: ((NSWindow?) -> Void)? = nil) {
+        self.name = name
+        self.found = found
+    }
+
+    func makeNSView(context: Context) -> KeeperView {
+        let v = KeeperView()
+        v.name = name
+        v.found = found
         return v
     }
-    func updateNSView(_ nsView: NSView, context: Context) {
-        DispatchQueue.main.async { [weak nsView] in found(nsView?.window) }
+    func updateNSView(_ v: KeeperView, context: Context) { v.found = found }
+
+    final class KeeperView: NSView {
+        var name = ""
+        var found: ((NSWindow?) -> Void)?
+        private weak var configured: NSWindow?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            found?(window)
+            guard let w = window, w !== configured else { return }
+            configured = w
+            let name = self.name
+            // after SwiftUI has given the window its first size and place, put it back where it was left
+            DispatchQueue.main.async {
+                if w.setFrameUsingName(name) {
+                    let onScreen = NSScreen.screens.contains { $0.visibleFrame.intersects(w.frame) }
+                    if !onScreen { w.center() }
+                }
+                w.setFrameAutosaveName(name)
+            }
+        }
     }
 }

@@ -25,6 +25,7 @@ struct ContentView: View {
             }
         }
         .onChange(of: player.showRequest) { _, _ in openWindow(id: "player") }
+        .background(WindowFrameKeeper(name: "FM1Pocket.Library"))
         .alert("Something went wrong", isPresented: Binding(get: { player.error != nil }, set: { if !$0 { player.error = nil } })) {
             Button("OK") { player.error = nil }
         } message: {
@@ -165,8 +166,11 @@ private struct IconGrid: View {
                                      playing: player.playingID == item.id, favourite: library.isFavourite(item))
                             .id(item.id)
                             .contentShape(Rectangle())
-                            .simultaneousGesture(TapGesture().onEnded { library.select(item.id) })
-                            .gesture(TapGesture(count: 2).onEnded { player.play(item, library: library) })
+                            // one click selects; the second click of a double-click plays (as Finder opens)
+                            .onTapGesture {
+                                library.select(item.id)
+                                if (NSApp.currentEvent?.clickCount ?? 1) >= 2 { player.play(item, library: library) }
+                            }
                             .contextMenu { FirmwareMenu(item: item) }
                     }
                 }
