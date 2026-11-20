@@ -8,6 +8,8 @@ struct LibraryItem: Identifiable, Hashable {
         case catalogue(CatalogueEntry)
         /// listed in the expanded catalogue but not downloadable in this app (its id)
         case listed(String)
+        /// an original .fwsc package opened from disk, played on the emulator engine (evaluation)
+        case package(URL)
     }
 
     enum Download: Hashable {
@@ -53,6 +55,18 @@ struct LibraryItem: Identifiable, Hashable {
 
     var isBuiltin: Bool { if case .builtin = source { return true } else { return false } }
     var isListedOnly: Bool { if case .listed = source { return true } else { return false } }
+    var isPackage: Bool { if case .package = source { return true } else { return false } }
+
+    /// an original FM-1 update package from disk, for the emulator engine
+    static func package(_ url: URL) -> LibraryItem {
+        let stem = url.deletingPathExtension().lastPathComponent
+        let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+        return LibraryItem(source: .package(url), id: "fwsc:" + stem, name: stem, version: "", authors: "",
+                           category: "Packages", tag: "Original package, emulator engine (evaluation)",
+                           about: "An FM-1 update package opened from disk, running on fm1-emu (Joakim Eriksson, MIT).",
+                           license: "", sourceURL: nil, imageURL: nil, screenshotFile: nil, size: size,
+                           download: .installed, downloading: false, lastError: nil)
+    }
     /// the only kind of item that can be played: built in, or downloadable from the catalogue
     var canPlay: Bool { !isListedOnly }
     var isExperimental: Bool { macState == .experimental }
@@ -469,6 +483,9 @@ final class LibraryModel: ObservableObject {
             let p = try await library.firmwareForPlayback(id: e.id)
             return PlayableFirmware(data: p.data, sha256: p.build.sha256, catalogueID: e.id, isFallback: p.isFallback,
                                     version: p.build.version)
+        case .package(let url):
+            let data = try Data(contentsOf: url)
+            return PlayableFirmware(data: data, sha256: sha256Hex(data), catalogueID: nil, isFallback: false, version: item.version)
         case .listed:
             throw PocketError.badFirmware("\(item.name) is not available in this app. \(item.macReason ?? "")")
         }

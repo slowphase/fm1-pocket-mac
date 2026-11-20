@@ -54,6 +54,21 @@ jobs:
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "Version $V, build ${{ github.run_number }}"
 
+      - name: Build upstream fm1-emu's engine (evaluation; universal static library)
+        run: scripts/build-emu.sh
+
+      - name: Original packages for the emulator self-test (makers' releases, SHA-256 checked)
+        run: |
+          mkdir -p build/packages
+          python3 - <<'PY'
+          import json, hashlib, urllib.request
+          for p in json.load(open("Tests/emu-packages.json"))["packages"]:
+              b = urllib.request.urlopen(urllib.request.Request(p["url"], headers={"User-Agent": "FM-1 Pocket for macOS CI"})).read()
+              ok = hashlib.sha256(b).hexdigest() == p["sha256"]
+              print(p["hub"], len(b), "ok" if ok else "SHA-256 MISMATCH")
+              if ok: open(f"build/packages/{p['hub']}.fwsc", "wb").write(b)
+          PY
+
       - name: Test the native firmware host (C, h1)
         run: make -C Tests/ctest test | tee host-test.log
 
@@ -64,7 +79,7 @@ jobs:
       - name: Run the Swift tests
         run: |
           set -o pipefail
-          swift test 2>&1 | tee swift-test.log
+          FM1_FWSC="$PWD/build/packages/felucca.fwsc" swift test 2>&1 | tee swift-test.log
 
       - name: Check the live Pocket catalogue (does not block the build)
         id: live
@@ -81,6 +96,24 @@ jobs:
 
       - name: Self-test the packaged app (boots h1 inside the .app)
         run: '"build/FM-1 Pocket.app/Contents/MacOS/FM1Pocket" --selftest build/selftest.json'
+
+      - name: Emulator engine self-test in the packaged app (evaluation; boot checks, nobody listens)
+        run: |
+          echo "## Emulator engine (fm1-emu, evaluation) on $(sysctl -n machdep.cpu.brand_string)" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Package | OK | Speed | Keys | MIDI | PLAY | Save round trip |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- | --- | --- | --- | --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "=====RESULTS-BEGIN====="
+          echo "["
+          first=1
+          for f in build/packages/*.fwsc; do
+            id=$(basename "$f" .fwsc)
+            "build/FM-1 Pocket.app/Contents/MacOS/FM1Pocket" --selftest-fwsc "$f" "build/emu-$id.json" > /dev/null || true
+            [ $first = 1 ] || echo ","; first=0
+            python3 -c "import json,sys; r=json.load(open('build/emu-$id.json')); r['id']='$id'; print(json.dumps(r))"
+            python3 -c "import json; r=json.load(open('build/emu-$id.json')); f=lambda k: '%.3f'%r.get(k,0); print(f\"| $id | {r['ok']} | {r.get('speedXRealtime',0):.2f}x | {f('keysRms')} | {f('midiRms')} | {f('playRms')} | {r.get('saveRoundTrip')} |\")" >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo "]"
+          echo "=====RESULTS-END====="
 
       - name: Make the DMG
         env:

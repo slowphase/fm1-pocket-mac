@@ -1,0 +1,205 @@
+{
+ "about": "Original packages from their makers' releases (as The Firmware Hub's catalogue of 2026-11-20 lists them, SHA-256 checked) for the emulator self-test. Downloaded at test time, never stored in this repository.",
+ "packages": [
+  {
+   "hub": "felucca",
+   "name": "Felucca",
+   "version": "1.8.2",
+   "license": "GPL-3.0",
+   "url": "https://github.com/hugelton/Felucca/releases/download/v1.8.2/felucca-1.8.2.fwsc",
+   "sha256": "770ea7c756088d08ac59a193f1ae78126476c3c8251a86938c837ead5ab0048a"
+  },
+  {
+   "hub": "amb",
+   "name": "AMB-1",
+   "version": "1.3.2",
+   "license": "MPL-2.0",
+   "url": "https://github.com/charlesvestal/fm1-amb/releases/download/v1.3.2/amb-1.3.2.fwsc",
+   "sha256": "a949a6a2a1ced8b3857d156ad0409a55e6ba53bbdd4094d0a38f2779364064f3"
+  },
+  {
+   "hub": "hortator",
+   "name": "Hortator",
+   "version": "1.0.1",
+   "license": "GPL-3.0",
+   "url": "https://github.com/DeadActive/hortator/releases/download/drum-v1.0.1/hortator-1.0.1.fwsc",
+   "sha256": "ac81af292e035ee0c4b8b7ab3a78b942e4f03deee31ae213a2613c743cd9110f"
+  },
+  {
+   "hub": "mnm1",
+   "name": "MNM-1",
+   "version": "1.0.1",
+   "license": "GPL-3.0",
+   "url": "https://github.com/galfaroth/mnm1/releases/download/v1.0.1/mnm1-1.0.1.fwsc",
+   "sha256": "d44011bf035314c037e16ab36a8e7895d9274732329e1d60e0bd94bd512eabf9"
+  },
+  {
+   "hub": "obssynthfm1",
+   "name": "ObsSynth FM-1",
+   "version": "0.2.0",
+   "license": "GPL-3.0",
+   "url": "https://github.com/orianbsilva/obssynth-fm1/releases/download/v0.2.0/obssynth-fm1-0.2.0.fwsc",
+   "sha256": "8af5e97d10e766172601bae9e12f0fcc014db200ccd36ef1cc696fb75cf0b4da"
+  },
+  {
+   "hub": "fizz",
+   "name": "FIZZ",
+   "version": "0.13.0",
+   "license": "MPL-2.0",
+   "url": "https://github.com/Quixotic7/FIZZ/releases/download/v0.13.0/fizz-0.13.0.fwsc",
+   "sha256": "f695bf2256f948caa4782fdc0554df17bca83d4b61f23453a5414dec7c614da2"
+  },
+  {
+   "hub": "choralroot",
+   "name": "ChoralRoot",
+   "version": "0.42",
+   "license": "GPL-3.0",
+   "url": "https://github.com/Quixotic7/ChoralRootFM1/releases/download/v0.42/choralroot-0.42.fwsc",
+   "sha256": "0391fac999db698a2d9cf8bca301860a19f668e11bffba16731458f63fe58a3d"
+  },
+  {
+   "hub": "sloop",
+   "name": "SLOOP",
+   "version": "2.8.5",
+   "license": "GPL-3.0",
+   "url": "https://github.com/isod89/sloop-fm1/releases/download/v2.8.5/sloop-2.8.5.fwsc",
+   "sha256": "b0446effb840740a3aa5c386ce004e79334e4f833d48d82a9eb5edbfde92ae67"
+  },
+  {
+   "hub": "x0x",
+   "name": "X0X",
+   "version": "1.2.2",
+   "license": "GPL-3.0",
+   "url": "https://github.com/charlesvestal/fm1-x0x/releases/download/v1.2.2/x0x-1.2.2.fwsc",
+   "sha256": "bbe601bc260e54f7109e54821e200f17a11ddba8fcce0bb2b612d72eaf448dd3"
+  },
+  {
+   "hub": "dx747",
+   "name": "DX747",
+   "version": "0.1",
+   "license": "GPL-3.0 + SDK exception",
+   "url": "https://github.com/esbenvb/fm1-dx747/releases/download/v0.1/FM1_DX747.fwsc",
+   "sha256": "91f9acd06e37cea10d2af519d74a50343507709f5edd69b635d7711b69520934"
+  },
+  {
+   "hub": "vesper",
+   "name": "VESPER",
+   "version": "2.0.2",
+   "license": null,
+   "url": "https://github.com/fatcatstudios-hub/vesper-fm1/releases/download/vesper-2.0.2/VESPER-2.0.2.fwsc",
+   "sha256": "c6f40b9a832f069f43c7aa9cb6ef0211d8316c5f4ea870f7e18daa99946a45f3"
+  },
+  {
+   "hub": "shineon",
+   "name": "Shine On",
+   "version": "3.5",
+   "license": "GPL-3.0",
+   "url": "https://github.com/zvenson/shineon/releases/download/v3.5/shineon-3.5.fwsc",
+   "sha256": "bdde36f1191e76ddb17c9da4b820f177c0d7e1350061c86406d861e5896379b0"
+  },
+  {
+   "hub": "sardine",
+   "name": "Sardine",
+   "version": "1.0.6",
+   "license": "GPL-3.0",
+   "url": "https://github.com/delirioux/sardine/releases/download/v1.0.6/sardine-1.0.6-fd7e915.fwsc",
+   "sha256": "16c29ab754b1850e9c941262e103c5a1030da74a571507fbac59fefc8a27565b"
+  },
+  {
+   "hub": "x0xrmx",
+   "name": "X0X-RMX",
+   "version": "1.1.0",
+   "license": "GPL-3.0",
+   "url": "https://github.com/Mr-Roboto/fm1-x0x-rmx/releases/download/v1.1.0/x0x-1.1.0.fwsc",
+   "sha256": "b343c135779c1de933d655236b14628103816036e170d65faed706aba620dcaa"
+  },
+  {
+   "hub": "beetle",
+   "name": "BEETLE",
+   "version": "1.8.3",
+   "license": "GPL-3.0",
+   "url": "https://github.com/SikkenWorks/BEETLE/releases/download/V1.8.3/BEETLE-V1.8.3.fwsc",
+   "sha256": "1c88c620b6d8763835597e085c3287b54dba9921d535efc764f4b4c5f3468538"
+  },
+  {
+   "hub": "b3organ",
+   "name": "B3 ORGAN",
+   "version": "0.5.1",
+   "license": "GPL-3.0",
+   "url": "https://github.com/R-Jeb/setBfree-fm1/releases/download/v0.5.1/b3organ-0.5.1.fwsc",
+   "sha256": "840ff7a100c1ec83f02a0b7b4055ab27247b1e2000f55eafbfba9318f600c918"
+  },
+  {
+   "hub": "fm1dock",
+   "name": "fm1-dock",
+   "version": "0.9.0",
+   "license": "GPL-3.0",
+   "url": "https://github.com/joakimeriksson/fm1-dock/releases/download/v0.9.0/fm1-dock-0.9.0.fwsc",
+   "sha256": "8bb30b2b890ee5fafa720b765f3f1585dcd56d2ce4bf1657d7c9e0a2a13dbe27"
+  },
+  {
+   "hub": "melodee",
+   "name": "Melodee",
+   "version": "1.6.1",
+   "license": "GPL-3.0",
+   "url": "https://github.com/keremimo/melodee/releases/download/v1.6.1/melodee-1.6.1.fwsc",
+   "sha256": "8555dc54670a9e39b352e228cf5fb5ecc877fc2b702f19631f155dd85e58ba66"
+  },
+  {
+   "hub": "386dx",
+   "name": "386DX",
+   "version": "2.0",
+   "license": "GPL-3.0",
+   "url": "https://github.com/seajaysec/386-DX-FM1-KaraokeBot/releases/download/v2.0/386dx-2.0.fwsc",
+   "sha256": "2ba90c24c0586c7519bc524113a9727e43fec60dd3314ddc245179833871e059"
+  },
+  {
+   "hub": "sloopdx",
+   "name": "sloopDX",
+   "version": "4.0.1",
+   "license": "GPL-3.0",
+   "url": "https://github.com/zvenson/dxsloop/releases/download/v4.0.1/felucca-4.0.1.fwsc",
+   "sha256": "cebc88c0f996f338d4741502ec7f99d05ecb9c6de3715ab674401a14d6a255d7"
+  },
+  {
+   "hub": "frodhes",
+   "name": "Frodhes",
+   "version": "0.9.11",
+   "license": "GPL-3.0",
+   "url": "https://github.com/leonardoMirabal/frodhes/releases/download/v0.9.11/frodhes-0.9.11-c1.fwsc",
+   "sha256": "9524a3cff24aae8bf2567e18c177f3c945c1849bdc8b538b4ac9414fae5d88f2"
+  },
+  {
+   "hub": "fm106",
+   "name": "FM-106",
+   "version": "1.02",
+   "license": "GPL-3.0",
+   "url": "https://github.com/PatttF/fm-106/releases/download/1.02/fm106.fwsc",
+   "sha256": "f3a1229b4176de901191a6ce1da2985daa7de925bedda78bae20325e47190034"
+  },
+  {
+   "hub": "arcturus",
+   "name": "Arcturus S6",
+   "version": "1.7",
+   "license": "GPL-3.0",
+   "url": "https://github.com/zeptosecond-dsp/Arcturus-S6/releases/download/v1.7/arcturus-s6-1.7.fwsc",
+   "sha256": "18b829548a23da9ef85087f0cbc1181c4ca0610a25a7d9e393079504172faee3"
+  },
+  {
+   "hub": "b1",
+   "name": "B1",
+   "version": "5.6",
+   "license": "GPL-3.0",
+   "url": "https://github.com/SikkenWorks/B1-Drawbar-Organ/releases/download/V5.6/SikkenWorks-B1-V5.6.fwsc",
+   "sha256": "4efc8646d729844f78fa3f85093cdbc45250738e218526f3f06aa69ce81cac61"
+  },
+  {
+   "hub": "scintilla",
+   "name": "Scintilla",
+   "version": "0.3.2",
+   "license": "GPL-3.0",
+   "url": "https://github.com/joakimeriksson/scintilla-fm1/releases/download/v0.3.2/scintilla-0.3.2.fwsc",
+   "sha256": "cdc9a736308ff58c71a0de11da874091469a4a6c1758f66c55998456e5d7ebf5"
+  }
+ ]
+}

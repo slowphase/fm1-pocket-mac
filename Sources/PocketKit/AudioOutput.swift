@@ -17,7 +17,7 @@ public final class AudioOutput {
     /// Mute keeps the firmware running (and its clock moving) but silences the output, as Pocket's mute does.
     public func setMuted(_ m: Bool) { engine.mainMixerNode.outputVolume = m ? 0 : 1 }
 
-    public func start(_ core: FirmwareCore) throws {
+    public func start(_ core: any PlayerEngine) throws {
         stop()
         guard let format = AVAudioFormat(standardFormatWithSampleRate: FirmwareCore.sampleRate, channels: 2) else {
             throw PocketError.badFirmware("Could not set up the audio format.")

@@ -1,0 +1,22 @@
+# Upstream fm1-emu's machine (joakimeriksson/fm1-emu, MIT) as a static library for the app: its crates/fm1-web, used
+# unchanged at a pinned commit and compiled for macOS, where its JIT is the native one (AArch64 or x86-64).
+# scripts/build-emu.sh builds it for both Mac architectures into Vendor/fm1emu/libfm1emu_pocket.a.
+[package]
+name = "fm1emu-pocket"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+path = "src/lib.rs"
+
+[dependencies]
+fm1-web = { git = "https://github.com/joakimeriksson/fm1-emu", rev = "09aeae3e9d78db52c3b9f5ceed93bd1120ccf444" }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
