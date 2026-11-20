@@ -43,8 +43,10 @@ struct LibraryItem: Identifiable, Hashable {
     /// what the expanded catalogue says about it on the Mac (nil with catalog.json, and for h1)
     var macState: CatalogueV2.Status.State?
     var macReason: String?
-    /// whether the Mac status rests on a test run on macOS itself
-    var testedOnMac = false
+    /// how the Mac status was established (individually on macOS, sample-verified, Linux only)
+    var verification: CatalogueV2.Status.Verification?
+    /// ran slower than real time in the app's engine
+    var mayStutter = false
     var makers: [CatalogueV2.Maker] = []
     /// The Firmware Hub's page for it
     var hubURL: String?
@@ -58,7 +60,9 @@ struct LibraryItem: Identifiable, Hashable {
     /// the small tag on its card, when its Mac status needs one
     var stateTag: String? {
         switch macState {
-        case .experimental: return testedOnMac ? "EXPERIMENTAL" : "UNTESTED"
+        case .experimental:
+            if mayStutter { return "MAY STUTTER" }
+            return verification == .linux || verification == CatalogueV2.Status.Verification.none ? "UNTESTED" : "EXPERIMENTAL"
         case .unsupported: return "NOT SUPPORTED"
         case .sourceOnly: return "SOURCE ONLY"
         default: return nil
@@ -104,7 +108,8 @@ struct LibraryItem: Identifiable, Hashable {
         if let p = s.previous, p.sha256 != e.sha256 { previousVersion = p.version }
         macState = s.mac?.state
         macReason = s.mac?.reason
-        testedOnMac = s.mac?.tested?.macos?.outcome != nil
+        verification = s.mac?.macVerification
+        mayStutter = s.mac?.mayStutter ?? false
         makers = s.makers
         hubURL = s.hubURL
     }
@@ -118,7 +123,8 @@ struct LibraryItem: Identifiable, Hashable {
         isBeta = e.beta
         macState = e.mac.state
         macReason = e.mac.reason ?? e.restriction?.reason
-        testedOnMac = e.mac.tested?.macos?.outcome != nil
+        verification = e.mac.macVerification
+        mayStutter = e.mac.mayStutter
         makers = e.makers
         hubURL = e.hubURL
     }

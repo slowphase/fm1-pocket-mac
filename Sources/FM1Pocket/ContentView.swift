@@ -550,10 +550,17 @@ private struct DetailView: View {
     }
 
     private func compatibility(_ st: CatalogueV2.Status.State) -> String {
+        let how: String
+        switch item.verification {
+        case .macos: how = "tested individually on macOS"
+        case .representative: how = "tested with this app's engine on Linux; a sample of firmware was verified on macOS"
+        case .linux: how = "tested with this app's engine on Linux only"
+        default: how = "not tested yet"
+        }
         switch st {
-        case .playable: return item.testedOnMac ? "Tested on macOS" : "Tested"
-        case .experimental: return item.testedOnMac ? "Experimental" : "Not yet tested on macOS"
-        case .unsupported: return "Not supported"
+        case .playable: return "Playable: " + how
+        case .experimental: return (item.mayStutter ? "Experimental, may stutter: " : "Experimental: ") + how
+        case .unsupported: return "Not supported: " + how
         case .sourceOnly: return "Source only"
         }
     }

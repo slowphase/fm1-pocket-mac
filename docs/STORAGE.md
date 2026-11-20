@@ -12,7 +12,9 @@ never downloads firmware from anywhere else, so Pocket's review and approval sta
 ## The two catalogues
 
 - `catalog-v2.json` (schema 2) is tried first. It lists every firmware Pocket has discovered, with each player's
-  status: **playable**, **experimental** (passed the checks, but not yet confirmed on macOS, or may run slowly),
+  status: **playable**, **experimental** (passed the checks, but macOS has not verified the engine version, or it may
+  stutter), with how the Mac status was established (tested individually on macOS, or on Linux with a
+  representative sample verified on macOS),
   **unsupported** or **source-only** (no build Pocket may redistribute), with the reason and the test behind it,
   the makers linked to their repositories, and The Firmware Hub's credit when its list was used. The app downloads
   only entries that have a build *and* a Mac status of playable or experimental. Those carry exactly their
