@@ -609,7 +609,7 @@ public enum CleanupPlanner {
         func isFile(_ u: URL) -> Bool { (try? u.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true }
         var out: [CleanupCandidate] = []
 
-        // firmware/<id>/<sha>.rfm1
+        // firmware/<id>/<sha>.rfm1 (and firmware/<id>.fwsc/<sha>.fwsc)
         for id in list(paths.firmware) {
             let dir = paths.firmware.appendingPathComponent(id, isDirectory: true)
             var isDir: ObjCBool = false
@@ -622,7 +622,9 @@ public enum CleanupPlanner {
             for name in list(dir) {
                 let u = dir.appendingPathComponent(name)
                 guard isFile(u) else { continue }
-                let sha = name.hasSuffix(".rfm1") ? String(name.dropLast(5)) : ""
+                // an original package's folder (`<id>.fwsc`) holds `.fwsc` files, every other one `.rfm1`
+                let ext = id.hasSuffix(CatalogueEntry.packageSuffix) ? ".fwsc" : ".rfm1"
+                let sha = name.hasSuffix(ext) ? String(name.dropLast(5)) : ""
                 if SafeName.isID(id), SafeName.isSHA256(sha) {
                     if kept.contains(sha) || active.contains(sha) { continue }
                     out.append(CleanupCandidate(url: u, reason: registry.firmwares[id] == nil ? .invalid : .superseded))
