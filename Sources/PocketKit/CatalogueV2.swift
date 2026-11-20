@@ -104,12 +104,15 @@ public struct CatalogueV2: Decodable, Equatable {
 
         public init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
-            id = try c.decode(String.self, forKey: .id)
-            name = try c.decodeIfPresent(String.self, forKey: .name) ?? id
+            let ident = try c.decode(String.self, forKey: .id)
+            id = ident
+            name = try c.decodeIfPresent(String.self, forKey: .name) ?? ident
             version = try c.decodeIfPresent(String.self, forKey: .version) ?? ""
-            authors = try c.decodeIfPresent([String].self, forKey: .authors) ?? []
-            source = try c.decodeIfPresent(String.self, forKey: .source)
-            makers = (try? c.decodeIfPresent([Maker].self, forKey: .makers)) ?? authors.map { Maker(name: $0, url: source) }
+            let who = try c.decodeIfPresent([String].self, forKey: .authors) ?? []
+            let src = try c.decodeIfPresent(String.self, forKey: .source)
+            authors = who
+            source = src
+            makers = (try? c.decodeIfPresent([Maker].self, forKey: .makers)) ?? who.map { Maker(name: $0, url: src) }
             category = try c.decodeIfPresent(String.self, forKey: .category) ?? "Other"
             tag = try c.decodeIfPresent(String.self, forKey: .tag) ?? ""
             about = try c.decodeIfPresent(String.self, forKey: .about) ?? ""
