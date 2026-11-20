@@ -32,7 +32,8 @@ Versioned DMGs can also be published under **Releases** (see below).
   or press ⌘↩, to play it. Right-click for more.
 - **Favourites:** the star in the details pane, the list's ★ column, the right-click menu, or ⌘D.
 - **The player** opens in its own window. Closing it stops the sound. h1 is built in, so there is always something to
-  play, even offline.
+  play, even offline. Both windows remember where you left them (second monitor included). Closing either one
+  does not quit the app: **View › Show Library** (⌘0), **View › Show Player** (⌥⌘P) or the Dock icon bring them back.
 - Computer keys in the player window, as in Pocket Player: **A W S E D R F G Y H U J K O L P ; [ '** play notes,
   **Z / X** change octave, **← →** presets, **↑ ↓** algorithm, **, .** select, **1–4** knobs (hold Shift to turn
   down).
