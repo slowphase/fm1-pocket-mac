@@ -333,11 +333,11 @@
     "mac": {
      "fm1-emu": {
       "level": "listened",
-      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-21 (FM-1 Pocket 0.1.0 build 37)."
+      "note": "A person listened to this file in the app (Pocket maintainer, Apple Silicon Mac, 2026-11-21, FM-1 Pocket 0.1.0 build 37); not every feature was tried."
      },
      "rfm1": {
       "level": "listened",
-      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-20 (FM-1 Pocket 0.1.0 build 34)."
+      "note": "A person listened to this file in the app (Pocket maintainer, Apple Silicon Mac, 2026-11-20, FM-1 Pocket 0.1.0 build 34); not every feature was tried."
      }
     }
    },
@@ -389,11 +389,11 @@
      "date": "2026-11-20",
      "engine": "fm1-emu",
      "firmware": "amb",
-     "machine": "MacBook (Apple M5)",
+     "machine": "Apple Silicon Mac",
      "notes": "Played and controlled correctly; switching engines worked.",
      "player": "mac",
      "verdict": "good",
-     "who": "Dean"
+     "who": "Pocket maintainer"
     },
     {
      "app": "FM-1 Pocket 0.1.0 build 34",
@@ -402,11 +402,11 @@
      "date": "2026-11-20",
      "engine": "rfm1",
      "firmware": "amb",
-     "machine": "MacBook (Apple M5)",
+     "machine": "Apple Silicon Mac",
      "notes": "Played after switching to the .rfm1 build.",
      "player": "mac",
      "verdict": "good",
-     "who": "Dean"
+     "who": "Pocket maintainer"
     },
     {
      "app": "FM-1 Pocket 0.1.0 build 37",
@@ -415,11 +415,11 @@
      "date": "2026-11-21",
      "engine": "fm1-emu",
      "firmware": "amb",
-     "machine": "MacBook (Apple M5)",
+     "machine": "Apple Silicon Mac",
      "notes": "A one-tap SAVE came back after relaunching; a G J L chord on the computer keyboard played all three notes; mute was silent at once.",
      "player": "mac",
      "verdict": "good",
-     "who": "Dean"
+     "who": "Pocket maintainer"
     }
    ],
    "release": {
@@ -4240,11 +4240,11 @@
     "mac": {
      "fm1-emu": {
       "level": "listened",
-      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-21 (FM-1 Pocket 0.1.0 build 37)."
+      "note": "A person listened to this file in the app (Pocket maintainer, Apple Silicon Mac, 2026-11-21, FM-1 Pocket 0.1.0 build 37); not every feature was tried."
      },
      "rfm1": {
       "level": "listened",
-      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-21 (FM-1 Pocket 0.1.0 build 37)."
+      "note": "A person listened to this file in the app (Pocket maintainer, Apple Silicon Mac, 2026-11-21, FM-1 Pocket 0.1.0 build 37); not every feature was tried."
      }
     }
    },
@@ -4295,11 +4295,11 @@
      "date": "2026-11-20",
      "engine": "fm1-emu",
      "firmware": "felucca",
-     "machine": "MacBook (Apple M5)",
+     "machine": "Apple Silicon Mac",
      "notes": "Settings did not come back after relaunching. Investigation: Felucca keeps only user presets saved with SAVE, OCT+, OCT+ (it always starts on its first factory sound); its saves work through the app (automated). Save timing in the emulator integration was also fixed. Awaiting a retest.",
      "player": "mac",
      "verdict": "problems",
-     "who": "Dean"
+     "who": "Pocket maintainer"
     },
     {
      "app": "FM-1 Pocket 0.1.0 build 37",
@@ -4308,11 +4308,11 @@
      "date": "2026-11-21",
      "engine": "fm1-emu",
      "firmware": "felucca",
-     "machine": "MacBook (Apple M5)",
+     "machine": "Apple Silicon Mac",
      "notes": "A user preset saved with SAVE, OCT+, OCT+ came back after quitting and reopening; the .rfm1 build kept its own.",
      "player": "mac",
      "verdict": "good",
-     "who": "Dean"
+     "who": "Pocket maintainer"
     },
     {
      "app": "FM-1 Pocket 0.1.0 build 37",
@@ -4321,11 +4321,11 @@
      "date": "2026-11-21",
      "engine": "rfm1",
      "firmware": "felucca",
-     "machine": "MacBook (Apple M5)",
+     "machine": "Apple Silicon Mac",
      "notes": "A user preset saved with SAVE, OCT+, OCT+ came back after quitting and reopening.",
      "player": "mac",
      "verdict": "good",
-     "who": "Dean"
+     "who": "Pocket maintainer"
     }
    ],
    "release": {
@@ -6439,11 +6439,11 @@
     "mac": {
      "fm1-emu": {
       "level": "listened",
-      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-21 (FM-1 Pocket 0.1.0 build 37)."
+      "note": "A person listened to this file in the app (Pocket maintainer, Apple Silicon Mac, 2026-11-21, FM-1 Pocket 0.1.0 build 37); not every feature was tried."
      },
      "rfm1": {
       "level": "listened",
-      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-20 (FM-1 Pocket 0.1.0 build 34)."
+      "note": "A person listened to this file in the app (Pocket maintainer, Apple Silicon Mac, 2026-11-20, FM-1 Pocket 0.1.0 build 34); not every feature was tried."
      }
     }
    },
@@ -6492,11 +6492,11 @@
      "date": "2026-11-20",
      "engine": "rfm1",
      "firmware": "hortator",
-     "machine": "MacBook (Apple M5)",
+     "machine": "Apple Silicon Mac",
      "notes": "Sounds when the .rfm1 build is chosen.",
      "player": "mac",
      "verdict": "good",
-     "who": "Dean"
+     "who": "Pocket maintainer"
     },
     {
      "app": "FM-1 Pocket 0.1.0 build 34",
@@ -6505,11 +6505,11 @@
      "date": "2026-11-20",
      "engine": "fm1-emu",
      "firmware": "hortator",
-     "machine": "MacBook (Apple M5)",
+     "machine": "Apple Silicon Mac",
      "notes": "No sound from the original package. Investigation: it starts with an empty pattern, so PLAY plays silence until steps are entered; with steps entered it plays through the app's own path (automated). Awaiting a listening retest.",
      "player": "mac",
      "verdict": "problems",
-     "who": "Dean"
+     "who": "Pocket maintainer"
     },
     {
      "app": "FM-1 Pocket 0.1.0 build 37",
@@ -6518,11 +6518,11 @@
      "date": "2026-11-21",
      "engine": "fm1-emu",
      "firmware": "hortator",
-     "machine": "MacBook (Apple M5)",
+     "machine": "Apple Silicon Mac",
      "notes": "With four steps entered on the keys, PLAY played the beat.",
      "player": "mac",
      "verdict": "good",
-     "who": "Dean"
+     "who": "Pocket maintainer"
     }
    ],
    "release": {
@@ -11885,7 +11885,7 @@
      },
      "rfm1": {
       "level": "listened",
-      "note": "Listened to in the app by Dean on MacBook (Apple M5), 2026-11-20 (FM-1 Pocket 0.1.0 build 34)."
+      "note": "A person listened to this file in the app (Pocket maintainer, Apple Silicon Mac, 2026-11-20, FM-1 Pocket 0.1.0 build 34); not every feature was tried."
      }
     }
    },
@@ -11937,11 +11937,11 @@
      "date": "2026-11-20",
      "engine": "rfm1",
      "firmware": "sidj",
-     "machine": "MacBook (Apple M5)",
+     "machine": "Apple Silicon Mac",
      "notes": "Sounds after PLAY. The keys make no sound, which fits the firmware (a SID tune player).",
      "player": "mac",
      "verdict": "good",
-     "who": "Dean"
+     "who": "Pocket maintainer"
     }
    ],
    "release": {

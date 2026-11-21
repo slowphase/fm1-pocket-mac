@@ -51,7 +51,15 @@ final class LibraryCountsTests: XCTestCase {
         items[0].confidence = CatalogueV2.Confidence(level: .listened)
         items[1].confidence = CatalogueV2.Confidence(level: .knownIssue, note: "x")
         XCTAssertEqual(LibraryCounts.confidenceLine(items), "Listened to: 1 · automated checks only: 1 · known issues: 1")
-        XCTAssertEqual(items[2].confidenceText, "Automated checks only (nobody has listened yet)")
+        XCTAssertEqual(items[2].compatibilityText, "Plays · automated checks only")
+        XCTAssertEqual(items[0].compatibilityText, "Plays · listened to in FM-1 Pocket")
+        XCTAssertEqual(items[1].compatibilityText, "Known issue: x")
+        var exp = items[2]
+        exp.macState = .experimental
+        XCTAssertEqual(exp.compatibilityText, "May not work fully · automated checks only")
+        exp.confidence = CatalogueV2.Confidence(level: .listened)
+        XCTAssertEqual(exp.compatibilityText, "Plays · listened to in FM-1 Pocket", "a person's listening is not contradicted by the automated flag")
+        for i in items { XCTAssertFalse(i.compatibilityText.contains("this Mac"), "never about the user's own Mac") }
     }
 
     /// Latest Release: newest release first, unknown release dates last; A–Z by name; New to Library from the listed day.

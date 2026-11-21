@@ -237,10 +237,13 @@ public struct CatalogueV2: Decodable, Equatable {
         public var release: Release?
         /// the day it first appeared in the library (`yyyy-MM-dd`): "New to Library" means in the last 14 days
         public var listed: String?
+        /// its picture, relative to the catalogue (an .rfm1 build's screen, or its screen as the emulator showed it);
+        /// without one the app draws its name
+        public var image: String?
 
         enum CodingKeys: String, CodingKey {
             case id, name, version, authors, makers, category, tag, about, license, source, beta, status, restriction, provenance, file, sha256, emu
-            case confidence, knownIssues, listened, release, listed
+            case confidence, knownIssues, listened, release, listed, image
         }
         struct Statuses: Decodable { var web: Status?; var mac: Status? }
         struct Provenance: Decodable {
@@ -279,6 +282,7 @@ public struct CatalogueV2: Decodable, Equatable {
             listened = (try? c.decodeIfPresent([Emu.Listened].self, forKey: .listened)) ?? []
             release = try? c.decodeIfPresent(Release.self, forKey: .release)
             listed = try? c.decodeIfPresent(String.self, forKey: .listed)
+            image = (try? c.decodeIfPresent(String.self, forKey: .image)).flatMap { SafeName.isRelativePath($0) ? $0 : nil }
         }
 
         /// Whether the Mac app may download and play its .rfm1 build: a build exists and the Mac status allows it.
@@ -293,7 +297,7 @@ public struct CatalogueV2: Decodable, Equatable {
             return CatalogueEntry(id: id + CatalogueEntry.packageSuffix, name: name, version: p.version ?? version, authors: authors,
                                   category: category, tag: tag, about: about, license: p.license ?? license,
                                   source: p.source ?? source, beta: beta, file: "pkg/\(id)-\(sha.prefix(8)).fwsc", sha256: sha,
-                                  size: p.size ?? 0, added: download?.added, updated: download?.updated, image: download?.image,
+                                  size: p.size ?? 0, added: download?.added, updated: download?.updated, image: download?.image ?? image,
                                   remoteURL: p.url)
         }
         /// the engine the catalogue recommends on the Mac, among those the app can run here. The catalogue's choice is
@@ -366,6 +370,7 @@ public struct CatalogueV2: Decodable, Equatable {
             }
             if c.firmwares[i].release == nil, let r = b.release { c.firmwares[i].release = r }
             if c.firmwares[i].listed == nil, let l = b.listed { c.firmwares[i].listed = l }
+            if c.firmwares[i].image == nil, let im = b.image, SafeName.isRelativePath(im) { c.firmwares[i].image = im }
         }
         return c
     }
@@ -378,6 +383,7 @@ public struct CatalogueV2: Decodable, Equatable {
             var listened: [Emu.Listened]?
             var release: Release?
             var listed: String?
+            var image: String?
         }
         var firmwares: [String: Item]
     }

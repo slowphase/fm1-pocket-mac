@@ -73,17 +73,20 @@ struct LibraryItem: Identifiable, Hashable {
     var listened: [CatalogueV2.Emu.Listened] = []
     /// how sure Pocket is of the engine it plays on now: a person listened, automated checks only, or a known issue
     var confidence: CatalogueV2.Confidence?
-    /// the confidence as one short phrase, for the details pane and the footer's tally
-    var confidenceText: String {
-        if isBuiltin { return "Built in (checked by every build of the app)" }
-        if isPackage { return "Opened from disk: not checked" }
+    /// The one Compatibility line: whether it plays, and how we know, without claiming more than was checked. A
+    /// person's listening outranks the automated checks in this summary (the details keep both); a known issue
+    /// outranks both. Nothing here is about the user's own Mac.
+    var compatibilityText: String {
+        if isBuiltin { return "Plays · built into FM-1 Pocket" }
+        if isPackage { return "Opened from disk · not checked" }
         if isListedOnly { return "Not playable in this app" }
-        if isWithdrawn { return "No longer in the catalogue" }
-        switch confidence?.level {
-        case .listened: return "Listened to in this app"
-        case .knownIssue: return "Known issue"
-        case .automated, .none: return "Automated checks only (nobody has listened yet)"
-        }
+        if isWithdrawn { return "No longer listed · your copy still plays" }
+        if confidence?.level == .knownIssue { return "Known issue" + (confidence?.note.map { ": " + $0 } ?? "") }
+        if macState == .unsupported { return "Not supported" }
+        let how = confidence?.level == .listened ? "listened to in FM-1 Pocket" : "automated checks only"
+        if confidence?.level == .listened || macState == .playable || macState == nil { return "Plays · " + how }
+        return (mayStutter ? "May stutter · " : "May not work fully · ") + how
+    }
     }
     var hasEngineChoice: Bool { engines.count > 1 }
 
@@ -187,6 +190,7 @@ struct LibraryItem: Identifiable, Hashable {
                   license: e.license, sourceURL: e.source, imageURL: nil, screenshotFile: nil, size: 0,
                   download: .notDownloaded, downloading: false, lastError: nil)
         isBeta = e.beta
+        release = e.release
         macState = e.mac.state
         macReason = e.mac.reason ?? e.restriction?.reason
         verification = e.mac.macVerification
