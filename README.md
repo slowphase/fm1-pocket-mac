@@ -15,10 +15,7 @@ sequencers, trackers and generative instruments for it. FM-1 Pocket gathers that
 Mac, so you can find something interesting, read what it does and hear it straight away. No FM-1 needed.
 
 <p align="center"><img src="docs/img/library.png" alt="The FM-1 Pocket library: firmware screens in a grid, with categories in the sidebar and h1's details on the right"></p>
-<p align="center">
-  <img src="docs/img/player.png" width="49%" alt="CoralFlower playing on the FM-1 faceplate, with knobs, buttons and a keyboard">
-  <img src="docs/img/details.png" width="49%" alt="The library as a list, with GR!MM's details: maker, version, release date, compatibility and engine">
-</p>
+<p align="center"><img src="docs/img/player-and-details.png" alt="Left: CoralFlower playing on the FM-1 faceplate. Right: the library as a list, with GR!MM's details: maker, version, release date, compatibility and engine"></p>
 
 ## What you can do
 
