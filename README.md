@@ -1,90 +1,94 @@
-# FM-1 Pocket for macOS
+<!-- HERO IMAGE: add docs/img/hero.png (wide, about 2000 x 670) when the new branding is ready, then replace this
+     comment with:
+     <p align="center"><img src="docs/img/hero.png" alt="FM-1 Pocket: a universe of firmware, one little player"></p> -->
 
-A native Mac app for playing M-VAVE FM-1 firmware, inspired by [FM-1 Pocket Player](https://github.com/slowphase/fm1-pocket-player).
-Discover like Finder. Play like an FM-1.
+<h1 align="center">FM-1 Pocket</h1>
 
-It reads FM-1 Pocket Player's published firmware catalogue and runs the same `.rfm1` firmware files natively: no
-browser, no web view, no Electron. The firmware runs in a small WebAssembly interpreter (wasm3) inside the app, and
-its sound goes through Core Audio.
+<p align="center"><strong>A universe of firmware. One little player.</strong></p>
 
-**Status:** Milestones 1 to 3 are done: the native player, the automatic firmware library, the Finder-style library
-window and the FM-1 faceplate. See [docs/MILESTONE-1.md](docs/MILESTONE-1.md) and
-[docs/STORAGE.md](docs/STORAGE.md).
+<p align="center">
+  <a href="https://github.com/slowphase/fm1-pocket-mac/releases/latest"><strong>Download for macOS</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://slowphase.github.io/fm1-pocket-player/"><strong>Try the web player</strong></a>
+</p>
 
-## Getting the app
+The M-VAVE FM-1 is a tiny synth that people keep reinventing: its community has written synths, drum machines,
+sequencers, trackers and generative instruments for it. FM-1 Pocket gathers that firmware into one library on your
+Mac, so you can find something interesting, read what it does and hear it straight away. No FM-1 needed.
 
-You never need to install developer tools. GitHub builds the app on one of its own Macs every time the code changes.
+It is a place to discover and audition firmware, not a music production app.
 
-1. Open the **Actions** tab of this repository and click the latest green **Build Mac app** run.
-2. Scroll to **Artifacts** at the bottom and click the **FM1-Pocket-…** entry. A `.zip` downloads.
-3. Double-click the `.zip` to get the `.dmg`, then double-click the `.dmg`.
-4. Drag **FM-1 Pocket** onto **Applications**.
-5. The first time, macOS blocks it because it is not notarised by Apple. Follow
-   [If the app will not open](docs/If%20the%20app%20will%20not%20open.txt) (also inside the DMG). Once only.
+<!-- SCREENSHOTS: add three real screenshots of the app, then replace this comment with:
+<p align="center">
+  <img src="docs/img/library.png" width="32%" alt="The firmware library, sorted by latest release">
+  <img src="docs/img/player.png" width="32%" alt="A firmware playing on the FM-1 faceplate">
+  <img src="docs/img/details.png" width="32%" alt="A firmware's details: maker, release date, compatibility and engine">
+</p> -->
 
-Versioned DMGs can also be published under **Releases** (see below).
+## What you can do
 
-## Using it
+- **Discover firmware.** Browse a library that keeps itself up to date, with a screenshot and a short description
+  for each firmware. Search by name, maker or description, filter by category, and sort by latest release or A to Z. New
+  to Library shows what joined in the last two weeks.
+- **Hear it.** Press Play and the firmware runs on a full FM-1 faceplate: its screen, knobs, buttons, lights and keys.
+- **Play it your way.** Use the mouse, your computer keyboard or a MIDI keyboard.
+- **Keep favourites.** Star the ones you like and find them again under Favourites and Recently Played.
+- **Pick up where you left off.** Firmware that saves its own settings keeps them between sessions. What a firmware
+  saves, and how, is up to the firmware: some save as you go, others have their own save button.
+- **Play offline.** Firmware you have played stays on your Mac, and the library works without a connection.
+- **Try your own files.** Open an original FM-1 firmware package (`.fwsc`) from your Mac.
 
-- **The library** works like Finder. The sidebar has All Firmware, Favourites, Recently Played, New (added to
-  Pocket in the last 14 days) and the catalogue's categories. Show firmware as icons (⌘1) or a sortable list (⌘2),
-  and search with the field in the toolbar ("kwa" finds K-WA SUB). Click a firmware to see its details; double-click,
-  or press ⌘↩, to play it. Right-click for more.
-- **More Firmware** (when Pocket publishes its expanded catalogue) lists firmware this app cannot download, each with
-  the reason and its source page. **Experimental** gathers firmware that is downloadable but not confirmed: tagged
-  MAY STUTTER when it ran slower than real time in this app's engine, UNTESTED when macOS has not verified the engine
-  version yet. The details pane says how each firmware was checked: tested individually on macOS, or tested with
-  this app's engine on Linux with a sample verified on macOS. Makers are linked to their repositories in the details
-  pane, and The Firmware Hub is credited at the bottom of the sidebar when its list was used.
-- **Favourites:** the star in the details pane, the list's ★ column, the right-click menu, or ⌘D.
-- **The player** is the FM-1 faceplate, laid out like FM-1 Pocket Player's and scaled to its window: PRESETS,
-  ALGORITHM, SELECT and MASTER on the left, the screen in the middle, the four knobs and twelve buttons on the right,
-  27 keys (F to G) below. Both windows remember where you left them (second monitor included). Closing the player
-  stops the sound but not the app: **View › Show Library** (⌘0), **View › Show Player** (⌥⌘P) or the Dock icon
-  bring windows back.
-  - **Knobs or sliders** (toolbar): drag a knob up or down, or scroll over it. When a firmware says what a knob is
-    tied to (h1 does), its name and value show and you can set it directly; otherwise it is an endless encoder.
-  - **Buttons** show the firmware's own names and lights. Hold one as long as you like; **Shift-click** latches it
-    down so the mouse is free to turn a knob.
-  - **Keys:** where you click sets the velocity (near the front is loud); drag across them to play each in turn.
-  - **Computer keys** (player window in front): **A W S E D R F G Y H U J K O L P ; [ '** play keys from F,
-    **Z / X** octave, **← →** presets, **↑ ↓** algorithm, **, .** select, **1–4** knobs (Shift turns down).
-  - **MIDI in:** any connected MIDI keyboard plays the firmware (toolbar toggle, on by default).
-  - **Firmware › Power Cycle** (⌘R), **Mute** (⌥⌘M) and **Firmware Info** (⌘I): credits, licences, the firmware's
-    log, and its saved settings (export, import, erase). Settings are saved per exact build; when a new version
-    starts fresh, the player offers to try the previous version's settings (copied, never moved).
-- The library downloads every approved firmware and screenshot automatically and works offline afterwards. Each
-  firmware keeps its current and previous build. **FM-1 Pocket › Check for Firmware Updates…** syncs by hand and
-  **Clean Up Old Downloads** removes downloads no longer kept. Your saved settings are never touched. Details:
-  [docs/STORAGE.md](docs/STORAGE.md).
+## Install
 
-## How it is built
+FM-1 Pocket needs a Mac with Apple silicon (M1 or later) and macOS 14 Sonoma or later.
 
-| Folder | What |
-| --- | --- |
-| `Sources/CWasm3` | wasm3 v0.5.0 (MIT), the WebAssembly interpreter |
-| `Sources/FM1Host` | C: runs one `.rfm1` on wasm3. A port of Pocket Player's `src/rfm1.js` (same boot, clock, panel and audio) |
-| `Sources/PocketKit` | Swift: the firmware library (sync, SHA-256-checked downloads, offline cache, two-build retention, safe cleanup), the firmware wrapper, Core Audio output, saved settings |
-| `Sources/FM1Pocket` | the SwiftUI app |
-| `Tests/` | Swift tests (`PocketKitTests`) and a plain C test of the host (`ctest`) |
-| `scripts/` | `build-app.sh` (assemble and ad-hoc sign the .app), `make-dmg.sh` |
-| `.github/workflows/build.yml` | the build, tests, DMG and optional release |
+1. Download the latest version from [Releases](https://github.com/slowphase/fm1-pocket-mac/releases/latest).
+2. Double-click the downloaded `.zip`, then drag **FM-1 Pocket** into your **Applications** folder.
+3. Open it. Because the app is free and not notarised by Apple, macOS stops it the first time. Click **Done**
+   (not Move to Bin), open **System Settings › Privacy & Security**, scroll down and click **Open Anyway**.
 
-The app only reads what FM-1 Pocket Player publishes (`https://slowphase.github.io/fm1-pocket-player/data/`). It
-does not change or duplicate Pocket Player's nightly sync, approval or screenshot jobs.
+You only do this once. [Step-by-step help, with a Terminal alternative](docs/If%20the%20app%20will%20not%20open.txt).
 
-## Publishing a release
+## How firmware plays
 
-**Actions › Build Mac app › Run workflow**, tick **Also publish this build as a GitHub Release**, type a version
-(for example `0.1.0`) and click **Run workflow**. The DMG appears under **Releases** when it finishes.
+FM-1 Pocket is a native Mac app, written in SwiftUI. It has two ways of running firmware:
 
-## Cost
+- **Original packages** (`.fwsc`), exactly as their makers released them, run on an emulation of the FM-1's chip.
+- **`.rfm1` builds**, versions of a firmware rebuilt to run on a computer.
 
-This repository is public, so GitHub Actions builds are free, Mac runners included. (A private repository would get
-a small monthly allowance of Mac build time on GitHub's free plan, then be charged.)
+Each firmware uses whichever runs it best, and where both work you can switch between them in its details.
 
-## Licences
+## Compatibility
 
-The app's own code is MIT. It includes wasm3 (MIT) and h1 (MIT, Jake Handy), and its firmware host is a port of
-Jake Handy's MIT-licensed simulator code: see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Every other firmware
-is downloaded from FM-1 Pocket Player when you play it, and stays its authors' work under its own licence.
+Every firmware shows a short compatibility line, such as **Plays · automated checks only** or **Plays · listened to
+in FM-1 Pocket**.
+
+Automated checks start each firmware, play it in a scripted test and check that it makes sound and keeps time. That
+catches firmware that will not run, but it is not the same as someone playing every feature. Most firmware has only
+passed automated checks so far. Known problems are shown as known issues.
+
+If something sounds wrong, [tell us](https://github.com/slowphase/fm1-pocket-player/issues/new?template=firmware-report.yml).
+
+## Credits
+
+FM-1 Pocket is an independent community project. It is not affiliated with or endorsed by M-VAVE.
+
+- Every firmware is the work of its makers and keeps its own licence. Each firmware's details link to its maker and
+  source.
+- Firmware list: [The Firmware Hub](https://thefirmwarehub.com/) – thefirmwarehub.com, licensed
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- Original packages run on [fm1-emu](https://github.com/joakimeriksson/fm1-emu) by Joakim Eriksson (MIT).
+- `.rfm1` builds come from [RemoteFM1FW](https://github.com/Quixotic7/RemoteFM1FW) by Michael P Jones (Quixotic7),
+  through [FM-1 Pocket Player](https://github.com/slowphase/fm1-pocket-player).
+- The `.rfm1` engine is a port of Jake Handy's [FM-1 Browser Simulator](https://github.com/jakehandy/fm1-browser-simulator)
+  (MIT), and the built-in h1 is [his firmware](https://github.com/jakehandy/h1) (MIT). It runs on
+  [wasm3](https://github.com/wasm3/wasm3) (MIT).
+
+The app's own code is MIT licensed: see [LICENSE](LICENSE) and [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+## More
+
+- [FM-1 Pocket Player](https://github.com/slowphase/fm1-pocket-player), the web version
+- [Report a firmware problem](https://github.com/slowphase/fm1-pocket-player/issues/new?template=firmware-report.yml)
+  or [an app problem](https://github.com/slowphase/fm1-pocket-mac/issues)
+- For developers: [DEVELOPMENT.md](docs/DEVELOPMENT.md) and [STORAGE.md](docs/STORAGE.md)

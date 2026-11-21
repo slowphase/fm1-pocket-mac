@@ -37,7 +37,7 @@ also inside the file's `rfm1.license.0` section).
 `Sources/CWasm3` is [wasm3](https://github.com/wasm3/wasm3) v0.5.0 with two small changes listed in
 `Sources/CWasm3/README.md`. MIT License, see `Sources/CWasm3/LICENSE`.
 
-## fm1-emu (Joakim Eriksson), the emulator engine (evaluation)
+## fm1-emu (Joakim Eriksson), the emulator engine
 
 https://github.com/joakimeriksson/fm1-emu, commit 09aeae3e9d78db52c3b9f5ceed93bd1120ccf444: its crates fm1-web,
 fm1-soc, fm1-core and fm1-isa are compiled into the app unchanged (Emu/, Vendor/fm1emu). No other crates. It runs an
