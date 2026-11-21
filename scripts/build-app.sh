@@ -17,6 +17,7 @@ cp Resources/h1.rfm1 "$APP/Contents/Resources/h1.rfm1"
 # emu blocks for a catalogue that does not publish them yet (ignored once Pocket does; see CatalogueV2.withPreview)
 [ -f Resources/emu-preview.json ] && cp Resources/emu-preview.json "$APP/Contents/Resources/emu-preview.json"
 cp THIRD-PARTY-NOTICES.md LICENSE "$APP/Contents/Resources/"
+iconutil -c icns Resources/AppIcon.iconset -o "$APP/Contents/Resources/AppIcon.icns"   # the app icon (scripts/make-icon.py)
 sed -e "s/__VERSION__/$VERSION/" -e "s/__BUILD__/$BUILD_NUMBER/" Resources/Info.plist > "$APP/Contents/Info.plist"
 plutil -lint "$APP/Contents/Info.plist"
 
