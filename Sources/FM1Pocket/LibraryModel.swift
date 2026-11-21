@@ -87,7 +87,6 @@ struct LibraryItem: Identifiable, Hashable {
         if confidence?.level == .listened || macState == .playable || macState == nil { return "Plays · " + how }
         return (mayStutter ? "May stutter · " : "May not work fully · ") + how
     }
-    }
     var hasEngineChoice: Bool { engines.count > 1 }
 
     static func engineName(_ e: String) -> String { e == "fm1-emu" ? "Original package (emulator)" : ".rfm1 build" }
