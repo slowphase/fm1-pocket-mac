@@ -37,6 +37,37 @@ also inside the file's `rfm1.license.0` section).
 `Sources/CWasm3` is [wasm3](https://github.com/wasm3/wasm3) v0.5.0 with two small changes listed in
 `Sources/CWasm3/README.md`. MIT License, see `Sources/CWasm3/LICENSE`.
 
+## fm1-emu (Joakim Eriksson), the emulator engine
+
+https://github.com/joakimeriksson/fm1-emu, commit 09aeae3e9d78db52c3b9f5ceed93bd1120ccf444: its crates fm1-web,
+fm1-soc, fm1-core and fm1-isa are compiled into the app unchanged (Emu/, Vendor/fm1emu). No other crates. It runs an
+author's original FM-1 update package (.fwsc); the packages are their authors', fetched from their releases or
+opened from disk, and are not part of the app.
+
+```
+MIT License
+
+Copyright (c) 2026 Joakim Eriksson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
 ## Firmware from the catalogue
 
 The app does not include any other firmware. It downloads firmware that FM-1 Pocket Player publishes, on your

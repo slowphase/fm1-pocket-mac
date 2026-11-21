@@ -7,7 +7,9 @@ name checks, the registry), `DownloadScheduler.swift` and `StateStore.swift`. Te
 
 The app only reads what Pocket Player publishes: `catalog-v2.json` (when published), `catalog.json`,
 `fw/<id>-<sha8>.rfm1` and `shots/<id>-<sha8>.png` under `https://slowphase.github.io/fm1-pocket-player/data/`. It
-never downloads firmware from anywhere else, so Pocket's review and approval stay the only way in.
+never downloads firmware from anywhere else, so Pocket's review and approval stay the only way in. The one exception
+is the emulator engine's original packages (below): those come from each maker's own GitHub release, as The Firmware
+Hub asks, and only when Pocket's catalogue lists them with the SHA-256 they must have.
 
 ## The two catalogues
 
@@ -27,6 +29,30 @@ never downloads firmware from anywhere else, so Pocket's review and approval sta
 - A firmware whose Mac status changes to unsupported leaves the downloadable list, so it is treated like a withdrawn
   firmware: the downloaded copy and its saved settings are kept.
 
+## The emulator engine (original packages)
+
+When `catalog-v2.json` has an `emu` block for a firmware (Pocket's nightly adds it; see fm1-pocket-player's
+`docs/EMULATOR-INTEGRATION.md`), the maker's original `.fwsc` package can run unchanged on fm1-emu (Joakim Eriksson,
+MIT; the emulator's licence, not the firmware's).
+
+- Each package the Mac status allows (playable or experimental, not excluded by Pocket's policy) becomes a library
+  entry `<id>.fwsc` beside the firmware's `.rfm1` build. It downloads from the maker's release URL (an https GitHub
+  URL only), never from Pocket's hosted copy or the Hub, and is kept only if its SHA-256 matches.
+- One firmware, one item in the library: it plays on the engine the user picked in its details pane (kept in
+  `UserData/engines.json`, only where it differs from the recommendation) or else on the engine the catalogue
+  recommends for the Mac (`emu.preferred.mac`). A firmware the emulator alone can run is in the library too.
+- In the background only the recommended engine's file is downloaded; the other downloads when it is chosen, and is
+  then kept like any build (current and previous, two-version rule).
+- Saved settings are per engine: an emulator save is keyed `fm1-emu+<version>@<sha12>` under its own id, so an
+  `.rfm1` save is never read or overwritten by the emulator, and switching back finds it as it was.
+- Automated checks (`emu.mac.tested`: machine, engine commit, speed; a scripted boot check) and listening tests
+  (`emu.listened`, recorded by hand) are shown separately in the details pane.
+- Test builds carry `emu-preview.json`, the emu blocks of a catalogue built for review, used only while the published
+  catalogue has none and only for entries whose Hub version still matches. Once Pocket publishes its own, the preview
+  is ignored.
+- The emulator is pinned in `Emu/Cargo.toml`, independently of Pocket's pin; CI warns if the pin is not one that
+  passed Pocket's upgrade check (`pocket/emu/verified.json`).
+
 ## Storage layout
 
 Everything is under `~/Library/Application Support/FM-1 Pocket/`.
@@ -37,11 +63,13 @@ Everything is under `~/Library/Application Support/FM-1 Pocket/`.
 | `Managed/catalog-v2.json` | app | the same for the expanded catalogue, preferred when present |
 | `Managed/registry.json`, `registry.bak.json` | app | what is installed (below) and its previous good copy |
 | `Managed/firmware/<id>/<sha256>.rfm1` | app | verified firmware, named by content hash |
+| `Managed/firmware/<id>.fwsc/<sha256>.fwsc` | app | verified original packages (emulator engine), the same way |
 | `Managed/shots/<name>.png` | app | screenshots, named as the catalogue names them |
 | `Managed/tmp/` | app | downloads in progress |
 | `State/<id>/<version>@<sha12>.flash` (+ `.prev`) | **user** | saved settings, one per exact build, with the previous save as backup |
 | `Imported/<id>-<sha12>.rfm1` | **user** | imported firmware (storage only; no import button yet) |
 | `UserData/favourites.json` | **user** | favourites (storage only; no favourites button yet) |
+| `UserData/engines.json` | **user** | the engine picked per firmware, where it differs from the recommendation |
 | `Catalogue/` | app | Milestone 1's old download cache, removed by cleanup |
 
 Sync and cleanup can only delete inside `Managed/` and the old `Catalogue/` cache. They never read, write or delete

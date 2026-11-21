@@ -5,3 +5,5 @@ build/
 Tests/ctest/host_test
 .DS_Store
 Tests/ctest/native_smoke
+Vendor/
+Emu/target/

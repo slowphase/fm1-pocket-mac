@@ -22,6 +22,8 @@
 	<string>__BUILD__</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.music</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
 	<key>NSHighResolutionCapable</key>
@@ -29,6 +31,6 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>FM-1 Pocket for macOS. Firmware by their authors under their own licences.</string>
+	<string>Made by slowphase. Firmware by their makers, under their own licences.</string>
 </dict>
 </plist>

@@ -55,17 +55,7 @@ private struct Sidebar: View {
             }
         }
         .listStyle(.sidebar)
-        .safeAreaInset(edge: .bottom) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(library.status)
-                    .lineLimit(4)
-                if let a = library.attribution { HubCredit(attribution: a) }
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(10)
-        }
+        .safeAreaInset(edge: .bottom) { LibraryFooter() }
     }
 
     private func row(_ s: SidebarItem, _ symbol: String) -> some View {
@@ -115,17 +105,16 @@ private struct Browser: View {
                 }
                 .pickerStyle(.segmented)
                 .help("Show as icons or as a list")
-                if library.viewMode == .icons {
-                    Menu {
-                        Picker("Sort By", selection: $library.sort) {
-                            ForEach(SortKey.allCases) { Text($0.title).tag($0) }
-                        }
-                        .pickerStyle(.inline)
-                    } label: {
-                        Label("Sort By", systemImage: "arrow.up.arrow.down")
+                Menu {
+                    Picker("Sort By", selection: $library.sort) {
+                        ForEach(SortKey.allCases) { Text($0.title).tag($0) }
                     }
-                    .help("Sort by")
+                    .pickerStyle(.inline)
+                } label: {
+                    Label(library.sort.title, systemImage: "arrow.up.arrow.down")
+                        .labelStyle(.titleAndIcon)
                 }
+                .help("Sort by latest release, name, author or category")
                 Button { library.refresh() } label: {
                     Label("Check for Updates", systemImage: "arrow.clockwise")
                 }
@@ -147,8 +136,8 @@ private struct Browser: View {
                 ContentUnavailableView("Nothing Played Yet", systemImage: "clock",
                                        description: Text("Firmware you play shows up here."))
             case .new:
-                ContentUnavailableView("Nothing New", systemImage: "sparkles",
-                                       description: Text("No firmware was added in the last \(NewBadge.days) days."))
+                ContentUnavailableView("Nothing New to the Library", systemImage: "sparkles",
+                                       description: Text("No firmware joined the library in the last \(NewBadge.days) days."))
             default:
                 ContentUnavailableView("No Firmware", systemImage: "square.dashed",
                                        description: Text("The catalogue has not downloaded yet. Check your connection, then choose Check for Firmware Updates."))
@@ -193,24 +182,6 @@ private struct IconGrid: View {
     }
 }
 
-/// The Firmware Hub's credit, as its terms ask: the credit line linked to the Hub, the licence linked, and what
-/// FM-1 Pocket changed.
-struct HubCredit: View {
-    let attribution: CatalogueV2.Attribution
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
-            if let u = URL(string: attribution.url) { Link(attribution.text, destination: u) } else { Text(attribution.text) }
-            HStack(spacing: 3) {
-                Text("Licence:")
-                if let l = attribution.licenseUrl, let u = URL(string: l) { Link(attribution.license, destination: u) }
-                else { Text(attribution.license) }
-            }
-        }
-        .help(attribution.changes ?? "")
-    }
-}
-
 /// The maker credits, each linked to their repository when known.
 struct MakerLinks: View {
     let makers: [CatalogueV2.Maker]
@@ -248,12 +219,7 @@ private struct FirmwareCard: View {
                             .padding(5)
                     }
                 }
-            HStack(spacing: 4) {
-                Text(item.name).font(.headline).lineLimit(1)
-                if item.isNew { Tag(text: "NEW", color: .green) }
-                if item.isBeta { Tag(text: "BETA", color: .orange) }
-                if let t = item.stateTag { Tag(text: t, color: .secondary).help(item.macReason ?? "") }
-            }
+            NameWithTags(item: item).font(.headline)
             Text(item.byline)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -308,6 +274,51 @@ struct Tag: View {
             .padding(.vertical, 1)
             .foregroundStyle(color)
             .overlay(RoundedRectangle(cornerRadius: 3).stroke(color, lineWidth: 1))
+            .lineLimit(1)
+            .fixedSize()   // a badge is never cut short or wrapped
+    }
+}
+
+/// A firmware's name with its badges. Badges stay whole: when space runs short the name shortens first, then the
+/// less important badges step aside (compatibility first, then BETA, then NEW), and the name always keeps some room.
+struct NameWithTags: View {
+    let item: LibraryItem
+
+    private struct Info: Identifiable { let text: String; let color: Color; let help: String; var id: String { text } }
+
+    private var tags: [Info] {
+        var t: [Info] = []
+        if let s = item.stateTag { t.append(Info(text: s, color: .secondary, help: item.macReason ?? "")) }
+        if item.isBeta { t.append(Info(text: "BETA", color: .orange, help: "")) }
+        if item.isNew { t.append(Info(text: "NEW", color: .green, help: "New to Library: first listed in the last \(NewBadge.days) days")) }
+        return t
+    }
+
+    var body: some View {
+        let all = tags
+        ViewThatFits(in: .horizontal) {
+            // everything at its natural size (no padding after a short name)
+            HStack(spacing: 4) { Text(item.name).lineLimit(1).fixedSize(); if !all.isEmpty { row(all) } }
+            // otherwise the name shortens, keeping at least a little room, and badges step aside as needed
+            if !all.isEmpty { HStack(spacing: 4) { shortName; row(all) } }
+            if all.count > 2 { HStack(spacing: 4) { shortName; row(Array(all.prefix(2))) } }
+            if all.count > 1 { HStack(spacing: 4) { shortName; row(Array(all.prefix(1))) } }
+            shortName
+        }
+        .help(item.name)
+    }
+
+    /// counts as 44 points wide when choosing what fits, then takes whatever room is left
+    private var shortName: some View {
+        Text(item.name).lineLimit(1).truncationMode(.tail).frame(minWidth: 44, idealWidth: 44, maxWidth: .infinity, alignment: .leading)
+    }
+
+    // shown in reading order: NEW, BETA, then compatibility
+    private func row(_ t: [Info]) -> some View {
+        HStack(spacing: 4) {
+            ForEach(t.reversed()) { x in Tag(text: x.text, color: x.color).help(x.help) }
+        }
+        .fixedSize()
     }
 }
 
@@ -330,10 +341,7 @@ private struct FirmwareTable: View {
             TableColumn("Name", value: \.name) { (item: LibraryItem) in
                 HStack(spacing: 6) {
                     Thumbnail(item: item).frame(width: 22, height: 22).clipShape(RoundedRectangle(cornerRadius: 3))
-                    Text(item.name)
-                    if item.isNew { Tag(text: "NEW", color: .green) }
-                    if item.isBeta { Tag(text: "BETA", color: .orange) }
-                    if let t = item.stateTag { Tag(text: t, color: .secondary).help(item.macReason ?? "") }
+                    NameWithTags(item: item)
                     if player.playingID == item.id { Image(systemName: "speaker.wave.2.fill").foregroundStyle(.tint) }
                 }
             }
@@ -341,8 +349,13 @@ private struct FirmwareTable: View {
             TableColumn("Version", value: \.version).width(min: 50, ideal: 70)
             TableColumn("Author", value: \.authors).width(min: 80, ideal: 150)
             TableColumn("Category", value: \.category).width(min: 70, ideal: 100)
+            TableColumn("Released", value: \.releasedSort) { (item: LibraryItem) in
+                Text(item.release?.day.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? "")
+            }
+            .width(min: 80, ideal: 100)
             TableColumn("Status", value: \.statusText).width(min: 90, ideal: 120)
         }
+        .onChange(of: library.sort) { order = [] }      // choosing Sort By takes over from a clicked column
         .contextMenu(forSelectionType: LibraryItem.ID.self) { ids in
             if let id = ids.first, let item = library.item(id) { FirmwareMenu(item: item) }
         } primaryAction: { ids in
@@ -395,11 +408,54 @@ struct Thumbnail: View {
         }
     }
 
-    private var placeholder: some View {
-        ZStack {
-            Color.black
-            Image(systemName: "waveform").font(.title2).foregroundStyle(.secondary)
+    private var placeholder: some View { FirmwareTile(item: item) }
+}
+
+/// For a firmware without a picture: its name (and maker) on a steady colour of its own, the same as the web
+/// player's tile, so every firmware is recognisable at a glance.
+struct FirmwareTile: View {
+    let item: LibraryItem
+
+    /// the web player's hsl(h, 35%, 30%), with h from the same hash of the firmware's id
+    static func colour(_ id: String) -> Color {
+        var h: UInt32 = 0
+        for c in id.unicodeScalars { h = h &* 31 &+ c.value }
+        return Color(hue: Double(h % 360) / 360, saturation: 0.519, brightness: 0.405)
+    }
+
+    var body: some View {
+        GeometryReader { g in
+            let w = g.size.width
+            ZStack {
+                Self.colour(item.id.hasPrefix("cat:") || item.id.hasPrefix("more:") ? String(item.id.split(separator: ":", maxSplits: 1).last ?? "") : item.id)
+                if w < 48 {
+                    Text(initials).font(.system(size: max(8, w * 0.42), weight: .bold, design: .monospaced))
+                } else {
+                    VStack(spacing: w * 0.04) {
+                        Text(item.name)
+                            .font(.system(size: w * 0.12, weight: .bold, design: .monospaced))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(3)
+                            .minimumScaleFactor(0.5)
+                        if w > 90, !item.authors.isEmpty {
+                            Text(item.authors)
+                                .font(.system(size: w * 0.06, design: .monospaced))
+                                .opacity(0.7)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
+                        }
+                    }
+                    .padding(w * 0.08)
+                }
+            }
+            .foregroundStyle(Color(white: 0.95))
         }
+        .accessibilityHidden(true)
+    }
+
+    private var initials: String {
+        let s = item.name.filter { $0.isLetter || $0.isNumber }
+        return String(s.prefix(2)).uppercased().isEmpty ? "?" : String(s.prefix(2)).uppercased()
     }
 }
 
@@ -423,6 +479,8 @@ private struct DetailView: View {
     @EnvironmentObject var player: PlayerModel
     @Environment(\.openWindow) private var openWindow
     let item: LibraryItem
+    /// collapsed by default: the main pane is for choosing and playing firmware, this is for the curious
+    @AppStorage("details.technical") private var showTechnical = false
 
     var body: some View {
         ScrollView {
@@ -436,7 +494,7 @@ private struct DetailView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
                         Text(item.name).font(.title).bold().textSelection(.enabled)
-                        if item.isNew { Tag(text: "NEW", color: .green) }
+                        if item.isNew { Tag(text: "NEW", color: .green).help("New to Library: first listed in the last \(NewBadge.days) days") }
                         if item.isBeta { Tag(text: "BETA", color: .orange) }
                     }
                     if !item.tag.isEmpty { Text(item.tag).font(.title3).foregroundStyle(.secondary) }
@@ -446,13 +504,6 @@ private struct DetailView: View {
                     notAvailable
                 } else {
                     controls
-                }
-
-                if let r = item.macReason, item.isExperimental {
-                    Label(r, systemImage: "flask")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 if item.isWithdrawn {
@@ -468,6 +519,16 @@ private struct DetailView: View {
 
                 facts
                     .font(.callout)
+
+                if !item.isBuiltin {
+                    DisclosureGroup("Technical details", isExpanded: $showTechnical) {
+                        technical
+                            .font(.callout)
+                            .padding(.top, 4)
+                    }
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                }
 
                 if item.hubURL != nil, let a = library.attribution {
                     HubCredit(attribution: a).font(.caption).foregroundStyle(.secondary)
@@ -516,30 +577,27 @@ private struct DetailView: View {
                 }
     }
 
+    /// What most people want: who made it, which version, when it came out, whether it plays, which engine, where
+    /// its source is.
     @ViewBuilder private var facts: some View {
                 Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 5) {
-                    fact("Version", item.version)
                     if item.makers.isEmpty {
-                        fact("Author", item.authors)
+                        fact("Maker", item.authors)
                     } else {
                         GridRow {
                             Text(item.makers.count == 1 ? "Maker" : "Makers").foregroundStyle(.secondary)
                             MakerLinks(makers: item.makers)
                         }
                     }
-                    fact("Category", item.category)
-                    fact("Licence", item.license)
-                    if item.size > 0 {
-                        fact("Size", ByteCountFormatter.string(fromByteCount: Int64(item.size), countStyle: .file))
+                    fact("Version", item.version)
+                    fact("Released", released)
+                    GridRow {
+                        Text("Compatibility").foregroundStyle(.secondary)
+                        Text(item.compatibilityText).textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
+                            .help("Automated checks: in a scripted test the firmware started, made sound and kept time. "
+                                  + "Listened to: a person played it in FM-1 Pocket. Neither means every feature was tried.")
                     }
-                    fact("Added", day(item.added))
-                    if item.updated != item.added { fact("Updated", day(item.updated)) }
-                    fact("Download", item.downloadText)
-                    if let st = item.macState, !item.isListedOnly { fact("On this Mac", compatibility(st)) }
-                    if let p = item.previousVersion { fact("Previous", "Version \(p) is kept too") }
-                    if let r = library.recent[item.id] {
-                        fact("Last played", RelativeDateTimeFormatter().localizedString(for: r, relativeTo: Date()))
-                    }
+                    if item.engines.count > 1 { engineRow }
                     if let s = item.sourceURL, let u = URL(string: s) {
                         GridRow {
                             Text("Source").foregroundStyle(.secondary)
@@ -549,20 +607,98 @@ private struct DetailView: View {
                 }
     }
 
-    private func compatibility(_ st: CatalogueV2.Status.State) -> String {
-        let how: String
-        switch item.verification {
-        case .macos: how = "tested individually on macOS"
-        case .representative: how = "tested with this app's engine on Linux; a sample of firmware was verified on macOS"
-        case .linux: how = "tested with this app's engine on Linux only"
-        default: how = "not tested yet"
+    /// Everything else, kept for those who want it: licence, size, files, the automated checks and the listening
+    /// tests behind the Compatibility line, engine details.
+    @ViewBuilder private var technical: some View {
+                Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 5) {
+                    fact("Category", item.category)
+                    fact("Licence", item.license)
+                    if item.size > 0 {
+                        fact("Size", ByteCountFormatter.string(fromByteCount: Int64(item.size), countStyle: .file))
+                    }
+                    fact("Download", item.downloadText)
+                    if let p = item.previousVersion { fact("Previous", "Version \(p) is kept too") }
+                    if !item.isPackage && !item.isListedOnly {
+                        fact("Engine", LibraryItem.engineName(item.engine) + (item.engines.count > 1 ? (item.engine == item.preferredEngine ? " (recommended)" : " (your choice)") : ""))
+                    }
+                    if item.engines.count > 1, let r = item.preferredReason { fact("Why recommended", r) }
+                    if let c = item.confidence, c.level == .knownIssue, let n = c.note { fact("Known issue", n) }
+                    fact("Automated checks", automatedText)
+                    if !item.isPackage && !item.isListedOnly {
+                        fact("Listening tests", item.listened.isEmpty ? "None for this file yet" :
+                             item.listened.map(listeningText).joined(separator: "\n"))
+                    }
+                    if let r = item.release, let src = r.source { fact("Release date from", src) }
+                    if let r = library.recent[item.id] {
+                        fact("Last played", RelativeDateTimeFormatter().localizedString(for: r, relativeTo: Date()))
+                    }
+                }
+    }
+
+    /// what the automated checks did, and where: GitHub's test machines, never the user's Mac
+    private var automatedText: String {
+        if item.isPackage || item.isListedOnly { return "" }
+        var parts: [String] = []
+        if item.engine == "fm1-emu", let t = item.emuTested {
+            var line = (t.machine?.contains("Darwin") ?? false) ? "Run on GitHub's macOS test machine (Apple Silicon)" : "Run on a GitHub test machine"
+            line += ": started, made sound"
+            if let sp = t.speed { line += String(format: ", %.1fx real time", sp) }
+            if let e = t.engine { line += " (\(e.replacingOccurrences(of: "@", with: " ")))" }
+            parts.append(line)
+        } else {
+            switch item.verification {
+            case .macos: parts.append("Run individually with this engine on GitHub's macOS test machine")
+            case .representative: parts.append("Run with this engine on GitHub's Linux test machine; a sample of firmware was also run on macOS")
+            case .linux: parts.append("Run with this engine on GitHub's Linux test machine")
+            default: break
+            }
         }
-        switch st {
-        case .playable: return "Playable: " + how
-        case .experimental: return (item.mayStutter ? "Experimental, may stutter: " : "Experimental: ") + how
-        case .unsupported: return "Not supported: " + how
-        case .sourceOnly: return "Source only"
-        }
+        if let r = item.macReason, item.isExperimental { parts.append(r) }
+        return parts.joined(separator: "\n")
+    }
+
+    private func listeningText(_ t: CatalogueV2.Emu.Listened) -> String {
+        let day = NewBadge.date(t.date).map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? (t.date ?? "")
+        let who = [t.who, t.machine, t.app].compactMap { $0 }.joined(separator: ", ")
+        return "\(day): \(t.verdict ?? "")" + (who.isEmpty ? "" : " (\(who))")
+    }
+
+    /// the engine selector, for a firmware both engines can run
+    @ViewBuilder private var engineRow: some View {
+            GridRow {
+                Text("Engine").foregroundStyle(.secondary)
+                Menu {
+                    ForEach(item.engines, id: \.self) { e in
+                        Button {
+                            let replay = player.playingID == item.id
+                            library.setEngine(e, for: item)
+                            if replay {
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 300_000_000)
+                                    if let next = library.item(item.id) { player.play(next, library: library) }
+                                }
+                            }
+                        } label: {
+                            Text(LibraryItem.engineName(e) + (e == item.preferredEngine ? " (recommended)" : ""))
+                        }
+                        .disabled(e == item.engine)
+                    }
+                } label: {
+                    Text(LibraryItem.engineName(item.engine) + (item.engine == item.preferredEngine ? "" : " (your choice)"))
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+                .help((item.preferredReason ?? "") + " Each engine keeps its own saved settings.")
+            }
+    }
+
+    /// "13 Nov 2026 (v1.8.2)", plus the version this app plays when it is not the latest release
+    private var released: String {
+        guard let r = item.release, let d = r.day else { return item.isBuiltin || item.isPackage ? "" : "Not known" }
+        var t = DateFormatter.localizedString(from: d, dateStyle: .medium, timeStyle: .none)
+        // the release date belongs to the latest version; say so when this app plays an older one
+        if let v = r.version, !v.isEmpty, !item.version.isEmpty, v != item.version { t += " (latest version \(v))" }
+        return t
     }
 
     private func day(_ s: String?) -> String {

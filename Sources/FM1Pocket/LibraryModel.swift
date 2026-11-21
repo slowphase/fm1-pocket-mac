@@ -8,6 +8,8 @@ struct LibraryItem: Identifiable, Hashable {
         case catalogue(CatalogueEntry)
         /// listed in the expanded catalogue but not downloadable in this app (its id)
         case listed(String)
+        /// an original .fwsc package opened from disk, played on the emulator engine
+        case package(URL)
     }
 
     enum Download: Hashable {
@@ -18,7 +20,7 @@ struct LibraryItem: Identifiable, Hashable {
     }
 
     let source: Source
-    let id: String
+    var id: String
     let name: String
     let version: String
     let authors: String
@@ -39,6 +41,10 @@ struct LibraryItem: Identifiable, Hashable {
     var isWithdrawn = false
     var added: String?
     var updated: String?
+    /// the firmware's latest release as its maker published it (never a catalogue or rebuild date), when known
+    var release: CatalogueV2.Release?
+    /// for sorting by release: newest first, unknown last ("" sorts last when descending)
+    var releasedSort: String { release?.date ?? "" }
     var previousVersion: String?
     /// what the expanded catalogue says about it on the Mac (nil with catalog.json, and for h1)
     var macState: CatalogueV2.Status.State?
@@ -51,8 +57,57 @@ struct LibraryItem: Identifiable, Hashable {
     /// The Firmware Hub's page for it
     var hubURL: String?
 
+    // MARK: engines
+    /// the engine this item plays on: "rfm1" (its .rfm1 build) or "fm1-emu" (the maker's original package)
+    var engine = "rfm1"
+    /// the engines this firmware can run on in this app (two when there is a choice)
+    var engines: [String] = []
+    /// the catalogue's recommendation, and why
+    var preferredEngine: String?
+    var preferredReason: String?
+    /// the other engine's download state, for the details pane
+    var otherDownloadText: String?
+    /// the emulator's automated check on macOS (machine, engine commit, speed): an automated boot check, not a listen
+    var emuTested: CatalogueV2.Emu.Tested?
+    /// real listening tests in this app for the file it plays now (by hand), kept apart from the automated checks
+    var listened: [CatalogueV2.Emu.Listened] = []
+    /// how sure Pocket is of the engine it plays on now: a person listened, automated checks only, or a known issue
+    var confidence: CatalogueV2.Confidence?
+    /// The one Compatibility line: whether it plays, and how we know, without claiming more than was checked. A
+    /// person's listening outranks the automated checks in this summary (the details keep both); a known issue
+    /// outranks both. Nothing here is about the user's own Mac.
+    var compatibilityText: String {
+        if isBuiltin { return "Plays · built into FM-1 Pocket" }
+        if isPackage { return "Opened from disk · not checked" }
+        if isListedOnly { return "Not playable in this app" }
+        if isWithdrawn { return "No longer listed · your copy still plays" }
+        if confidence?.level == .knownIssue { return "Known issue" + (confidence?.note.map { ": " + $0 } ?? "") }
+        if macState == .unsupported { return "Not supported" }
+        let how = confidence?.level == .listened ? "listened to in FM-1 Pocket" : "automated checks only"
+        if confidence?.level == .listened || macState == .playable || macState == nil { return "Plays · " + how }
+        return (mayStutter ? "May stutter · " : "May not work fully · ") + how
+    }
+    var hasEngineChoice: Bool { engines.count > 1 }
+
+    static func engineName(_ e: String) -> String { e == "fm1-emu" ? "Original package (emulator)" : ".rfm1 build" }
+
     var isBuiltin: Bool { if case .builtin = source { return true } else { return false } }
     var isListedOnly: Bool { if case .listed = source { return true } else { return false } }
+    var isPackage: Bool { if case .package = source { return true } else { return false } }
+
+    /// an original FM-1 update package from disk, for the emulator engine
+    static func package(_ url: URL) -> LibraryItem {
+        let stem = url.deletingPathExtension().lastPathComponent
+        let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+        var it = LibraryItem(source: .package(url), id: "fwsc:" + stem, name: stem, version: "", authors: "",
+                           category: "Packages", tag: "Original package, emulator engine",
+                           about: "An FM-1 update package opened from disk, running on fm1-emu (Joakim Eriksson; MIT is the emulator's licence, not the firmware's).",
+                           license: "", sourceURL: nil, imageURL: nil, screenshotFile: nil, size: size,
+                           download: .installed, downloading: false, lastError: nil)
+        it.engine = "fm1-emu"
+        it.engines = ["fm1-emu"]
+        return it
+    }
     /// the only kind of item that can be played: built in, or downloadable from the catalogue
     var canPlay: Bool { !isListedOnly }
     var isExperimental: Bool { macState == .experimental }
@@ -112,6 +167,19 @@ struct LibraryItem: Identifiable, Hashable {
         mayStutter = s.mac?.mayStutter ?? false
         makers = s.makers
         hubURL = s.hubURL
+        if e.isPackage {
+            id = "cat:" + e.baseID
+            engine = "fm1-emu"
+            emuTested = s.emu?.macTested
+            // the emulator's runs are per package, on macOS Apple Silicon: an individual automated check
+            if let m = emuTested?.machine, m.contains("Darwin") { verification = .macos }
+        }
+        listened = s.listened
+        confidence = s.confidence
+        release = s.release
+        isNew = NewBadge.isNew(listed: s.listed)
+        preferredEngine = s.preferredEngine
+        preferredReason = s.preferredReason
     }
 
     /// a firmware the expanded catalogue lists that this app cannot download: shown with why, never played
@@ -121,6 +189,7 @@ struct LibraryItem: Identifiable, Hashable {
                   license: e.license, sourceURL: e.source, imageURL: nil, screenshotFile: nil, size: 0,
                   download: .notDownloaded, downloading: false, lastError: nil)
         isBeta = e.beta
+        release = e.release
         macState = e.mac.state
         macReason = e.mac.reason ?? e.restriction?.reason
         verification = e.mac.macVerification
@@ -212,7 +281,7 @@ enum SidebarItem: Hashable {
         case .all: return "All Firmware"
         case .favourites: return "Favourites"
         case .recent: return "Recently Played"
-        case .new: return "New"
+        case .new: return "New to Library"
         case .withdrawn: return "No Longer Listed"
         case .experimental: return "Experimental"
         case .more: return "More Firmware"
@@ -224,14 +293,14 @@ enum SidebarItem: Hashable {
 enum ViewMode: String, CaseIterable { case icons, list }
 
 enum SortKey: String, CaseIterable, Identifiable {
-    case name, author, category, added
+    case latestRelease, name, author, category
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .name: return "Name"
+        case .latestRelease: return "Latest Release"
+        case .name: return "Name (A–Z)"
         case .author: return "Author"
         case .category: return "Category"
-        case .added: return "Date Added"
         }
     }
 }
@@ -244,30 +313,38 @@ final class LibraryModel: ObservableObject {
     @Published private(set) var moreItems: [LibraryItem] = []
     /// The Firmware Hub's credit, when the catalogue used its list
     @Published private(set) var attribution: CatalogueV2.Attribution?
-    @Published private(set) var status = ""
     @Published private(set) var isRefreshing = false
+    /// the last Check for Firmware Updates (the update window and the sidebar footer)
+    @Published private(set) var updateCheck: UpdateCheck = .idle
+    /// what the sidebar footer counts (nil until a catalogue has been downloaded)
+    @Published private(set) var counts: LibraryCounts?
+    /// a one-off note for the footer (Clean Up Old Downloads), cleared by the next check
+    @Published private(set) var note: String?
     @Published var selection: LibraryItem.ID?
     @Published var search = ""
     @Published var section: SidebarItem = .all { didSet { defaults.set(section.key, forKey: "library.section") } }
     @Published var viewMode: ViewMode = .icons { didSet { defaults.set(viewMode.rawValue, forKey: "library.viewMode") } }
-    @Published var sort: SortKey = .name { didSet { defaults.set(sort.rawValue, forKey: "library.sort") } }
+    @Published var sort: SortKey = .latestRelease { didSet { defaults.set(sort.rawValue, forKey: "library.sort") } }
     @Published private(set) var favourites: Set<String> = []
     @Published private(set) var recent: [String: Date] = [:]
 
     /// the firmware store: catalogue, downloads, cache, cleanup (PocketKit/FirmwareLibrary.swift)
-    let library = FirmwareLibrary()
+    let library = FirmwareLibrary(emuPreview: Bundle.main.url(forResource: "emu-preview", withExtension: "json").flatMap { try? Data(contentsOf: $0) })
     private let defaults = UserDefaults.standard
     private lazy var favouritesStore = FavouritesStore(paths: library.paths)
+    private lazy var engineStore = EngineChoiceStore(paths: library.paths)
+    /// the engine picked per firmware id where it differs from the catalogue's recommendation (UserData/engines.json)
+    @Published private(set) var engineChoices: [String: String] = [:]
     private lazy var recentStore = RecentStore(paths: library.paths)
     private var started = false
     private var reloadPending = false
-    private var lastSync = ""
     private var builtinShot: URL?
 
     init() {
         section = SidebarItem(key: defaults.string(forKey: "library.section") ?? "all")
         viewMode = ViewMode(rawValue: defaults.string(forKey: "library.viewMode") ?? "") ?? .icons
-        sort = SortKey(rawValue: defaults.string(forKey: "library.sort") ?? "") ?? .name
+        // "added" (the old Date Added, a catalogue date) and no choice yet both become Latest Release
+        sort = SortKey(rawValue: defaults.string(forKey: "library.sort") ?? "") ?? .latestRelease
         selection = defaults.string(forKey: "library.selection")
     }
 
@@ -291,7 +368,13 @@ final class LibraryModel: ObservableObject {
         if section == .recent && q.isEmpty {
             return list.sorted { (recent[$0.id] ?? .distantPast) > (recent[$1.id] ?? .distantPast) }
         }
-        return list.sorted { a, b in
+        return Self.ordered(list, by: sort, query: q)
+    }
+
+    /// The library's order: the built-in h1 first, then (when searching) names that match best, then the chosen
+    /// sort, then the name.
+    static func ordered(_ list: [LibraryItem], by sort: SortKey, query q: String = "") -> [LibraryItem] {
+        list.sorted { a, b in
             if a.isBuiltin != b.isBuiltin { return a.isBuiltin }
             if !q.isEmpty {
                 let ra = LibrarySearch.rank(name: a.name, query: q), rb = LibrarySearch.rank(name: b.name, query: q)
@@ -305,8 +388,9 @@ final class LibraryModel: ObservableObject {
             case .category:
                 let c = a.category.localizedCaseInsensitiveCompare(b.category)
                 if c != .orderedSame { return c == .orderedAscending }
-            case .added:
-                let x = a.added ?? "", y = b.added ?? ""
+            case .latestRelease:
+                // newest release first; a firmware whose release date is unknown goes after every dated one
+                let x = a.releasedSort, y = b.releasedSort
                 if x != y { return x > y }
             }
             return a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
@@ -345,6 +429,16 @@ final class LibraryModel: ObservableObject {
         try? favouritesStore.save(favourites)
     }
 
+    /// Plays this firmware on the other engine from now on (a choice kept per firmware; picking the recommended engine
+    /// again clears it). Each engine keeps its own saved settings.
+    func setEngine(_ engine: String, for item: LibraryItem) {
+        guard item.engines.contains(engine), item.id.hasPrefix("cat:") else { return }
+        let id = String(item.id.dropFirst(4))
+        if engine == (item.preferredEngine ?? "rfm1") { engineChoices[id] = nil } else { engineChoices[id] = engine }
+        try? engineStore.save(engineChoices)
+        Task { await reload() }
+    }
+
     func notePlayed(_ item: LibraryItem) {
         if let r = try? recentStore.note(item.id) { recent = r }
     }
@@ -364,6 +458,7 @@ final class LibraryModel: ObservableObject {
         started = true
         favourites = favouritesStore.load()
         recent = recentStore.load()
+        engineChoices = engineStore.load()
         let lib = library
         // h1 is built in, so the catalogue has no picture of it: make one the way Pocket makes its own
         if let h1 = Bundle.main.url(forResource: "h1", withExtension: "rfm1") {
@@ -389,18 +484,18 @@ final class LibraryModel: ObservableObject {
     func refresh() {
         guard !isRefreshing else { return }
         isRefreshing = true
-        status = "Checking for firmware updates…"
+        updateCheck = .checking
+        note = nil
         Task {
             let r = await library.sync()
             isRefreshing = false
             if let err = r.catalogueError {
-                lastSync = "Offline: showing the downloaded library. (\(err))"
+                updateCheck = .offline(err)
             } else {
-                var parts: [String] = []
-                if !r.installed.isEmpty { parts.append("\(r.installed.count) downloaded") }
-                if !r.failed.isEmpty { parts.append("\(r.failed.count) could not be downloaded") }
-                if !r.withdrawn.isEmpty { parts.append("\(r.withdrawn.count) withdrawn from the catalogue") }
-                lastSync = parts.isEmpty ? "Up to date" : parts.joined(separator: ", ")
+                // by firmware, not by file (an .rfm1 build and an original package of one firmware count once)
+                let firmwares = { (ids: [String]) in Set(ids.map(LibraryCounts.baseID)).count }
+                let d = firmwares(r.installed), f = firmwares(Array(r.failed.keys)), w = firmwares(r.withdrawn)
+                updateCheck = d + f + w == 0 ? .upToDate : .updated(downloaded: d, failed: f, withdrawn: w)
             }
             await reload()
         }
@@ -410,7 +505,7 @@ final class LibraryModel: ObservableObject {
     func cleanUp() {
         Task {
             let removed = await library.cleanUp()
-            lastSync = removed.isEmpty ? "Nothing to clean up" : "Cleaned up \(removed.count) old download\(removed.count == 1 ? "" : "s")"
+            note = removed.isEmpty ? "Nothing to clean up" : "Cleaned up \(removed.count) old download\(removed.count == 1 ? "" : "s")"
             await reload()
         }
     }
@@ -425,17 +520,13 @@ final class LibraryModel: ObservableObject {
         }
     }
 
-    private func reload() async {
+    func reload() async {
         let snap = await library.snapshot()
-        var list: [LibraryItem] = []
-        if let h1 = LibraryItem.builtinH1(screenshot: builtinShot) { list.append(h1) }
-        for e in snap.entries {
-            var it = LibraryItem(e, base: library.base)
-            it.isNew = NewBadge.isNew(added: e.entry.added, since: snap.catalogueSince)
-            list.append(it)
-        }
+        let merged = Self.merged(snap, choices: engineChoices, base: library.base, paths: library.paths,
+                                 builtin: LibraryItem.builtinH1(screenshot: builtinShot))
+        let list = merged.items
         items = list
-        withdrawnItems = snap.withdrawn.compactMap { LibraryItem(withdrawn: $0, paths: library.paths) }
+        withdrawnItems = merged.withdrawn
         moreItems = snap.more.map { LibraryItem(listed: $0) }
         attribution = snap.attribution
         if section == .withdrawn && withdrawnItems.isEmpty { section = .all }
@@ -444,18 +535,50 @@ final class LibraryModel: ObservableObject {
         if case .category(let c) = section, !categoryNames.contains(c), !list.isEmpty { section = .all }
         if selection == nil || item(selection) == nil { select(visible.first?.id ?? list.first?.id) }
 
-        let total = snap.entries.count
-        let have = snap.entries.filter { $0.availability == .installed }.count
-        let busy = snap.entries.filter(\.downloading).count
-        var line = total == 0 ? "No catalogue downloaded yet" : "\(total) firmwares · \(have) downloaded"
-        if busy > 0 { line += " · downloading \(busy)" }
-        if let u = snap.catalogueUpdated {
-            let date = ISO8601DateFormatter.withFractions.date(from: u) ?? ISO8601DateFormatter().date(from: u)
-            line += " · catalogue " + (date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .short) } ?? u)
+        // The footer counts firmwares, never files: a firmware with both an .rfm1 build and an original package is one.
+        // "available offline" is those whose chosen engine's file is downloaded; "more listed" matches More Firmware.
+        counts = snap.entries.isEmpty ? nil : LibraryCounts(items: list, more: moreItems, withdrawn: withdrawnItems)
+    }
+
+    /// One library item per firmware: its .rfm1 build and/or its original package (`<id>.fwsc`), on the engine the
+    /// user picked, else the one the catalogue recommends; and No Longer Listed, one item per firmware, only for
+    /// firmware the library no longer has on any engine (an original package whose emu entry went away while its
+    /// .rfm1 build is still listed is not a withdrawn firmware).
+    static func merged(_ snap: FirmwareLibrary.Snapshot, choices: [String: String], base: URL, paths: LibraryPaths,
+                       builtin: LibraryItem?) -> (items: [LibraryItem], withdrawn: [LibraryItem]) {
+        var list: [LibraryItem] = []
+        if let builtin { list.append(builtin) }
+        var builds: [String: LibraryItem] = [:], packages: [String: LibraryItem] = [:], order: [String] = []
+        for e in snap.entries {
+            var it = LibraryItem(e, base: base)
+            let b = e.entry.baseID
+            if !order.contains(b) { order.append(b) }
+            if e.entry.isPackage { packages[b] = it } else { builds[b] = it }
         }
-        if isRefreshing { line = "Checking for firmware updates… " + line }
-        else if !lastSync.isEmpty { line = lastSync + " · " + line }
-        status = line
+        for id in order {
+            let b = builds[id], p = packages[id]
+            let engines = (b == nil ? [] : ["rfm1"]) + (p == nil ? [] : ["fm1-emu"])
+            let preferred = (b ?? p)?.preferredEngine
+            let want = choices[id] ?? preferred ?? "rfm1"
+            guard var it = (want == "fm1-emu" ? p ?? b : b ?? p) else { continue }
+            it.engines = engines
+            if engines.count > 1 { it.otherDownloadText = (it.engine == "fm1-emu" ? b : p)?.downloadText }
+            if it.engine == "fm1-emu", let b {      // the build's picture, dates and badges describe the same firmware
+                it.isNew = b.isNew; it.added = b.added; it.updated = b.updated
+            }
+            list.append(it)
+        }
+        var gone: [String: LibraryItem] = [:]
+        let listed = Set(list.map(\.id))
+        for r in snap.withdrawn {
+            guard var w = LibraryItem(withdrawn: r, paths: paths), let e = r.entry else { continue }
+            w.id = "cat:" + e.baseID
+            if e.isPackage { w.engine = "fm1-emu"; w.engines = ["fm1-emu"] } else { w.engines = ["rfm1"] }
+            if listed.contains(w.id) { continue }
+            if let have = gone[w.id], have.engine == "rfm1" { continue }      // both withdrawn: the build stands for it
+            gone[w.id] = w
+        }
+        return (list, gone.values.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending })
     }
 
     /// The firmware's bytes: bundled, or from the library (downloaded first, ahead of background downloads, if
@@ -469,6 +592,9 @@ final class LibraryModel: ObservableObject {
             let p = try await library.firmwareForPlayback(id: e.id)
             return PlayableFirmware(data: p.data, sha256: p.build.sha256, catalogueID: e.id, isFallback: p.isFallback,
                                     version: p.build.version)
+        case .package(let url):
+            let data = try Data(contentsOf: url)
+            return PlayableFirmware(data: data, sha256: sha256Hex(data), catalogueID: nil, isFallback: false, version: item.version)
         case .listed:
             throw PocketError.badFirmware("\(item.name) is not available in this app. \(item.macReason ?? "")")
         }
@@ -481,4 +607,51 @@ extension ISO8601DateFormatter {
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return f
     }()
+}
+
+
+/// What the library footer says, counted by firmware (one per firmware id, whichever engines it has).
+struct LibraryCounts: Equatable {
+    var library = 0, readyOffline = 0, downloading = 0, more = 0, withdrawn = 0
+
+    init(items: [LibraryItem], more: [LibraryItem], withdrawn: [LibraryItem]) {
+        library = Set(items.map(\.id)).count
+        readyOffline = items.filter { $0.download == .installed && !$0.downloading }.count
+        downloading = items.filter(\.downloading).count
+        self.more = Set(more.map(\.id)).count
+        self.withdrawn = Set(withdrawn.map(\.id)).count
+    }
+
+    static func baseID(_ id: String) -> String {
+        id.hasSuffix(CatalogueEntry.packageSuffix) ? String(id.dropLast(CatalogueEntry.packageSuffix.count)) : id
+    }
+
+    /// the footer's second line, in pieces so a narrow sidebar can stack them
+    var offlineText: String { "\(readyOffline) available offline" }
+    var moreText: String? { more > 0 ? "\(more) more listed" : nil }
+    var footerLine: String { [offlineText, moreText].compactMap { $0 }.joined(separator: " · ") }
+}
+
+/// The last Check for Firmware Updates.
+enum UpdateCheck: Equatable {
+    case idle, checking, upToDate
+    case updated(downloaded: Int, failed: Int, withdrawn: Int)
+    case offline(String)
+}
+
+extension LibraryModel {
+    /// the footer's first line: the library's state, a short form for a narrow sidebar, and any detail (as a tooltip)
+    var footerStatus: (text: String, short: String, detail: String?) {
+        if isRefreshing { return ("Checking for updates…", "Checking…", nil) }
+        if let c = counts, c.downloading > 0 { return ("Downloading \(c.downloading)…", "Downloading…", nil) }
+        if let note { return (note, note, nil) }
+        switch updateCheck {
+        case .offline(let e): return ("Offline · your firmware still plays", "Offline", e)
+        case .updated(let d, let f, _) where f > 0:
+            return ("\(f) couldn't be downloaded", "\(f) not downloaded", d > 0 ? "\(d) downloaded" : nil)
+        case .updated(let d, _, _) where d > 0: return ("\(d) new downloaded", "\(d) new", nil)
+        case .idle where counts == nil: return ("No library downloaded yet", "No library yet", nil)
+        default: return ("Library up to date", "Up to date", nil)
+        }
+    }
 }

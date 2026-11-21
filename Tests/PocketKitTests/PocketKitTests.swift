@@ -91,6 +91,30 @@ final class HostTests: XCTestCase {
         XCTAssertFalse(again.isHalted, again.errorMessage)
     }
 
+    /// A save that exists but is empty (the emulator engine's "nothing differs from the package") is a real save:
+    /// an older backup must not come back in its place. A missing save still falls back to its backup.
+    func testAnEmptySaveIsNotReplacedByItsBackup() throws {
+        let store = StateStore(folder: tempDir())
+        let sha = String(repeating: "c", count: 64)
+        try store.save(Data([1, 2, 3]), id: "x", version: "fm1-emu+1", sha256: sha)
+        try store.save(Data(), id: "x", version: "fm1-emu+1", sha256: sha)          // the .prev now holds [1, 2, 3]
+        XCTAssertNil(store.load(id: "x", version: "fm1-emu+1", sha256: sha))
+        try FileManager.default.removeItem(at: store.url(id: "x", version: "fm1-emu+1", sha256: sha))
+        XCTAssertEqual(store.load(id: "x", version: "fm1-emu+1", sha256: sha), Data([1, 2, 3]), "a missing save falls back to its backup")
+    }
+
+    /// Saves made by released builds (id, version and hash) keep their place and load unchanged.
+    func testReleasedBuildSavesKeepTheirKey() throws {
+        let store = StateStore(folder: tempDir())
+        let sha = String(repeating: "d", count: 64)
+        let old = store.folder.appendingPathComponent("h1/0.9@dddddddddddd.flash")
+        try FileManager.default.createDirectory(at: old.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data([9, 8, 7]).write(to: old)
+        XCTAssertEqual(store.url(id: "h1", version: "0.9", sha256: sha), old)
+        XCTAssertEqual(store.load(id: "h1", version: "0.9", sha256: sha), Data([9, 8, 7]))
+        XCTAssertNil(store.load(id: "h1", version: "fm1-emu+0.9", sha256: sha), "the emulator never reads an .rfm1 save")
+    }
+
     /// Ten seconds of h1 with a chord held: how much faster than real time this machine runs it.
     func testSpeed() throws {
         let core = try FirmwareCore(bytes: h1())

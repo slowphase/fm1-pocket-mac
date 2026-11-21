@@ -586,6 +586,110 @@ final class LibrarySyncTests: XCTestCase {
         XCTAssertEqual(try status(#"{"state":"playable","verification":"teleported"}"#).macVerification, .none)
     }
 
+    /// catalog-v2.json's emu block: the maker's original package, as `<id>.fwsc`, downloaded from the maker (never from
+    /// Pocket), checked against its hash; only the preferred engine in the background; saved under `.fwsc` paths.
+    func testV2EmuPackagesComeFromTheMakerAndOnlyThePreferredInTheBackground() async throws {
+        let site = FakePocket(), paths = freshRoot()
+        let a = FW("alpha", "1.0"), b = FW("beta", "2.0")
+        let pkgA = Data("alpha original package bytes".utf8), pkgC = Data("gamma original package bytes".utf8)
+        let makerA = "/maker/alpha/releases/download/v1.1/alpha-1.1.fwsc", makerC = "/maker/gamma/releases/download/v3/gamma-3.fwsc"
+        await publish([a, b], on: site)
+        await site.set(makerA, pkgA)
+        await site.set(makerC, pkgC)
+        var v2 = try JSONSerialization.jsonObject(with: catalogueV2JSON([(a, "playable"), (b, "playable")],
+            listed: [("gamma", "source-only", nil)], hub: true)) as! [String: Any]
+        var list = v2["firmwares"] as! [[String: Any]]
+        func emu(_ url: String, _ data: Data, prefer: String) -> [String: Any] {
+            ["package": ["url": "https://github.com" + url, "sha256": sha256Hex(data), "size": data.count, "version": "1.1", "license": "GPL-3.0",
+                         "source": "https://github.com/maker/x/tree/v1.1", "file": "pkg/x.fwsc"],
+             "mac": ["state": "playable", "reason": "Played the scripted session.", "tested": ["machine": "Darwin arm64, Apple M1", "speed": 3.1, "engine": "fm1-emu@09aeae3e9d78"]],
+             "web": ["state": "playable"], "preferred": ["mac": ["engine": prefer, "reason": "why"], "web": ["engine": prefer]],
+             "listened": []]
+        }
+        list[0]["emu"] = emu(makerA, pkgA, prefer: "fm1-emu")       // alpha: both engines, the emulator preferred
+        list[1]["emu"] = ["package": NSNull(), "mac": ["state": "unavailable"], "web": ["state": "unavailable"], "preferred": ["mac": ["engine": "rfm1"]]]
+        list[2]["emu"] = emu(makerC, pkgC, prefer: "fm1-emu")       // gamma: no build, the package only
+        v2["firmwares"] = list
+        await site.set("/data/catalog-v2.json", try JSONSerialization.data(withJSONObject: v2))
+        let lib = library(paths, site)
+        let r = await lib.sync()
+        XCTAssertNil(r.catalogueError)
+        XCTAssertEqual(r.installed, ["alpha.fwsc", "beta", "gamma.fwsc"], "alpha's .rfm1 is the alternative: not downloaded in the background")
+        let reqs = await site.requests
+        XCTAssertTrue(reqs.contains(makerA) && reqs.contains(makerC), "packages come from the makers' releases")
+        XCTAssertFalse(reqs.contains("/data/pkg/x.fwsc"), "never Pocket's hosted copy")
+        XCTAssertFalse(reqs.contains("/data/" + a.file))
+        XCTAssertTrue(exists(paths.firmwareFile(id: "alpha.fwsc", sha256: sha256Hex(pkgA))))
+        XCTAssertTrue(paths.firmwareFile(id: "alpha.fwsc", sha256: sha256Hex(pkgA)).path.hasSuffix(".fwsc"))
+        let snap = await lib.snapshot()
+        XCTAssertEqual(snap.entries.map(\.entry.id), ["alpha", "alpha.fwsc", "beta", "gamma.fwsc"])
+        XCTAssertEqual(snap.entries[1].mac?.state, .playable)
+        XCTAssertEqual(snap.entries[1].emu?.macTested?.speed, 3.1)
+        XCTAssertFalse(snap.more.contains { $0.id == "gamma" }, "a firmware the emulator plays is in the library, not under More")
+        // choosing the other engine downloads it on demand
+        let p = try await lib.firmwareForPlayback(id: "alpha")
+        XCTAssertEqual(p.data, a.data)
+        let q = try await lib.firmwareForPlayback(id: "alpha.fwsc")
+        XCTAssertEqual(q.data, pkgA)
+        // a package that does not match its hash is never used
+        await site.set(makerC, Data("tampered".utf8))
+        let fresh = library(freshRoot(), site)
+        let r2 = await fresh.sync()
+        XCTAssertNotNil(r2.failed["gamma.fwsc"])
+        // the registry rebuilt from disk keeps packages as packages
+        let v2data = await site.files["/data/catalog-v2.json"]!
+        let rebuilt = RegistryStore(paths: paths).rebuild(catalogue: try CatalogueV2.decode(v2data).macCatalogue())
+        XCTAssertEqual(rebuilt.firmwares["alpha.fwsc"]?.current?.sha256, sha256Hex(pkgA))
+    }
+
+    func testEmuPreviewFillsOnlyMissingBlocksForTheSameHubVersion() throws {
+        let sha = String(repeating: "b", count: 64)
+        let json = #"{"schema":2,"snapshot":"s","updated":"u","firmwares":[{"id":"x","name":"X","file":"fw/x.rfm1","sha256":"\#(String(repeating: "a", count: 64))","size":1,"status":{"web":{"state":"playable"},"mac":{"state":"playable"}},"provenance":{"hub":{"version":"2.0"}}},{"id":"y","name":"Y","status":{"mac":{"state":"source-only"}},"provenance":{"hub":{"version":"1.0"}}}]}"#
+        let preview = #"{"firmwares":{"x":{"hubVersion":"2.0","emu":{"package":{"url":"https://github.com/m/x/releases/download/v2/x.fwsc","sha256":"\#(sha)","version":"2.0"},"mac":{"state":"playable"},"preferred":{"mac":{"engine":"fm1-emu"}}},"confidence":{"mac":{"fm1-emu":{"level":"listened","note":"n"},"rfm1":{"level":"known-issue","note":"k"}}},"listened":[{"firmware":"x","player":"mac","engine":"fm1-emu","verdict":"good"}]},"y":{"hubVersion":"0.9","emu":{"package":{"url":"https://github.com/m/y/releases/download/v1/y.fwsc","sha256":"\#(sha)"},"mac":{"state":"playable"}}}}}"#
+        let c = try CatalogueV2.decode(Data(json.utf8)).withPreview(Data(preview.utf8))
+        XCTAssertEqual(c.firmwares[0].emu?.package?.sha256, sha)
+        XCTAssertNil(c.firmwares[1].emu, "a preview made for another Hub version is not used")
+        XCTAssertEqual(c.firmwares[0].confidence["fm1-emu"]?.level, .listened)
+        XCTAssertEqual(c.firmwares[0].confidence["rfm1"], CatalogueV2.Confidence(level: .knownIssue, note: "k"))
+        XCTAssertEqual(c.firmwares[0].listened.count, 1)
+        XCTAssertEqual(c.firmwares[0].preferredMacEngine, "fm1-emu")
+        XCTAssertEqual(c.alternative(for: "x"), true)
+        XCTAssertEqual(c.alternative(for: "x.fwsc"), false)
+        XCTAssertEqual(try c.macCatalogue().firmwares.map(\.id), ["x", "x.fwsc"])
+        XCTAssertEqual(try c.macCatalogue().firmwares[1].makerURL?.host, "github.com")
+        // once the catalogue has its own emu blocks, the preview is ignored
+        let own = try CatalogueV2.decode(Data(json.replacingOccurrences(of: #""provenance":{"hub":{"version":"1.0"}}"#, with: #""provenance":{"hub":{"version":"1.0"}},"emu":{"mac":{"state":"unavailable"}}"#).utf8))
+        XCTAssertNil(own.withPreview(Data(preview.utf8)).firmwares[0].emu)
+        // a package on a host that is not a maker's release is never downloaded
+        var odd = try c.macCatalogue().firmwares[1]
+        odd.remoteURL = "http://example.test/x.fwsc"
+        XCTAssertNil(odd.makerURL)
+    }
+
+    /// Discovery dates: the firmware's real release (version and date) and the day it was first listed; a missing
+    /// release stays unknown; a test build's preview fills them in where the catalogue lacks them.
+    func testV2ReleaseAndListedDates() throws {
+        let sha = String(repeating: "a", count: 64)
+        let json = #"{"schema":2,"snapshot":"s","updated":"u","firmwares":[{"id":"x","name":"X","file":"fw/x.rfm1","sha256":"\#(sha)","size":1,"status":{"mac":{"state":"playable"}},"release":{"version":"1.8.2","date":"2026-11-13T04:17:47Z","source":"The Firmware Hub"},"listed":"2026-10-08"},{"id":"y","name":"Y","status":{"mac":{"state":"source-only"}},"release":null,"provenance":{"hub":{"version":"1.0"}}}]}"#
+        let c = try CatalogueV2.decode(Data(json.utf8))
+        XCTAssertEqual(c.firmwares[0].release?.version, "1.8.2")
+        XCTAssertEqual(c.firmwares[0].release?.day, ISO8601DateFormatter().date(from: "2026-11-13T04:17:47Z"))
+        XCTAssertEqual(c.firmwares[0].listed, "2026-10-08")
+        XCTAssertNil(c.firmwares[1].release)
+        let preview = #"{"firmwares":{"y":{"hubVersion":"1.0","release":{"version":"1.0","date":"2026-11-02T00:00:00Z"},"listed":"2026-11-15"}}}"#
+        let p = c.withPreview(Data(preview.utf8))
+        XCTAssertEqual(p.firmwares[1].release?.version, "1.0")
+        XCTAssertEqual(p.firmwares[1].listed, "2026-11-15")
+        XCTAssertEqual(p.firmwares[0].release?.version, "1.8.2", "the catalogue's own dates win")
+    }
+
+    func testEngineChoicesAreKept() throws {
+        let paths = freshRoot(), store = EngineChoiceStore(paths: paths)
+        XCTAssertEqual(store.load(), [:])
+        try store.save(["alpha": "rfm1", "beta": "fm1-emu"])
+        XCTAssertEqual(store.load(), ["alpha": "rfm1", "beta": "fm1-emu"])
+    }
+
     func testV2DecodingToleratesUnknownStatesAndFields() throws {
         let json = #"{"schema":2,"snapshot":"s","updated":"u","future":true,"firmwares":[{"id":"x","name":"X","file":"fw/x.rfm1","sha256":"\#(String(repeating: "a", count: 64))","size":1,"status":{"web":{"state":"playable"},"mac":{"state":"teleported"}}},{"id":"y"}]}"#
         let c = try CatalogueV2.decode(Data(json.utf8))

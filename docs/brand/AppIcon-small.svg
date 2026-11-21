@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26262b"/><stop offset="1" stop-color="#0d0d10"/></linearGradient>
+ <linearGradient id="knob" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#e9e1cf"/><stop offset="1" stop-color="#b9ae97"/></linearGradient>
+ <radialGradient id="face" cx="0.4" cy="0.32" r="0.8"><stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#ece4d3"/></radialGradient>
+ <linearGradient id="collar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050506"/><stop offset="1" stop-color="#1c1c20"/></linearGradient>
+ <filter color-interpolation-filters="sRGB" id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur in="SourceAlpha" stdDeviation="14"/><feOffset dy="12"/><feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter color-interpolation-filters="sRGB" id="kshadow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur in="SourceAlpha" stdDeviation="16"/><feOffset dy="18"/><feComponentTransfer><feFuncA type="linear" slope="0.6"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter color-interpolation-filters="sRGB" id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#shadow)"><rect x="100" y="100" width="824" height="824" rx="185" fill="url(#bg)"/><rect x="101.5" y="101.5" width="821" height="821" rx="183.5" fill="none" stroke="#ffffff" stroke-opacity="0.07" stroke-width="3"/></g>
+<g>
+<rect x="279.5" y="692.5" width="52" height="52" rx="8.7" fill="#5a2e9c" transform="rotate(-135.00 305.5 718.5)"/><rect x="216.2" y="597.7" width="52" height="52" rx="8.7" fill="#6134a1" transform="rotate(-112.50 242.2 623.7)"/><rect x="194.0" y="486.0" width="52" height="52" rx="8.7" fill="#6c3fab" transform="rotate(-90.00 220.0 512.0)"/><rect x="216.2" y="374.3" width="52" height="52" rx="8.7" fill="#7a4db7" transform="rotate(-67.50 242.2 400.3)"/><rect x="279.5" y="279.5" width="52" height="52" rx="8.7" fill="#8b5cc4" transform="rotate(-45.00 305.5 305.5)"/><rect x="374.3" y="216.2" width="52" height="52" rx="8.7" fill="#9d6dd3" transform="rotate(-22.50 400.3 242.2)"/><rect x="486.0" y="194.0" width="52" height="52" rx="8.7" fill="#b080e3" transform="rotate(0.00 512.0 220.0)"/><rect x="597.7" y="216.2" width="52" height="52" rx="8.7" fill="#c594f4" transform="rotate(22.50 623.7 242.2)"/><rect x="695.5" y="282.5" width="46" height="46" rx="7.7" fill="#34343b" transform="rotate(45.00 718.5 305.5)"/><rect x="758.8" y="377.3" width="46" height="46" rx="7.7" fill="#34343b" transform="rotate(67.50 781.8 400.3)"/><rect x="781.0" y="489.0" width="46" height="46" rx="7.7" fill="#34343b" transform="rotate(90.00 804.0 512.0)"/><rect x="758.8" y="600.7" width="46" height="46" rx="7.7" fill="#34343b" transform="rotate(112.50 781.8 623.7)"/><rect x="695.5" y="695.5" width="46" height="46" rx="7.7" fill="#34343b" transform="rotate(135.00 718.5 718.5)"/>
+<circle cx="512" cy="512" r="232" fill="url(#collar)"/>
+<g filter="url(#kshadow)"><circle cx="512" cy="512" r="196" fill="url(#knob)"/></g>
+<circle cx="512" cy="512" r="172" fill="url(#face)"/>
+<circle cx="512" cy="512" r="172" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="2"/>
+<circle cx="591.2" cy="399.0" r="34" fill="#8a4fe0"/>
+<circle cx="587.2" cy="394.0" r="12.2" fill="#ffffff" fill-opacity="0.18"/>
+</g>
+</svg>

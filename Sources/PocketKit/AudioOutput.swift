@@ -9,15 +9,21 @@ public final class AudioOutput {
     private var node: AVAudioSourceNode?
     private var scratch: UnsafeMutablePointer<Float>?
     private static let chunk = 4096
+    /// rendered offline on request instead of to the output device (the integration test)
+    private let manual: Bool
 
-    public init() {}
+    public init(manual: Bool = false) { self.manual = manual }
 
     public var isRunning: Bool { engine.isRunning }
 
-    /// Mute keeps the firmware running (and its clock moving) but silences the output, as Pocket's mute does.
-    public func setMuted(_ m: Bool) { engine.mainMixerNode.outputVolume = m ? 0 : 1 }
+    /// Mute keeps the firmware running (and its clock moving) but silences the output, as Pocket's mute does. The
+    /// render callback writes silence from its next buffer on (the mixer's volume ramps, so it let a fraction through
+    /// for a while: the integration test measured 10 to 20% of the level 300 ms after muting).
+    public func setMuted(_ m: Bool) { mute.on = m }
+    private final class Flag: @unchecked Sendable { var on = false }
+    private let mute = Flag()
 
-    public func start(_ core: FirmwareCore) throws {
+    public func start(_ core: any PlayerEngine) throws {
         stop()
         guard let format = AVAudioFormat(standardFormatWithSampleRate: FirmwareCore.sampleRate, channels: 2) else {
             throw PocketError.badFirmware("Could not set up the audio format.")
@@ -26,6 +32,7 @@ public final class AudioOutput {
         buf.initialize(repeating: 0, count: Self.chunk * 2)
         scratch = buf
         let chunk = Self.chunk
+        let mute = self.mute
         let src = AVAudioSourceNode(format: format) { _, _, frameCount, abl -> OSStatus in
             let list = UnsafeMutableAudioBufferListPointer(abl)
             let total = Int(frameCount)
@@ -33,6 +40,7 @@ public final class AudioOutput {
             while done < total {
                 let n = min(total - done, chunk)
                 core.pull(buf, frames: n)
+                if mute.on { for i in 0..<(2 * n) { buf[i] = 0 } }
                 for ch in 0..<list.count {
                     guard let data = list[ch].mData else { continue }
                     let out = data.assumingMemoryBound(to: Float.self)
@@ -46,12 +54,29 @@ public final class AudioOutput {
         node = src
         engine.attach(src)
         engine.connect(src, to: engine.mainMixerNode, format: format)
+        if manual {
+            try engine.enableManualRenderingMode(.offline, format: format, maximumFrameCount: AVAudioFrameCount(Self.chunk))
+        }
         engine.prepare()
         try engine.start()
     }
 
+    /// Manual mode only: `frames` of what the output would play (the firmware, through the mixer, muted or not):
+    /// the sum of squared samples and their count.
+    public func renderOffline(frames: Int) -> (Double, Int)? {
+        guard manual, engine.isRunning,
+              let buf = AVAudioPCMBuffer(pcmFormat: engine.manualRenderingFormat, frameCapacity: AVAudioFrameCount(frames)),
+              (try? engine.renderOffline(AVAudioFrameCount(frames), to: buf)) == .success,
+              let ch = buf.floatChannelData else { return nil }
+        var s = 0.0
+        let n = Int(buf.frameLength)
+        for c in 0..<Int(buf.format.channelCount) { for i in 0..<n { s += Double(ch[c][i] * ch[c][i]) } }
+        return (s, n * Int(buf.format.channelCount))
+    }
+
     public func stop() {
         engine.stop()
+        if manual && engine.isInManualRenderingMode { engine.disableManualRenderingMode() }
         if let node {
             engine.detach(node)
             self.node = nil
