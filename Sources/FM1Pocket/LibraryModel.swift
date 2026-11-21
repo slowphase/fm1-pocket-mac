@@ -313,8 +313,13 @@ final class LibraryModel: ObservableObject {
     @Published private(set) var moreItems: [LibraryItem] = []
     /// The Firmware Hub's credit, when the catalogue used its list
     @Published private(set) var attribution: CatalogueV2.Attribution?
-    @Published private(set) var status = ""
     @Published private(set) var isRefreshing = false
+    /// the last Check for Firmware Updates (the update window and the sidebar footer)
+    @Published private(set) var updateCheck: UpdateCheck = .idle
+    /// what the sidebar footer counts (nil until a catalogue has been downloaded)
+    @Published private(set) var counts: LibraryCounts?
+    /// a one-off note for the footer (Clean Up Old Downloads), cleared by the next check
+    @Published private(set) var note: String?
     @Published var selection: LibraryItem.ID?
     @Published var search = ""
     @Published var section: SidebarItem = .all { didSet { defaults.set(section.key, forKey: "library.section") } }
@@ -333,7 +338,6 @@ final class LibraryModel: ObservableObject {
     private lazy var recentStore = RecentStore(paths: library.paths)
     private var started = false
     private var reloadPending = false
-    private var lastSync = ""
     private var builtinShot: URL?
 
     init() {
@@ -480,20 +484,18 @@ final class LibraryModel: ObservableObject {
     func refresh() {
         guard !isRefreshing else { return }
         isRefreshing = true
-        status = "Checking for firmware updates…"
+        updateCheck = .checking
+        note = nil
         Task {
             let r = await library.sync()
             isRefreshing = false
             if let err = r.catalogueError {
-                lastSync = "Offline: showing the downloaded library. (\(err))"
+                updateCheck = .offline(err)
             } else {
-                var parts: [String] = []
                 // by firmware, not by file (an .rfm1 build and an original package of one firmware count once)
                 let firmwares = { (ids: [String]) in Set(ids.map(LibraryCounts.baseID)).count }
-                if !r.installed.isEmpty { parts.append("\(firmwares(r.installed)) downloaded") }
-                if !r.failed.isEmpty { parts.append("\(firmwares(Array(r.failed.keys))) could not be downloaded") }
-                if !r.withdrawn.isEmpty { parts.append("\(firmwares(r.withdrawn)) withdrawn from the catalogue") }
-                lastSync = parts.isEmpty ? "Up to date" : parts.joined(separator: ", ")
+                let d = firmwares(r.installed), f = firmwares(Array(r.failed.keys)), w = firmwares(r.withdrawn)
+                updateCheck = d + f + w == 0 ? .upToDate : .updated(downloaded: d, failed: f, withdrawn: w)
             }
             await reload()
         }
@@ -503,7 +505,7 @@ final class LibraryModel: ObservableObject {
     func cleanUp() {
         Task {
             let removed = await library.cleanUp()
-            lastSync = removed.isEmpty ? "Nothing to clean up" : "Cleaned up \(removed.count) old download\(removed.count == 1 ? "" : "s")"
+            note = removed.isEmpty ? "Nothing to clean up" : "Cleaned up \(removed.count) old download\(removed.count == 1 ? "" : "s")"
             await reload()
         }
     }
@@ -534,18 +536,8 @@ final class LibraryModel: ObservableObject {
         if selection == nil || item(selection) == nil { select(visible.first?.id ?? list.first?.id) }
 
         // The footer counts firmwares, never files: a firmware with both an .rfm1 build and an original package is one.
-        // "in the library" is All Firmware (the built-in h1 included); "ready offline" those whose chosen engine's file
-        // is downloaded; the other two match their sidebar sections.
-        let counts = LibraryCounts(items: list, more: moreItems, withdrawn: withdrawnItems)
-        var line = snap.entries.isEmpty ? "No catalogue downloaded yet" : counts.line
-        if !snap.entries.isEmpty { line += "\n" + LibraryCounts.confidenceLine(list) }
-        if let u = snap.catalogueUpdated {
-            let date = ISO8601DateFormatter.withFractions.date(from: u) ?? ISO8601DateFormatter().date(from: u)
-            line += " · catalogue " + (date.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .short) } ?? u)
-        }
-        if isRefreshing { line = "Checking for firmware updates… " + line }
-        else if !lastSync.isEmpty { line = lastSync + " · " + line }
-        status = line
+        // "available offline" is those whose chosen engine's file is downloaded; "more listed" matches More Firmware.
+        counts = snap.entries.isEmpty ? nil : LibraryCounts(items: list, more: moreItems, withdrawn: withdrawnItems)
     }
 
     /// One library item per firmware: its .rfm1 build and/or its original package (`<id>.fwsc`), on the engine the
@@ -634,20 +626,32 @@ struct LibraryCounts: Equatable {
         id.hasSuffix(CatalogueEntry.packageSuffix) ? String(id.dropLast(CatalogueEntry.packageSuffix.count)) : id
     }
 
-    /// how sure we are of the library, on each firmware's chosen engine (the built-in h1 left out)
-    static func confidenceLine(_ items: [LibraryItem]) -> String {
-        let rated = items.filter { !$0.isBuiltin && !$0.isPackage }
-        let listened = rated.filter { $0.confidence?.level == .listened }.count
-        let issues = rated.filter { $0.confidence?.level == .knownIssue }.count
-        let automated = rated.count - listened - issues
-        return "Listened to: \(listened) · automated checks only: \(automated) · known issues: \(issues)"
-    }
+    /// the footer's second line, in pieces so a narrow sidebar can stack them
+    var offlineText: String { "\(readyOffline) available offline" }
+    var moreText: String? { more > 0 ? "\(more) more listed" : nil }
+    var footerLine: String { [offlineText, moreText].compactMap { $0 }.joined(separator: " · ") }
+}
 
-    var line: String {
-        var parts = ["\(library) firmware\(library == 1 ? "" : "s") in the library", "\(readyOffline) ready offline"]
-        if downloading > 0 { parts.append("downloading \(downloading)") }
-        if more > 0 { parts.append("\(more) more listed") }
-        if withdrawn > 0 { parts.append("\(withdrawn) no longer listed") }
-        return parts.joined(separator: " · ")
+/// The last Check for Firmware Updates.
+enum UpdateCheck: Equatable {
+    case idle, checking, upToDate
+    case updated(downloaded: Int, failed: Int, withdrawn: Int)
+    case offline(String)
+}
+
+extension LibraryModel {
+    /// the footer's first line: the library's state, a short form for a narrow sidebar, and any detail (as a tooltip)
+    var footerStatus: (text: String, short: String, detail: String?) {
+        if isRefreshing { return ("Checking for updates…", "Checking…", nil) }
+        if let c = counts, c.downloading > 0 { return ("Downloading \(c.downloading)…", "Downloading…", nil) }
+        if let note { return (note, note, nil) }
+        switch updateCheck {
+        case .offline(let e): return ("Offline · your firmware still plays", "Offline", e)
+        case .updated(let d, let f, _) where f > 0:
+            return ("\(f) couldn't be downloaded", "\(f) not downloaded", d > 0 ? "\(d) downloaded" : nil)
+        case .updated(let d, _, _) where d > 0: return ("\(d) new downloaded", "\(d) new", nil)
+        case .idle where counts == nil: return ("No library downloaded yet", "No library yet", nil)
+        default: return ("Library up to date", "Up to date", nil)
+        }
     }
 }

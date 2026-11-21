@@ -55,17 +55,7 @@ private struct Sidebar: View {
             }
         }
         .listStyle(.sidebar)
-        .safeAreaInset(edge: .bottom) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(library.status)
-                    .lineLimit(4)
-                if let a = library.attribution { HubCredit(attribution: a) }
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(10)
-        }
+        .safeAreaInset(edge: .bottom) { LibraryFooter() }
     }
 
     private func row(_ s: SidebarItem, _ symbol: String) -> some View {
@@ -189,24 +179,6 @@ private struct IconGrid: View {
     private func open(_ item: LibraryItem) {
         if item.canPlay { player.play(item, library: library) }
         else if let s = item.sourceURL ?? item.hubURL, let u = URL(string: s) { NSWorkspace.shared.open(u) }
-    }
-}
-
-/// The Firmware Hub's credit, as its terms ask: the credit line linked to the Hub, the licence linked, and what
-/// FM-1 Pocket changed.
-struct HubCredit: View {
-    let attribution: CatalogueV2.Attribution
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
-            if let u = URL(string: attribution.url) { Link(attribution.text, destination: u) } else { Text(attribution.text) }
-            HStack(spacing: 3) {
-                Text("Licence:")
-                if let l = attribution.licenseUrl, let u = URL(string: l) { Link(attribution.license, destination: u) }
-                else { Text(attribution.license) }
-            }
-        }
-        .help(attribution.changes ?? "")
     }
 }
 

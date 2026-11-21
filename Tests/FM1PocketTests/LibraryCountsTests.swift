@@ -39,7 +39,8 @@ final class LibraryCountsTests: XCTestCase {
         XCTAssertEqual(c.library, 3)
         XCTAssertEqual(c.readyOffline, 2, "alpha (its package is downloaded and chosen) and gamma; beta is not downloaded")
         XCTAssertEqual(c.withdrawn, 1)
-        XCTAssertEqual(c.line, "3 firmwares in the library · 2 ready offline · 1 no longer listed")
+        XCTAssertEqual(c.footerLine, "2 available offline", "no total, no withdrawn count: the sidebar shows those")
+        XCTAssertEqual(LibraryCounts(items: m.items, more: [m.items[0]], withdrawn: []).footerLine, "2 available offline · 1 more listed")
         // choosing alpha's .rfm1 build: still one item, now not ready offline
         let r = LibraryModel.merged(snap, choices: ["alpha": "rfm1"], base: URL(string: "https://example.test/")!,
                                     paths: LibraryPaths(root: FileManager.default.temporaryDirectory), builtin: nil)
@@ -50,7 +51,6 @@ final class LibraryCountsTests: XCTestCase {
         var items = m.items
         items[0].confidence = CatalogueV2.Confidence(level: .listened)
         items[1].confidence = CatalogueV2.Confidence(level: .knownIssue, note: "x")
-        XCTAssertEqual(LibraryCounts.confidenceLine(items), "Listened to: 1 · automated checks only: 1 · known issues: 1")
         XCTAssertEqual(items[2].compatibilityText, "Plays · automated checks only")
         XCTAssertEqual(items[0].compatibilityText, "Plays · listened to in FM-1 Pocket")
         XCTAssertEqual(items[1].compatibilityText, "Known issue: x")

@@ -37,8 +37,11 @@ struct FM1PocketApp: App {
         .defaultSize(width: 1180, height: 760)
         .commands {
             CommandGroup(replacing: .newItem) {}
+            CommandGroup(replacing: .appInfo) {
+                Button("About FM-1 Pocket") { AboutPanel.show(attribution: library.attribution) }
+            }
             CommandGroup(after: .appInfo) {
-                Button("Check for Firmware Updates…") { library.refresh() }
+                CheckForUpdatesButton(library: library)
                 Button("Clean Up Old Downloads") { library.cleanUp() }
             }
             SidebarCommands()
@@ -108,6 +111,15 @@ struct FM1PocketApp: App {
         .windowResizability(.contentMinSize)
         .defaultSize(width: 1240, height: 860)
         .defaultPosition(.center)
+
+        // Check for Firmware Updates…: a small window with the result
+        Window("Firmware Updates", id: UpdateCheckView.windowID) {
+            UpdateCheckView().environmentObject(library)
+        }
+        .windowResizability(.contentSize)
+        .windowStyle(.hiddenTitleBar)
+        .defaultPosition(.center)
+        .commandsRemoved()
     }
 }
 
