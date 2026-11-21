@@ -296,22 +296,21 @@ struct NameWithTags: View {
 
     var body: some View {
         let all = tags
-        HStack(spacing: 4) {
-            Text(item.name)
-                .lineLimit(1)
-                .truncationMode(.tail)
-                .frame(minWidth: 44, alignment: .leading)
-                .help(item.name)
-            if !all.isEmpty {
-                ViewThatFits(in: .horizontal) {
-                    row(all)
-                    if all.count > 2 { row(Array(all.prefix(2))) }
-                    if all.count > 1 { row(Array(all.prefix(1))) }
-                    Color.clear.frame(width: 0, height: 0)
-                }
-                .layoutPriority(1)
-            }
+        ViewThatFits(in: .horizontal) {
+            // everything at its natural size (no padding after a short name)
+            HStack(spacing: 4) { Text(item.name).lineLimit(1).fixedSize(); if !all.isEmpty { row(all) } }
+            // otherwise the name shortens, keeping at least a little room, and badges step aside as needed
+            if !all.isEmpty { HStack(spacing: 4) { shortName; row(all) } }
+            if all.count > 2 { HStack(spacing: 4) { shortName; row(Array(all.prefix(2))) } }
+            if all.count > 1 { HStack(spacing: 4) { shortName; row(Array(all.prefix(1))) } }
+            shortName
         }
+        .help(item.name)
+    }
+
+    /// counts as 44 points wide when choosing what fits, then takes whatever room is left
+    private var shortName: some View {
+        Text(item.name).lineLimit(1).truncationMode(.tail).frame(minWidth: 44, idealWidth: 44, maxWidth: .infinity, alignment: .leading)
     }
 
     // shown in reading order: NEW, BETA, then compatibility
