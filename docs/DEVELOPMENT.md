@@ -41,8 +41,7 @@ A release is a normal GitHub Release (not a pre-release), marked as the latest, 
 `Resources/emu-preview.json` (the test builds' stand-in emulator data). Build it only once FM-1 Pocket Player has
 published its emulator catalogue, or emulator firmware will not show.
 
-After the first release exists, point the README's **Download for macOS** button and install step at
-`/releases/latest` instead of `/releases`.
+The README's **Download for macOS** button and install step point at `/releases/latest`.
 
 ## The emulator engine
 

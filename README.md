@@ -5,7 +5,7 @@
 <p align="center"><strong>A universe of firmware. One little player.</strong></p>
 
 <p align="center">
-  <a href="https://github.com/slowphase/fm1-pocket-mac/releases"><strong>Download for macOS</strong></a>
+  <a href="https://github.com/slowphase/fm1-pocket-mac/releases/latest"><strong>Download for macOS</strong></a>
   &nbsp;·&nbsp;
   <a href="https://slowphase.github.io/fm1-pocket-player/"><strong>Try the web player</strong></a>
 </p>
@@ -37,10 +37,10 @@ Mac, so you can find something interesting, read what it does and hear it straig
 
 FM-1 Pocket needs a Mac with Apple silicon (M1 or later) and macOS 14 Sonoma or later.
 
-1. Download the latest `.zip` from [Releases](https://github.com/slowphase/fm1-pocket-mac/releases).
+1. Download the latest `.zip` from [Releases](https://github.com/slowphase/fm1-pocket-mac/releases/latest).
 2. Double-click the `.zip` if your Mac hasn't unzipped it already, then drag **FM-1 Pocket** into your
    **Applications** folder.
-3. Open it. FM-1 Pocket isn't notarised by Apple, so macOS stops it the first time. Click **Done** (not Move to Bin),
+3. Open it. FM-1 Pocket isn't notarised by Apple, so macOS may block it when first opened. Click **Done** (not Move to Bin),
    open **System Settings › Privacy & Security**, scroll down and click **Open Anyway**.
 
 After that it opens normally. You may need to repeat step 3 when you download a newer version.
