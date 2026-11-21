@@ -4,7 +4,7 @@ FM-1 Pocket: opening it the first time
 FM-1 Pocket is not sold through the App Store and is not "notarised" by Apple (that needs a paid Apple developer
 account). macOS therefore blocks it the first time. You only have to do this once.
 
-1. Drag "FM-1 Pocket" onto the Applications shortcut in this window.
+1. Double-click the downloaded .zip, then drag "FM-1 Pocket" into your Applications folder.
 2. Open your Applications folder and double-click "FM-1 Pocket".
 3. macOS says it cannot verify the app. Click "Done" (or "OK"). Do NOT click "Move to Bin".
 4. Open System Settings, then click "Privacy & Security" in the sidebar.
