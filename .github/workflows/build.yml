@@ -182,7 +182,7 @@ jobs:
           {
             echo "## FM-1 Pocket ${{ steps.v.outputs.version }} (build ${{ github.run_number }})"
             echo
-            echo "**Download:** scroll to *Artifacts* at the bottom of this page and click the FM1-Pocket entry. GitHub wraps it in a .zip; inside is FM1-Pocket-….zip, and inside that the app."
+            echo "**Download:** scroll to *Artifacts* at the bottom of this page and click the FM1-Pocket entry. Double-click the downloaded .zip to get the app."
             echo
             echo "### Native host (C, h1)"
             echo '```'; grep -E "^(loaded|ok|FAIL)" host-test.log 2>/dev/null || echo "(not run)"; echo '```'
@@ -197,8 +197,9 @@ jobs:
       - name: Upload the zip
         uses: actions/upload-artifact@v7
         with:
-          name: FM1-Pocket-${{ steps.v.outputs.version }}-build${{ github.run_number }}
-          path: build/*.zip
+          # uploaded as it is (one zip to download, not a zip inside GitHub's own zip)
+          archive: false
+          path: build/FM1-Pocket-${{ steps.v.outputs.version }}.zip
           if-no-files-found: error
           retention-days: 30
 

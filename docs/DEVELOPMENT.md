@@ -28,7 +28,7 @@ More: [STORAGE.md](STORAGE.md) (the library, engines, saves and files on disk) a
 
 1. Open the **Actions** tab and click the latest green **Build Mac app** run.
 2. Scroll to **Artifacts** and download the **FM1-Pocket-…** entry.
-3. Unzip it (twice: GitHub wraps the zip in another) and install it as the README describes. Test builds are
+3. Unzip it and install it as the README describes. Test builds are
    not notarised either.
 
 ## Publishing a release
