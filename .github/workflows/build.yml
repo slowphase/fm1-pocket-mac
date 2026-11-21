@@ -214,5 +214,7 @@ jobs:
           if gh release view "v$V" >/dev/null 2>&1; then
             gh release upload "v$V" build/*.zip --clobber
           else
-            gh release create "v$V" build/*.zip --title "FM-1 Pocket $V" --notes "$NOTES" --target "$GITHUB_SHA" --latest
+            # docs/release-notes/<version>.md when there is one, else the short note above
+            if [ -f "docs/release-notes/$V.md" ]; then set -- --notes-file "docs/release-notes/$V.md"; else set -- --notes "$NOTES"; fi
+            gh release create "v$V" build/*.zip --title "FM-1 Pocket $V" "$@" --target "$GITHUB_SHA" --latest
           fi
