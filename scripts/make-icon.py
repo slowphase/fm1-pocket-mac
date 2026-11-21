@@ -25,7 +25,9 @@ for i in range(N):
 pr = math.radians(ptr); dx = C + 138 * math.sin(pr); dy = C - 138 * math.cos(pr)
 dot_r = 34 if small else 25
 F = 'color-interpolation-filters="sRGB"'
-if full:
+if "--bare" in sys.argv:
+    tile = ""; content = "<g>"
+elif full:
     tile = '<rect width="1024" height="1024" fill="url(#bg)"/>'
     content = f'<g transform="translate(512 512) scale(1.15) translate(-512 -512)">'
 else:

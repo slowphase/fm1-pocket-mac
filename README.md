@@ -1,6 +1,4 @@
-<!-- HERO IMAGE: add docs/img/hero.png (wide, about 2000 x 670) when the new branding is ready, then replace this
-     comment with:
-     <p align="center"><img src="docs/img/hero.png" alt="FM-1 Pocket: a universe of firmware, one little player"></p> -->
+<p align="center"><img src="docs/img/hero.png" alt="FM-1 Pocket: a universe of firmware, one little player"></p>
 
 <h1 align="center">FM-1 Pocket</h1>
 
