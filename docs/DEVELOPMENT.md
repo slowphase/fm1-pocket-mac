@@ -15,7 +15,7 @@ Macs every time the code changes.
 | `Sources/PocketKit` | Swift: the firmware library (sync, SHA-256-checked downloads, offline cache, two-build retention, safe cleanup), both engines behind one `PlayerEngine` protocol, Core Audio output, saved settings |
 | `Sources/FM1Pocket` | the SwiftUI app, and its self-tests (`--selftest`, `--selftest-fwsc`, `--integration`) |
 | `Tests/` | Swift tests (`PocketKitTests`, `FM1PocketTests`), a plain C test of the host (`ctest`), the integration test's scenarios |
-| `scripts/` | `build-app.sh` (assemble and ad-hoc sign the .app), `build-emu.sh`, `make-dmg.sh` |
+| `scripts/` | `build-app.sh` (assemble and ad-hoc sign the .app), `build-emu.sh`, `make-zip.sh`, `make-icon.py`, `make-hero.py` |
 | `.github/workflows/build.yml` | the build, tests, packaging and optional release |
 
 The app reads what FM-1 Pocket Player publishes (`https://slowphase.github.io/fm1-pocket-player/data/`) and
@@ -28,12 +28,21 @@ More: [STORAGE.md](STORAGE.md) (the library, engines, saves and files on disk) a
 
 1. Open the **Actions** tab and click the latest green **Build Mac app** run.
 2. Scroll to **Artifacts** and download the **FM1-Pocket-…** entry.
-3. Install it as the README describes. Test builds are not notarised either.
+3. Unzip it (twice: GitHub wraps the zip in another) and install it as the README describes. Test builds are
+   not notarised either.
 
 ## Publishing a release
 
 **Actions › Build Mac app › Run workflow**, tick **Also publish this build as a GitHub Release**, type a version (for
-example `0.9.0`) and click **Run workflow**. The download appears under **Releases** when it finishes.
+example `0.9.0`) and click **Run workflow**. Pushing a tag such as `v0.9.0` does the same. The zip appears under
+**Releases** when it finishes.
+
+A release is a normal GitHub Release (not a pre-release), marked as the latest, and leaves out
+`Resources/emu-preview.json` (the test builds' stand-in emulator data). Build it only once FM-1 Pocket Player has
+published its emulator catalogue, or emulator firmware will not show.
+
+After the first release exists, point the README's **Download for macOS** button and install step at
+`/releases/latest` instead of `/releases`.
 
 ## The emulator engine
 

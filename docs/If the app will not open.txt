@@ -1,10 +1,10 @@
 FM-1 Pocket: opening it the first time
 ======================================
 
-FM-1 Pocket is not sold through the App Store and is not "notarised" by Apple (that needs a paid Apple developer
-account). macOS therefore blocks it the first time. You only have to do this once.
+FM-1 Pocket is not "notarised" by Apple, so macOS blocks it the first time you open it. These steps unblock it.
+You may need to repeat them when you install a newer version.
 
-1. Double-click the downloaded .zip, then drag "FM-1 Pocket" into your Applications folder.
+1. Double-click the downloaded .zip (if your Mac has not unzipped it already), then drag "FM-1 Pocket" into your Applications folder.
 2. Open your Applications folder and double-click "FM-1 Pocket".
 3. macOS says it cannot verify the app. Click "Done" (or "OK"). Do NOT click "Move to Bin".
 4. Open System Settings, then click "Privacy & Security" in the sidebar.
@@ -12,7 +12,7 @@ account). macOS therefore blocks it the first time. You only have to do this onc
    Click "Open Anyway".
 6. Type your Mac password (or use Touch ID), then click "Open Anyway" once more.
 
-From then on it opens normally, like any other app.
+From then on that version opens normally, like any other app.
 
 The step in System Settings only appears for about an hour after you first try to open the app. If you cannot see
 it, double-click the app again and go straight back to Privacy & Security.

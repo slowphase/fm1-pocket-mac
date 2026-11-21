@@ -5,7 +5,7 @@
 <p align="center"><strong>A universe of firmware. One little player.</strong></p>
 
 <p align="center">
-  <a href="https://github.com/slowphase/fm1-pocket-mac/releases/latest"><strong>Download for macOS</strong></a>
+  <a href="https://github.com/slowphase/fm1-pocket-mac/releases"><strong>Download for macOS</strong></a>
   &nbsp;·&nbsp;
   <a href="https://slowphase.github.io/fm1-pocket-player/"><strong>Try the web player</strong></a>
 </p>
@@ -13,8 +13,6 @@
 The M-VAVE FM-1 is a tiny synth that people keep reinventing: its community has written synths, drum machines,
 sequencers, trackers and generative instruments for it. FM-1 Pocket gathers that firmware into one library on your
 Mac, so you can find something interesting, read what it does and hear it straight away. No FM-1 needed.
-
-It is a place to discover and audition firmware, not a music production app.
 
 <!-- SCREENSHOTS: add three real screenshots of the app, then replace this comment with:
 <p align="center">
@@ -25,12 +23,12 @@ It is a place to discover and audition firmware, not a music production app.
 
 ## What you can do
 
-- **Discover firmware.** Browse a library that keeps itself up to date, with a screenshot and a short description
-  for each firmware. Search by name, maker or description, filter by category, and sort by latest release or A to Z. New
+- **Discover firmware.** Browse a library that keeps itself up to date, with screen previews, descriptions and
+  firmware details. Search by name, maker or description, filter by category, and sort by latest release or A to Z. New
   to Library shows what joined in the last two weeks.
 - **Hear it.** Press Play and the firmware runs on a full FM-1 faceplate: its screen, knobs, buttons, lights and keys.
 - **Play it your way.** Use the mouse, your computer keyboard or a MIDI keyboard.
-- **Keep favourites.** Star the ones you like and find them again under Favourites and Recently Played.
+- **Keep favourites.** Star your favourites, or return to instruments you've recently explored.
 - **Pick up where you left off.** Firmware that saves its own settings keeps them between sessions. What a firmware
   saves, and how, is up to the firmware: some save as you go, others have their own save button.
 - **Play offline.** Firmware you have played stays on your Mac, and the library works without a connection.
@@ -40,12 +38,14 @@ It is a place to discover and audition firmware, not a music production app.
 
 FM-1 Pocket needs a Mac with Apple silicon (M1 or later) and macOS 14 Sonoma or later.
 
-1. Download the latest version from [Releases](https://github.com/slowphase/fm1-pocket-mac/releases/latest).
-2. Double-click the downloaded `.zip`, then drag **FM-1 Pocket** into your **Applications** folder.
-3. Open it. Because the app is free and not notarised by Apple, macOS stops it the first time. Click **Done**
-   (not Move to Bin), open **System Settings › Privacy & Security**, scroll down and click **Open Anyway**.
+1. Download the latest `.zip` from [Releases](https://github.com/slowphase/fm1-pocket-mac/releases).
+2. Double-click the `.zip` if your Mac hasn't unzipped it already, then drag **FM-1 Pocket** into your
+   **Applications** folder.
+3. Open it. FM-1 Pocket isn't notarised by Apple, so macOS stops it the first time. Click **Done** (not Move to Bin),
+   open **System Settings › Privacy & Security**, scroll down and click **Open Anyway**.
 
-You only do this once. [Step-by-step help, with a Terminal alternative](docs/If%20the%20app%20will%20not%20open.txt).
+After that it opens normally. You may need to repeat step 3 when you download a newer version.
+[Step-by-step help, with a Terminal alternative](docs/If%20the%20app%20will%20not%20open.txt).
 
 ## How firmware plays
 
@@ -54,7 +54,8 @@ FM-1 Pocket is a native Mac app, written in SwiftUI. It has two ways of running 
 - **Original packages** (`.fwsc`), exactly as their makers released them, run on an emulation of the FM-1's chip.
 - **`.rfm1` builds**, versions of a firmware rebuilt to run on a computer.
 
-Each firmware uses whichever runs it best, and where both work you can switch between them in its details.
+FM-1 Pocket recommends an engine based on compatibility and performance checks, and where both work you can switch
+between them in a firmware's details.
 
 ## Compatibility
 

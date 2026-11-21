@@ -1,7 +1,8 @@
-# Builds FM-1 Pocket for macOS on GitHub's Apple Silicon Mac, tests it, signs it ad hoc and packs a DMG.
+# Builds FM-1 Pocket for macOS on GitHub's Apple Silicon Mac, tests it, signs it ad hoc and packs a zip.
 #
-#   Every push to main and every pull request: build, test, upload the DMG as a downloadable artifact.
-#   A version tag (v0.1.0) or "Run workflow" with "Publish a release" ticked: also a GitHub Release with the DMG.
+#   Every push to main and every pull request: build, test, upload the zip as a downloadable artifact.
+#   A version tag (v0.9.0) or "Run workflow" with "Publish a release" ticked: also a normal (not pre-release) GitHub
+#   Release with the zip, marked as the latest release. Release builds leave out Resources/emu-preview.json.
 #
 # Nothing to install on your own Mac: everything runs here.
 name: Build Mac app
@@ -18,7 +19,7 @@ on:
         type: boolean
         default: false
       version:
-        description: "Version number for the release (e.g. 0.1.0)"
+        description: "Version number for the release (e.g. 0.9.0)"
         type: string
         default: ""
 
@@ -50,7 +51,7 @@ jobs:
         run: |
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then V="${GITHUB_REF#refs/tags/v}"
           elif [ -n "${{ inputs.version }}" ]; then V="${{ inputs.version }}"
-          else V="0.1.0"; fi
+          else V="0.9.0"; fi
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "Version $V, build ${{ github.run_number }}"
 
@@ -107,6 +108,8 @@ jobs:
         env:
           VERSION: ${{ steps.v.outputs.version }}
           BUILD_NUMBER: ${{ github.run_number }}
+          # a release reads the published catalogue only, without the test builds' stand-in emulator data
+          NO_PREVIEW: ${{ (startsWith(github.ref, 'refs/tags/v') || inputs.release) && '1' || '' }}
         run: scripts/build-app.sh
 
       - name: Self-test the packaged app (boots h1 inside the .app)
@@ -168,10 +171,10 @@ jobs:
           PY
           exit $code
 
-      - name: Make the DMG
+      - name: Make the zip
         env:
           VERSION: ${{ steps.v.outputs.version }}
-        run: scripts/make-dmg.sh
+        run: scripts/make-zip.sh
 
       - name: Summary
         if: always()
@@ -179,7 +182,7 @@ jobs:
           {
             echo "## FM-1 Pocket ${{ steps.v.outputs.version }} (build ${{ github.run_number }})"
             echo
-            echo "**Download:** scroll to *Artifacts* at the bottom of this page and click the FM1-Pocket entry. You get a .zip; double-click it to get the .dmg."
+            echo "**Download:** scroll to *Artifacts* at the bottom of this page and click the FM1-Pocket entry. GitHub wraps it in a .zip; inside is FM1-Pocket-….zip, and inside that the app."
             echo
             echo "### Native host (C, h1)"
             echo '```'; grep -E "^(loaded|ok|FAIL)" host-test.log 2>/dev/null || echo "(not run)"; echo '```'
@@ -191,11 +194,11 @@ jobs:
             echo '```json'; cat build/selftest.json 2>/dev/null || echo "(not run)"; echo; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload the DMG
+      - name: Upload the zip
         uses: actions/upload-artifact@v7
         with:
           name: FM1-Pocket-${{ steps.v.outputs.version }}-build${{ github.run_number }}
-          path: build/*.dmg
+          path: build/*.zip
           if-no-files-found: error
           retention-days: 30
 
@@ -205,9 +208,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           V: ${{ steps.v.outputs.version }}
         run: |
-          NOTES="FM-1 Pocket $V for Apple Silicon Macs (macOS 14 or newer). Not notarised: see \"If the app will not open.txt\" inside the DMG."
+          NOTES="FM-1 Pocket $V for Apple silicon Macs (macOS 14 Sonoma or later). Not notarised by Apple: see https://github.com/${{ github.repository }}/blob/main/docs/If%20the%20app%20will%20not%20open.txt"
+          # a normal release (no --prerelease), marked as the latest so /releases/latest points to it
           if gh release view "v$V" >/dev/null 2>&1; then
-            gh release upload "v$V" build/*.dmg --clobber
+            gh release upload "v$V" build/*.zip --clobber
           else
-            gh release create "v$V" build/*.dmg --title "FM-1 Pocket $V" --notes "$NOTES" --target "$GITHUB_SHA"
+            gh release create "v$V" build/*.zip --title "FM-1 Pocket $V" --notes "$NOTES" --target "$GITHUB_SHA" --latest
           fi
