@@ -219,12 +219,7 @@ private struct FirmwareCard: View {
                             .padding(5)
                     }
                 }
-            HStack(spacing: 4) {
-                Text(item.name).font(.headline).lineLimit(1)
-                if item.isNew { Tag(text: "NEW", color: .green).help("New to Library: first listed in the last \(NewBadge.days) days") }
-                if item.isBeta { Tag(text: "BETA", color: .orange) }
-                if let t = item.stateTag { Tag(text: t, color: .secondary).help(item.macReason ?? "") }
-            }
+            NameWithTags(item: item).font(.headline)
             Text(item.byline)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -279,6 +274,52 @@ struct Tag: View {
             .padding(.vertical, 1)
             .foregroundStyle(color)
             .overlay(RoundedRectangle(cornerRadius: 3).stroke(color, lineWidth: 1))
+            .lineLimit(1)
+            .fixedSize()   // a badge is never cut short or wrapped
+    }
+}
+
+/// A firmware's name with its badges. Badges stay whole: when space runs short the name shortens first, then the
+/// less important badges step aside (compatibility first, then BETA, then NEW), and the name always keeps some room.
+struct NameWithTags: View {
+    let item: LibraryItem
+
+    private struct Info: Identifiable { let text: String; let color: Color; let help: String; var id: String { text } }
+
+    private var tags: [Info] {
+        var t: [Info] = []
+        if let s = item.stateTag { t.append(Info(text: s, color: .secondary, help: item.macReason ?? "")) }
+        if item.isBeta { t.append(Info(text: "BETA", color: .orange, help: "")) }
+        if item.isNew { t.append(Info(text: "NEW", color: .green, help: "New to Library: first listed in the last \(NewBadge.days) days")) }
+        return t
+    }
+
+    var body: some View {
+        let all = tags
+        HStack(spacing: 4) {
+            Text(item.name)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(minWidth: 44, alignment: .leading)
+                .help(item.name)
+            if !all.isEmpty {
+                ViewThatFits(in: .horizontal) {
+                    row(all)
+                    if all.count > 2 { row(Array(all.prefix(2))) }
+                    if all.count > 1 { row(Array(all.prefix(1))) }
+                    Color.clear.frame(width: 0, height: 0)
+                }
+                .layoutPriority(1)
+            }
+        }
+    }
+
+    // shown in reading order: NEW, BETA, then compatibility
+    private func row(_ t: [Info]) -> some View {
+        HStack(spacing: 4) {
+            ForEach(t.reversed()) { x in Tag(text: x.text, color: x.color).help(x.help) }
+        }
+        .fixedSize()
     }
 }
 
@@ -301,10 +342,7 @@ private struct FirmwareTable: View {
             TableColumn("Name", value: \.name) { (item: LibraryItem) in
                 HStack(spacing: 6) {
                     Thumbnail(item: item).frame(width: 22, height: 22).clipShape(RoundedRectangle(cornerRadius: 3))
-                    Text(item.name)
-                    if item.isNew { Tag(text: "NEW", color: .green).help("New to Library: first listed in the last \(NewBadge.days) days") }
-                    if item.isBeta { Tag(text: "BETA", color: .orange) }
-                    if let t = item.stateTag { Tag(text: t, color: .secondary).help(item.macReason ?? "") }
+                    NameWithTags(item: item)
                     if player.playingID == item.id { Image(systemName: "speaker.wave.2.fill").foregroundStyle(.tint) }
                 }
             }
