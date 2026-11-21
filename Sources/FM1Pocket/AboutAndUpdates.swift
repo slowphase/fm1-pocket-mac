@@ -7,12 +7,12 @@ import SwiftUI
 /// The standard About window, with the credits: who made the app, The Firmware Hub's credit as its terms ask (credit
 /// line linked, licence linked), the engines and their licences, and the independence statement.
 enum AboutPanel {
-    static func show(attribution: CatalogueV2.Attribution?) {
+    static func show(attribution: CatalogueV2.Attribution?, editor: CatalogueV2.Source? = nil) {
         NSApp.activate(ignoringOtherApps: true)
-        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits(attribution)])
+        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits(attribution, editor: editor)])
     }
 
-    static func credits(_ hub: CatalogueV2.Attribution?) -> NSAttributedString {
+    static func credits(_ hub: CatalogueV2.Attribution?, editor: CatalogueV2.Source? = nil) -> NSAttributedString {
         let out = NSMutableAttributedString()
         let centred = NSMutableParagraphStyle()
         centred.alignment = .center
@@ -39,6 +39,14 @@ enum AboutPanel {
         link(hub?.license ?? "CC BY 4.0", hub?.licenseUrl ?? "https://creativecommons.org/licenses/by/4.0/")
         text(".")
         if let c = hub?.changes, !c.isEmpty { text(" " + c) }
+        if let e = editor {
+            // FM1 Editor's directory: more listings, and the descriptions marked as its own (MIT)
+            text("\nMore listings and descriptions marked as from it: ")
+            link("FM1 Editor – fm1-editor.com", e.url ?? "https://fm1-editor.com/firmware/")
+            text(", " + (e.copyright ?? "Copyright (c) 2026 Ben Sparrow") + ", licensed ")
+            link(e.license ?? "MIT", e.licenseUrl ?? "https://github.com/benny-sparra/fm1-dx7-patch-importer/blob/main/LICENSE")
+            text(".")
+        }
         text("\n\n")
 
         bold("Engines\n")
@@ -159,6 +167,23 @@ struct LibraryFooter: View {
 
 /// The Firmware Hub's credit, as its terms ask: the credit line linked to the Hub, the licence linked, and what
 /// FM-1 Pocket changed (shown under a firmware the Hub lists).
+/// The credit under a description another source wrote (FM1 Editor's): the credit linked to its card, and the
+/// licence linked to its text, in the same form as the Firmware Hub's credit. The copyright shows on hover.
+struct DescriptionCredit: View {
+    let description: CatalogueV2.AttributedDescription
+
+    var body: some View {
+        HStack(spacing: 3) {
+            if let s = description.url, let u = URL(string: s) { Link(description.credit, destination: u) } else { Text(description.credit) }
+            if let l = description.license {
+                Text("· Licence:")
+                if let s = description.licenseUrl, let u = URL(string: s) { Link(l, destination: u) } else { Text(l) }
+            }
+        }
+        .help(description.copyright ?? "")
+    }
+}
+
 struct HubCredit: View {
     let attribution: CatalogueV2.Attribution
 

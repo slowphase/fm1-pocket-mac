@@ -382,12 +382,18 @@ struct FirmwareMenu: View {
                 Button("Download Now") { library.download(item) }
             }
             Divider()
+        } else if item.isListedOnly {
+            Button(library.isFavourite(item) ? "Remove from Favourites" : "Add to Favourites") { library.toggleFavourite(item) }
+            Divider()
         }
         if let s = item.sourceURL, let u = URL(string: s) {
             Button("Open Source Page") { NSWorkspace.shared.open(u) }
         }
         if let s = item.hubURL, let u = URL(string: s) {
             Button("Open on The Firmware Hub") { NSWorkspace.shared.open(u) }
+        }
+        if let s = item.editorURL, let u = URL(string: s) {
+            Button("Open on FM1 Editor") { NSWorkspace.shared.open(u) }
         }
     }
 }
@@ -515,6 +521,12 @@ private struct DetailView: View {
 
                 if !item.about.isEmpty {
                     Text(item.about).fixedSize(horizontal: false, vertical: true).textSelection(.enabled)
+                } else if let d = item.attributed {
+                    // another source's description: never without its credit and licence
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(d.text).fixedSize(horizontal: false, vertical: true).textSelection(.enabled)
+                        DescriptionCredit(description: d).font(.caption).foregroundStyle(.secondary)
+                    }
                 }
 
                 facts
@@ -532,6 +544,9 @@ private struct DetailView: View {
 
                 if item.hubURL != nil, let a = library.attribution {
                     HubCredit(attribution: a).font(.caption).foregroundStyle(.secondary)
+                }
+                if let s = item.editorURL, let u = URL(string: s) {
+                    Link("Listed by FM1 Editor", destination: u).font(.caption).foregroundStyle(.secondary)
                 }
             }
             .padding(20)
@@ -552,7 +567,14 @@ private struct DetailView: View {
                 }
                 if let s = item.hubURL, let u = URL(string: s) {
                     Button("Open on The Firmware Hub") { NSWorkspace.shared.open(u) }
+                } else if let s = item.editorURL, let u = URL(string: s) {
+                    Button("Open on FM1 Editor") { NSWorkspace.shared.open(u) }
                 }
+                Button { library.toggleFavourite(item) } label: {
+                    Label(library.isFavourite(item) ? "Favourite" : "Add to Favourites",
+                          systemImage: library.isFavourite(item) ? "star.fill" : "star")
+                }
+                .help(library.isFavourite(item) ? "Remove from Favourites" : "Add to Favourites")
             }
         }
     }

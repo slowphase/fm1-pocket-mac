@@ -12,7 +12,9 @@ final class PreflightTests: XCTestCase {
         }
         let root = URL(fileURLWithPath: dir, isDirectory: true)
         let paths = LibraryPaths(root: root.appendingPathComponent("library", isDirectory: true))
-        let lib = FirmwareLibrary(paths: paths, emuPreview: nil)
+        // FM1_PREFLIGHT_BASE: another catalogue folder or site (the expanded catalogue in CI); the live site otherwise
+        let base = ProcessInfo.processInfo.environment["FM1_PREFLIGHT_BASE"].map { $0.hasPrefix("http") ? URL(string: $0)! : URL(fileURLWithPath: $0, isDirectory: true) }
+        let lib = FirmwareLibrary(paths: paths, base: base ?? CatalogueService.defaultBase, emuPreview: nil)
         let r = await lib.sync()
         XCTAssertNil(r.catalogueError, "the live catalogue could not be read")
         let snap = await lib.snapshot()

@@ -539,6 +539,42 @@ final class LibrarySyncTests: XCTestCase {
         }
     }
 
+    /// A firmware Pocket keeps under a permanent id (first listed from FM1 Editor, later built by RemoteFM1FW):
+    /// catalog.json uses the build's own id. After a night on catalog.json alone, the library still knows it by its
+    /// Pocket id: the same downloaded build, no second download, nothing "No Longer Listed", also offline.
+    func testPromotedBuildKeepsItsPocketIDOnCatalogJSONAlone() async throws {
+        let site = FakePocket(), paths = freshRoot()
+        let a = FW("alpha", "1.0"), g = FW("glitchdrums", "0.4.0")
+        await publish([a, g], on: site)
+        var v2 = try JSONSerialization.jsonObject(with: catalogueV2JSON([(a, "playable"), (g, "playable")])) as! [String: Any]
+        var list = v2["firmwares"] as! [[String: Any]]
+        list[1]["id"] = "glitch-ttreu"
+        list[1]["aliases"] = ["glitchdrums"]
+        v2["firmwares"] = list
+        await site.set("/data/catalog-v2.json", try JSONSerialization.data(withJSONObject: v2))
+        let r1 = await library(paths, site).sync()
+        XCTAssertEqual(r1.feed, "v2")
+        XCTAssertEqual(Set(r1.installed), ["alpha", "glitch-ttreu"])
+
+        await site.set("/data/catalog-v2.json", nil)
+        await site.clearLog()
+        let lib = library(paths, site)
+        let r2 = await lib.sync()
+        XCTAssertNil(r2.catalogueError)
+        XCTAssertEqual(r2.feed, "v1")
+        XCTAssertTrue(r2.installed.isEmpty, "nothing is downloaded again")
+        let snap = await lib.snapshot()
+        XCTAssertEqual(snap.entries.map(\.entry.id), ["alpha", "glitch-ttreu"])
+        XCTAssertEqual(snap.entries.map(\.availability), [.installed, .installed])
+        XCTAssertTrue(snap.withdrawn.isEmpty, "nothing reads No Longer Listed")
+        let reqs = await site.requests
+        XCTAssertFalse(reqs.contains("/data/" + g.file))
+
+        await site.setOffline(true)
+        let again = await library(paths, site).snapshot()
+        XCTAssertEqual(again.entries.map(\.entry.id), ["alpha", "glitch-ttreu"], "the cached catalog.json too")
+    }
+
     func testV2WithdrawnFromSiteRetiresTheCachedCopy() async throws {
         let site = FakePocket(), paths = freshRoot()
         let a = FW("alpha", "1.0")
