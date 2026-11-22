@@ -191,6 +191,7 @@ jobs:
             more:more:kickside more:more:midi-processor more:more:shrub favourite:more:kickside about || true
           perl -e 'alarm 240; exec @ARGV' "$APP" --ui-snapshot "$PWD/build/ui-cat-night2" "$PWD/build/ui/night2" \
             all:cat:kickside all:cat:glitch-ttreu all:cat:glitch favourites || true
+          for n in night1 night2; do echo "--- $n progress"; cat "build/ui/$n/progress.log" 2>/dev/null || echo "(none)"; done
           python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           import json, sys
           n1 = json.load(open("build/ui/night1/ui-snapshot.json")); n2 = json.load(open("build/ui/night2/ui-snapshot.json"))

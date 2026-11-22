@@ -280,6 +280,10 @@ struct ShowWindowCommands: Commands {
 
 /// Keeps the app running when its windows are closed, and brings the library back when the Dock icon is clicked.
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        MainActor.assumeIsolated { UISnapshot.startFromDelegate() }
+    }
+
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

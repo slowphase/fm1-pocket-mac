@@ -360,6 +360,7 @@ final class LibraryModel: ObservableObject {
     private var builtinShot: URL?
 
     init() {
+        if UISnapshotConfig.enabled { UISnapshot.model = self }
         section = SidebarItem(key: defaults.string(forKey: "library.section") ?? "all")
         viewMode = ViewMode(rawValue: defaults.string(forKey: "library.viewMode") ?? "") ?? .icons
         // "added" (the old Date Added, a catalogue date) and no choice yet both become Latest Release

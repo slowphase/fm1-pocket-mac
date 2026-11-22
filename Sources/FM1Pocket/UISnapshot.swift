@@ -28,16 +28,51 @@ enum UISnapshotConfig {
 
 @MainActor
 enum UISnapshot {
+    /// the library model, once the app has made it (for the start from the app delegate)
+    static weak var model: LibraryModel?
+    private static var started = false
+    private static var out: URL? { UISnapshotConfig.args.map { URL(fileURLWithPath: $0[1], isDirectory: true) } }
+
+    /// a line in OUT_DIR/progress.log (and on stderr), so a run that does not finish shows where it stopped
+    static func note(_ s: String) {
+        guard let out else { return }
+        try? FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
+        let line = "\(ISO8601DateFormatter().string(from: Date())) \(s)\n"
+        FileHandle.standardError.write(Data(line.utf8))
+        let f = out.appendingPathComponent("progress.log")
+        if let h = try? FileHandle(forWritingTo: f) { h.seekToEndOfFile(); h.write(Data(line.utf8)); try? h.close() }
+        else { try? Data(line.utf8).write(to: f) }
+    }
+
+    /// from the app delegate: starts the run even if the library window's task never comes
+    static func startFromDelegate() {
+        guard UISnapshotConfig.enabled else { return }
+        note("launched")
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 8_000_000_000)
+            if !started, let m = model { note("window task did not start; starting from the app delegate"); m.start(); await run(m) }
+            else if !started { note("no library model after 8 s; windows: \(NSApp.windows.map(\.title))") }
+        }
+    }
+
     static func run(_ library: LibraryModel) async {
-        guard let a = UISnapshotConfig.args else { return }
+        guard let a = UISnapshotConfig.args, !started else { return }
+        started = true
         let out = URL(fileURLWithPath: a[1], isDirectory: true)
         try? FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
+        note("run started; windows: \(NSApp.windows.map(\.title))")
         // the catalogue read and the library shown (downloads may go on in the background; they are not waited for)
-        for _ in 0..<600 where library.items.isEmpty || library.isRefreshing { try? await Task.sleep(nanoseconds: 100_000_000) }
+        var waited = 0
+        while (library.items.isEmpty || library.isRefreshing) && waited < 600 {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            waited += 1
+        }
+        note("library: \(library.items.count) items, \(library.moreItems.count) more, refreshing \(library.isRefreshing), waited \(waited / 10) s")
         try? await Task.sleep(nanoseconds: 1_500_000_000)
         var log: [[String: Any]] = []
         for (n, shot) in a.dropFirst(2).enumerated() {
             let name = String(format: "%02d-", n + 1) + shot.replacingOccurrences(of: ":", with: "_")
+            note("shot \(shot)")
             var r: [String: Any] = ["shot": shot]
             if shot == "about" {
                 AboutPanel.show(attribution: library.attribution, editor: library.editorSource)
@@ -78,6 +113,7 @@ enum UISnapshot {
         if let d = try? JSONSerialization.data(withJSONObject: summary, options: [.prettyPrinted, .sortedKeys]) {
             try? d.write(to: out.appendingPathComponent("ui-snapshot.json"))
         }
+        note("done")
         if UISnapshotConfig.keep == nil, let r = UISnapshotConfig.root { try? FileManager.default.removeItem(at: r) }
         NSApp.terminate(nil)
     }
