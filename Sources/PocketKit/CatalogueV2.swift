@@ -33,7 +33,7 @@ public struct CatalogueV2: Decodable, Equatable {
 
     /// A description written by another source than the firmware's own listing (FM1 Editor's), carried apart from
     /// `about` so it is only ever shown together with its credit and licence.
-    public struct AttributedDescription: Codable, Equatable, Sendable {
+    public struct AttributedDescription: Codable, Hashable, Sendable {
         public var text: String
         public var credit: String
         public var url: String?
