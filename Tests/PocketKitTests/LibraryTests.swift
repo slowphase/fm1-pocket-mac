@@ -413,6 +413,82 @@ final class LibrarySyncTests: XCTestCase {
         XCTAssertEqual(n, 1, "one download, however many asked for it")
     }
 
+    /// ARGO and Felucca 8 Patterns list the same original package under different library ids.
+    /// Both need their own install record and file, including on an offline relaunch.
+    func testIdenticalPackagesUnderDifferentIDsAreBothInstalled() async throws {
+        let site = FakePocket(), paths = freshRoot()
+        let data = Data("shared original package".utf8)
+        let maker = "/maker/releases/download/v1/shared.fwsc"
+        let ids = ["argo", "felucca8"]
+        let entries: [[String: Any]] = ids.map { id in
+            ["id": id, "name": id, "status": ["mac": ["state": "source-only"]],
+             "emu": ["package": ["url": "https://github.com" + maker, "sha256": sha256Hex(data), "size": data.count],
+                     "mac": ["state": "playable"], "preferred": ["mac": ["engine": "fm1-emu"]]]]
+        }
+        await site.set("/data/catalog-v2.json", try JSONSerialization.data(withJSONObject:
+            ["schema": 2, "snapshot": "test", "updated": "test", "firmwares": entries]))
+        await site.set(maker, data)
+        await site.hold(maker)
+        let lib = library(paths, site)
+        let sync = Task { await lib.sync() }
+        let bothStarted = await eventually { await site.count(maker) == 2 }
+        await site.release(maker)      // also releases the held request when this regression fails
+        let report = await sync.value
+        XCTAssertTrue(bothStarted, "different ids must not reuse a task that installs only one id")
+        XCTAssertEqual(report.failed, [:])
+        XCTAssertEqual(Set(report.installed), Set(ids.map { $0 + ".fwsc" }))
+        let snap = await lib.snapshot()
+        XCTAssertEqual(snap.entries.map(\.availability), [.installed, .installed])
+        for id in ids {
+            let key = id + ".fwsc"
+            XCTAssertEqual(try Data(contentsOf: paths.firmwareFile(id: key, sha256: sha256Hex(data))), data)
+            let play = try await lib.firmwareForPlayback(id: key)
+            XCTAssertEqual(play.build.id, key, "playback and saved state belong to this firmware")
+        }
+        await site.clearLog()
+        let again = await lib.sync()
+        XCTAssertTrue(again.installed.isEmpty)
+        let requests = await site.requests
+        XCTAssertFalse(requests.contains(maker), "neither installed entry is downloaded again")
+        await site.setOffline(true)
+        let offline = library(paths, site)
+        let cached = await offline.snapshot()
+        XCTAssertEqual(cached.entries.map(\.availability), [.installed, .installed])
+        for id in ids {
+            let play = try await offline.firmwareForPlayback(id: id + ".fwsc")
+            XCTAssertEqual(play.build.id, id + ".fwsc")
+            XCTAssertEqual(play.data, data)
+        }
+    }
+
+    func testIdenticalHashesDoNotHideAnotherFirmwaresDownloadFailure() async throws {
+        let site = FakePocket(), paths = freshRoot()
+        let a = FW("alpha", "1.0", image: nil)
+        var b = FW("beta", "1.0", image: nil)
+        b.data = a.data
+        await publish([a, b], on: site)
+        await site.hold("/data/" + a.file)
+        await site.hold("/data/" + b.file)
+        await site.fail("/data/" + b.file)
+        let lib = library(paths, site)
+        let sync = Task { await lib.sync() }
+        let bothStarted = await eventually {
+            let first = await site.waiting("/data/" + a.file)
+            let second = await site.waiting("/data/" + b.file)
+            return first && second
+        }
+        await site.releaseAll()
+        let report = await sync.value
+        XCTAssertTrue(bothStarted)
+        XCTAssertEqual(report.installed, ["alpha"])
+        XCTAssertEqual(Set(report.failed.keys), ["beta"])
+        let snap = await lib.snapshot()
+        XCTAssertEqual(snap.entries.map(\.availability), [.installed, .notDownloaded])
+        XCTAssertNil(snap.entries[0].lastError)
+        XCTAssertNotNil(snap.entries[1].lastError)
+        XCTAssertTrue(snap.entries.allSatisfy { !$0.downloading })
+    }
+
     // 18
     func testPlaybackJumpsTheQueue() async throws {
         let site = FakePocket(), paths = freshRoot()

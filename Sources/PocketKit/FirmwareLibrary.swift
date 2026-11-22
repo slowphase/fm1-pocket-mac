@@ -22,7 +22,7 @@ public actor FirmwareLibrary {
     public private(set) var discovery: CatalogueV2?
     public nonisolated let registryLoad: RegistryLoad
 
-    private var inflight: [String: Task<InstalledBuild, Error>] = [:]     // by firmware sha256
+    private var inflight: [String: Task<InstalledBuild, Error>] = [:]     // by firmware id and sha256
     private var shotInflight: [String: Task<Bool, Never>] = [:]           // by screenshot name
     private var downloadingIDs: Set<String> = []
     private var active: [String: Int] = [:]                               // sha256 -> number of players
@@ -327,8 +327,8 @@ public actor FirmwareLibrary {
     }
 
     /// Makes sure this catalogue build is on disk: already there, adopted from a verified file a crash left behind,
-    /// or downloaded. Concurrent requests for the same build share one download; an interactive request promotes
-    /// a queued background one.
+    /// or downloaded. Concurrent requests for the same firmware id and build share one download; different ids
+    /// need their own file and registry record even when their bytes match. An interactive request promotes a queued one.
     @discardableResult
     public func ensureInstalled(_ e: CatalogueEntry, priority: DownloadScheduler.Priority = .interactive) async throws -> InstalledBuild {
         guard SafeName.isID(e.id), SafeName.isSHA256(e.sha256), SafeName.isRelativePath(e.file) else {
@@ -344,22 +344,23 @@ public actor FirmwareLibrary {
         if let data = try? Data(contentsOf: dest), sha256Hex(data) == e.sha256 {    // left by an interrupted sync
             return try commit(e, size: data.count)
         }
-        if let t = inflight[e.sha256] {
-            if priority == .interactive { await scheduler.promote(tag: e.sha256) }
+        let key = "\(e.id)-\(e.sha256)"
+        if let t = inflight[key] {
+            if priority == .interactive { await scheduler.promote(tag: key) }
             return try await t.value
         }
-        let task = Task { try await self.download(e, priority: priority) }
-        inflight[e.sha256] = task
+        let task = Task { try await self.download(e, key: key, priority: priority) }
+        inflight[key] = task
         downloadingIDs.insert(e.id)
         changed()
         do {
             let b = try await task.value
-            inflight[e.sha256] = nil
+            inflight[key] = nil
             downloadingIDs.remove(e.id)
             changed()
             return b
         } catch {
-            inflight[e.sha256] = nil
+            inflight[key] = nil
             downloadingIDs.remove(e.id)
             if var rec = registry.firmwares[e.id] { rec.lastError = error.localizedDescription; registry.firmwares[e.id] = rec }
             try? store.save(registry)
@@ -368,7 +369,7 @@ public actor FirmwareLibrary {
         }
     }
 
-    private func download(_ e: CatalogueEntry, priority: DownloadScheduler.Priority) async throws -> InstalledBuild {
+    private func download(_ e: CatalogueEntry, key: String, priority: DownloadScheduler.Priority) async throws -> InstalledBuild {
         // an original package comes from its maker's release, never from Pocket or the Hub; the hash decides
         let source: URL
         if e.isPackage {
@@ -377,7 +378,7 @@ public actor FirmwareLibrary {
         } else {
             source = try url(for: e.file)
         }
-        let granted = await scheduler.acquire(tag: e.sha256, priority: priority)
+        let granted = await scheduler.acquire(tag: key, priority: priority)
         let result: Result<(Data, Int), Error>
         do { result = .success(try await fetcher.fetch(source)) } catch { result = .failure(error) }
         await scheduler.release(granted)                        // the slot is for the network transfer only
@@ -385,7 +386,7 @@ public actor FirmwareLibrary {
         guard code == 200 else { throw PocketError.http(code, e.name) }
         let fm = FileManager.default
         try fm.createDirectory(at: paths.tmp, withIntermediateDirectories: true)
-        let tmp = paths.tmp.appendingPathComponent("\(e.sha256).download")
+        let tmp = paths.tmp.appendingPathComponent("\(key).download")
         try data.write(to: tmp)
         guard sha256Hex(data) == e.sha256 else {
             try? fm.removeItem(at: tmp)
