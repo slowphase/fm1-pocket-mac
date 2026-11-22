@@ -173,11 +173,13 @@ struct DescriptionCredit: View {
     let description: CatalogueV2.AttributedDescription
 
     var body: some View {
-        HStack(spacing: 3) {
+        VStack(alignment: .leading, spacing: 1) {
             if let s = description.url, let u = URL(string: s) { Link(description.credit, destination: u) } else { Text(description.credit) }
             if let l = description.license {
-                Text("· Licence:")
-                if let s = description.licenseUrl, let u = URL(string: s) { Link(l, destination: u) } else { Text(l) }
+                HStack(spacing: 3) {
+                    Text("Licence:")
+                    if let s = description.licenseUrl, let u = URL(string: s) { Link(l, destination: u) } else { Text(l) }
+                }
             }
         }
         .help(description.copyright ?? "")

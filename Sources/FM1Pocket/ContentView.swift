@@ -567,14 +567,13 @@ private struct DetailView: View {
                 }
                 if let s = item.hubURL, let u = URL(string: s) {
                     Button("Open on The Firmware Hub") { NSWorkspace.shared.open(u) }
-                } else if let s = item.editorURL, let u = URL(string: s) {
-                    Button("Open on FM1 Editor") { NSWorkspace.shared.open(u) }
                 }
+                // a listed firmware can be a favourite too (it stays one if it becomes playable): a small star here
                 Button { library.toggleFavourite(item) } label: {
-                    Label(library.isFavourite(item) ? "Favourite" : "Add to Favourites",
-                          systemImage: library.isFavourite(item) ? "star.fill" : "star")
+                    Image(systemName: library.isFavourite(item) ? "star.fill" : "star")
                 }
                 .help(library.isFavourite(item) ? "Remove from Favourites" : "Add to Favourites")
+                .accessibilityLabel(library.isFavourite(item) ? "Remove from Favourites" : "Add to Favourites")
             }
         }
     }
