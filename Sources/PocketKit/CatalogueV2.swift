@@ -206,6 +206,30 @@ public struct CatalogueV2: Decodable, Equatable {
     }
 
     public struct Entry: Decodable, Equatable {
+        /// Report-only preview decisions, including an exact last-good package.
+        public struct Qualification: Decodable, Equatable {
+            public struct Route: Decodable, Equatable {
+                var eligible: Bool
+                var sha256: String?
+                var package: Emu.Package?
+                var status: Status?
+                var macTested: Emu.Tested?
+                private enum Keys: String, CodingKey { case eligible, sha256, package, status }
+                public init(from decoder: Decoder) throws {
+                    let c = try decoder.container(keyedBy: Keys.self)
+                    eligible = try c.decode(Bool.self, forKey: .eligible)
+                    sha256 = try c.decodeIfPresent(String.self, forKey: .sha256)
+                    package = try c.decodeIfPresent(Emu.Package.self, forKey: .package)
+                    status = try c.decodeIfPresent(Status.self, forKey: .status)
+                    macTested = (try? c.decodeIfPresent(Emu.MacBlock.self, forKey: .status))?.tested
+                }
+            }
+            var visible: Bool
+            var engines: [String]
+            var routes: [String: Route]
+        }
+        public var qualificationMac: Qualification?
+        public var hasQualification: Bool
         /// the catalog.json entry, for downloadable builds
         public var download: CatalogueEntry?
         public var id: String
@@ -277,6 +301,14 @@ public struct CatalogueV2: Decodable, Equatable {
             hubVersion = prov?.hub?.version
             download = c.contains(.file) && c.contains(.sha256) ? try? CatalogueEntry(from: decoder) : nil
             emu = try? c.decodeIfPresent(Emu.self, forKey: .emu)
+            let qc = try decoder.container(keyedBy: QualificationKey.self)
+            hasQualification = qc.contains(.qualification)
+            qualificationMac = (try? qc.decodeIfPresent(PerPlayer<Qualification>.self, forKey: .qualification))?.mac
+            if let r = qualificationMac?.routes["fm1-emu"], r.eligible, let p = r.package {
+                emu?.package = p
+                if let status = r.status { emu?.mac = status }
+                emu?.macTested = r.macTested
+            }
             confidence = (try? c.decodeIfPresent(PerPlayer<[String: Confidence]>.self, forKey: .confidence))?.mac ?? [:]
             knownIssues = (try? c.decodeIfPresent(PerPlayer<[String: String]>.self, forKey: .knownIssues))?.mac ?? [:]
             listened = (try? c.decodeIfPresent([Emu.Listened].self, forKey: .listened)) ?? []
@@ -289,6 +321,23 @@ public struct CatalogueV2: Decodable, Equatable {
         public var macDownloadable: Bool { download != nil && (mac.state == .playable || mac.state == .experimental) }
         /// Whether the app can play it at all: its .rfm1 build, or its original package on the emulator.
         public var macPlayable: Bool { macDownloadable || (emu?.macPlayable ?? false) }
+
+        private enum QualificationKey: String, CodingKey { case qualification }
+
+        /// Display only passing engines. Retain the complete internal catalogue,
+        /// so hiding never marks a cached firmware withdrawn or deletes user data.
+        public func qualifiesMac(engine: String) -> Bool {
+            if let q = qualificationMac {
+                let sha = engine == "rfm1" ? download?.sha256 : emu?.package?.sha256
+                return q.visible && q.engines.contains(engine) && q.routes[engine]?.eligible == true &&
+                    sha != nil && q.routes[engine]?.sha256 == sha
+            }
+            if hasQualification { return false } // malformed/unknown preview decisions fail closed
+            guard restriction?.code != "restricted", restriction?.code != "withdrawn",
+                  knownIssues[engine] == nil, emu?.excluded == nil else { return false }
+            return engine == "rfm1" ? macDownloadable && mac.state == .playable :
+                emu?.macPlayable == true && emu?.mac.state == .playable
+        }
 
         /// the original package as a library entry (`<id>.fwsc`), downloaded from the maker and checked against its hash
         public var packageEntry: CatalogueEntry? {

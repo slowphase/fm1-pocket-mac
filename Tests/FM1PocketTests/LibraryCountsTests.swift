@@ -62,6 +62,22 @@ final class LibraryCountsTests: XCTestCase {
         for i in items { XCTAssertFalse(i.compatibilityText.contains("this Mac"), "never about the user's own Mac") }
     }
 
+    func testHiddenEngineCannotBeSelectedOrResurfaceAsWithdrawn() {
+        var bad = entry("alpha", installed: true)
+        bad.libraryVisible = false
+        var snap = FirmwareLibrary.Snapshot(entries: [bad, entry("alpha.fwsc", installed: true)],
+            withdrawn: [withdrawn("hidden")], imports: [], catalogueUpdated: nil, catalogueSince: nil, registryLoad: .loaded)
+        snap.hiddenIDs = ["hidden"]
+        let before = snap
+        let m = LibraryModel.merged(snap, choices: ["alpha": "rfm1"], base: URL(string: "https://example.test/")!,
+            paths: LibraryPaths(root: FileManager.default.temporaryDirectory), builtin: nil)
+        XCTAssertEqual(m.items.map(\.id), ["cat:alpha"])
+        XCTAssertEqual(m.items[0].engines, ["fm1-emu"])
+        XCTAssertEqual(m.items[0].engine, "fm1-emu", "a stored preference cannot select an unqualified engine")
+        XCTAssertTrue(m.withdrawn.isEmpty)
+        XCTAssertEqual(snap, before, "visibility does not mutate installed builds or the registry")
+    }
+
     /// Latest Release: newest release first, unknown release dates last; A–Z by name; New to Library from the listed day.
     func testSortByLatestReleaseAndNewToLibrary() {
         var a = entry("alpha", installed: true), b = entry("beta", installed: true), c = entry("gamma", installed: true)
