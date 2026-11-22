@@ -16,6 +16,37 @@ public struct CatalogueV2: Decodable, Equatable {
     public var since: String?
     public var attribution: Attribution?
     public var firmwares: [Entry]
+    /// where the catalogue's entries came from, with each source's credit and licence (FM1 Editor's listings and
+    /// descriptions are MIT licensed). Absent in older catalogues.
+    public var sources: [Source]?
+
+    public struct Source: Codable, Equatable, Sendable {
+        public var name: String
+        public var url: String?
+        public var credit: String?
+        public var license: String?
+        public var licenseUrl: String?
+        public var copyright: String?
+    }
+    /// the FM1 Editor source, when the catalogue lists firmware from its directory
+    public var editorSource: Source? { sources?.first { $0.name == "FM1 Editor" } }
+
+    /// A description written by another source than the firmware's own listing (FM1 Editor's), carried apart from
+    /// `about` so it is only ever shown together with its credit and licence.
+    public struct AttributedDescription: Codable, Hashable, Sendable {
+        public var text: String
+        public var credit: String
+        public var url: String?
+        public var license: String?
+        public var licenseUrl: String?
+        public var copyright: String?
+        public var source: String?
+        public init(text: String, credit: String, url: String? = nil, license: String? = nil, licenseUrl: String? = nil,
+                    copyright: String? = nil, source: String? = nil) {
+            self.text = text; self.credit = credit; self.url = url; self.license = license; self.licenseUrl = licenseUrl
+            self.copyright = copyright; self.source = source
+        }
+    }
 
     /// The Firmware Hub's credit, present when the catalogue used the Hub's list (its terms ask for it to be shown)
     public struct Attribution: Codable, Equatable, Sendable {
@@ -237,18 +268,26 @@ public struct CatalogueV2: Decodable, Equatable {
         public var release: Release?
         /// the day it first appeared in the library (`yyyy-MM-dd`): "New to Library" means in the last 14 days
         public var listed: String?
+        /// another source's description, shown only with its credit (`about` stays the firmware's own)
+        public var attributedDescription: AttributedDescription?
+        /// FM1 Editor's card for it, when the Editor lists it
+        public var editorURL: String?
+        /// other ids this firmware is known by: catalog.json's id for a build Pocket keeps under a permanent id
+        public var aliases: [String] = []
         /// its picture, relative to the catalogue (an .rfm1 build's screen, or its screen as the emulator showed it);
         /// without one the app draws its name
         public var image: String?
 
         enum CodingKeys: String, CodingKey {
             case id, name, version, authors, makers, category, tag, about, license, source, beta, status, restriction, provenance, file, sha256, emu
-            case confidence, knownIssues, listened, release, listed, image
+            case confidence, knownIssues, listened, release, listed, image, attributedDescription, aliases
         }
         struct Statuses: Decodable { var web: Status?; var mac: Status? }
         struct Provenance: Decodable {
             struct Hub: Decodable { var url: String?; var version: String? }
+            struct Editor: Decodable { var url: String? }
             var hub: Hub?
+            var editor: Editor?
         }
 
         public init(from decoder: Decoder) throws {
@@ -275,6 +314,10 @@ public struct CatalogueV2: Decodable, Equatable {
             let prov = try? c.decodeIfPresent(Provenance.self, forKey: .provenance)
             hubURL = prov?.hub?.url
             hubVersion = prov?.hub?.version
+            editorURL = prov?.editor?.url.flatMap { $0.hasPrefix("https://") ? $0 : nil }
+            attributedDescription = (try? c.decodeIfPresent(AttributedDescription.self, forKey: .attributedDescription))
+                .flatMap { $0.text.isEmpty || $0.credit.isEmpty ? nil : $0 }
+            aliases = ((try? c.decodeIfPresent([String].self, forKey: .aliases)) ?? []).filter { SafeName.isID($0) }
             download = c.contains(.file) && c.contains(.sha256) ? try? CatalogueEntry(from: decoder) : nil
             emu = try? c.decodeIfPresent(Emu.self, forKey: .emu)
             confidence = (try? c.decodeIfPresent(PerPlayer<[String: Confidence]>.self, forKey: .confidence))?.mac ?? [:]

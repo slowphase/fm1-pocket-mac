@@ -55,7 +55,7 @@ jobs:
         run: |
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then V="${GITHUB_REF#refs/tags/v}"
           elif [ -n "${{ inputs.version }}" ]; then V="${{ inputs.version }}"
-          else V="0.9.0"; fi
+          else V="0.9.1"; fi
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "Version $V, build ${{ github.run_number }}"
 
@@ -175,6 +175,86 @@ jobs:
           PY
           exit $code
 
+      - name: The expanded catalogue in the real app (FM1 Editor listings, credits, favourites and two promotions)
+        # the packaged app on this Mac reads Tests/Fixtures' expanded catalogue (from FM-1 Pocket Player's pipeline) instead
+        # of the site: night 1 has FM1 Editor's 159 listings; on night 2 the Hub and RemoteFM1FW have taken up KickSide and
+        # GLITCH. It saves its own windows as pictures and what each selected firmware showed; the checks below read those.
+        run: |
+          set -o pipefail
+          APP="build/FM-1 Pocket.app/Contents/MacOS/FM1Pocket"
+          mkdir -p build/ui-cat-night1 build/ui-cat-night2 build/ui-library
+          cp Tests/Fixtures/expanded-v2-night1.json build/ui-cat-night1/catalog-v2.json
+          cp Tests/Fixtures/expanded-v2-night2.json build/ui-cat-night2/catalog-v2.json
+          cp Tests/Fixtures/expanded-v1-night2.json build/ui-cat-night2/catalog.json
+          export FM1_UI_LIBRARY="$PWD/build/ui-library"
+          perl -e 'alarm 240; exec @ARGV' "$APP" --ui-snapshot "$PWD/build/ui-cat-night1" "$PWD/build/ui/night1" \
+            more:more:kickside more:more:midi-processor more:more:shrub favourite:more:kickside about || true
+          perl -e 'alarm 240; exec @ARGV' "$APP" --ui-snapshot "$PWD/build/ui-cat-night2" "$PWD/build/ui/night2" \
+            all:cat:kickside all:cat:glitch-ttreu all:cat:glitch favourites || true
+          for n in night1 night2; do echo "--- $n progress"; cat "build/ui/$n/progress.log" 2>/dev/null || echo "(none)"; done
+          python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json, sys
+          n1 = json.load(open("build/ui/night1/ui-snapshot.json")); n2 = json.load(open("build/ui/night2/ui-snapshot.json"))
+          s1 = {s["shot"]: s for s in n1["shots"]}; s2 = {s["shot"]: s for s in n2["shots"]}
+          bad = []
+          def check(ok, what): (None if ok else bad.append(what))
+          print("## The expanded catalogue in the real app\n")
+          print(f"Night 1: {n1['items']} in the library, {n1['more']} under More Firmware. Night 2: {n2['items']} and {n2['more']}.\n")
+          print("| Shot | Firmware | Section | Plays | Description credit | Licence | Listed by FM1 Editor | Hub credit | Favourite | Picture |")
+          print("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
+          for night in (n1, n2):
+              for s in night["shots"]:
+                  it = s.get("item", {})
+                  print(f"| {s['shot']} | {it.get('name','')} | {s.get('section','')} | {it.get('canPlay','')} | {it.get('descriptionCredit','')} | "
+                        f"{it.get('descriptionLicence','')} | {'yes' if it.get('editorURL') else ''} | {'yes' if it.get('hubURL') else ''} | {it.get('favourite','')} | {s.get('saved')} |")
+          for s in n1["shots"] + n2["shots"]: check(s.get("saved") is True, f"{s['shot']}: no picture")
+          for k in ("more:more:kickside", "more:more:midi-processor", "more:more:shrub"):
+              it = s1[k]["item"]
+              check(it["listedOnly"] and not it["canPlay"], f"{k}: should be a listing")
+              check(it["description"] and it["about"] == "", f"{k}: the Editor's description, outside about")
+              check(it["descriptionCredit"] == "Description from FM1 Editor" and it["descriptionLicence"] == "MIT", f"{k}: description without its credit")
+              check(it["editorURL"] and not it["hubURL"], f"{k}: Editor credit, never the Hub's")
+          check(s1["more:more:midi-processor"]["item"]["category"] == "Other", "a tool is under Other")
+          check(s1["more:more:shrub"]["item"]["sourceURL"] == "https://shrub.audio/editor/install", "SHRUB links to its install page")
+          check("more:kickside" in s1["favourite:more:kickside"].get("favourites", []), "a listing can be a favourite")
+          k = s2["all:cat:kickside"]["item"]; g = s2["all:cat:glitch-ttreu"]["item"]; gr = s2["all:cat:glitch"]["item"]
+          check(k["canPlay"] and k["engine"] == "fm1-emu", "KickSide plays its original package")
+          check(k["hubURL"] and k["editorURL"] and k["descriptionCredit"], "KickSide: Hub credit, Editor credit, credited description")
+          check(g["canPlay"] and g["engine"] == "rfm1" and g["name"] == "GLITCH", "GLITCH plays its .rfm1 build under glitch-ttreu")
+          check(gr["name"] == "GR!MM" and not gr["editorURL"], "Pocket's glitch is GR!MM, untouched")
+          check(k["favourite"], "the favourite made on night 1, while KickSide was a listing, is still a favourite on night 2")
+          check(s2["favourites"]["item"]["id"] == "cat:kickside", "Favourites shows KickSide, now playable")
+          print("\n" + ("All checks passed." if not bad else "**Failed:** " + "; ".join(bad)))
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Pictures of the expanded catalogue in the app (also in the log, small)
+        if: always()
+        run: |
+          mkdir -p build/ui-small
+          for f in build/ui/*/*.png; do
+            [ -f "$f" ] || continue
+            n="$(basename "$(dirname "$f")")-$(basename "$f" .png)"
+            sips -Z 1400 -s format jpeg -s formatOptions 62 "$f" --out "build/ui-small/$n.jpg" > /dev/null
+            echo "=====IMAGE-BEGIN $n====="; base64 -i "build/ui-small/$n.jpg" | tr -d '\n'; echo; echo "=====IMAGE-END====="
+          done
+
+      - name: Keep the app's pictures of the expanded catalogue
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: expanded-catalogue-in-the-app
+          path: |
+            build/ui/
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Release preflight on the expanded catalogue (the library code with FM1 Editor's listings and promotions)
+        run: |
+          set -o pipefail
+          rm -rf build/preflight-expanded && mkdir -p build/preflight-expanded
+          FM1_PREFLIGHT="$PWD/build/preflight-expanded" FM1_PREFLIGHT_BASE="$PWD/build/ui-cat-night2" swift test --filter PreflightTests 2>&1 | tee build/preflight-expanded/test.log | tail -6
+
       - name: Release preflight (the live catalogue, no emu-preview.json; a failure stops the release)
         if: startsWith(github.ref, 'refs/tags/v') || inputs.release || inputs.preflight
         run: |
@@ -183,7 +263,7 @@ jobs:
           test ! -e "$APP/Contents/Resources/emu-preview.json" || { echo "emu-preview.json is inside the app"; exit 1; }
           rm -rf build/preflight && mkdir -p build/preflight
           # the app's library code, as the release runs it: live catalog-v2.json, original packages downloaded, SHA-256 checked
-          FM1_PREFLIGHT="$PWD/build/preflight" swift test --filter PreflightTests 2>&1 | tail -15
+          FM1_PREFLIGHT="$PWD/build/preflight" swift test --filter PreflightTests 2>&1 | tee build/preflight/test.log | tail -15
           cat build/preflight/preflight.json
           # the packaged release app plays five of the packages the library downloaded (keys, MIDI, PLAY, a save)
           python3 - "$APP/Contents/MacOS/FM1Pocket" <<'PY'
@@ -199,12 +279,30 @@ jobs:
               rows.append(f"| {f['name']} | {r.get('ok')} | {r.get('keysRms', 0):.3f} | {r.get('playRms', 0):.3f} | {r.get('saveRoundTrip')} |")
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as s:
               s.write("## Release preflight (no emu-preview.json, live catalogue)\n\n")
-              s.write(f"Feed {p['feed']}: {p['packages']} original packages, {p['preferEmulator']} preferring the emulator, "
-                      f"{p['packagesDownloaded']} downloaded and checked ({p['failedDownloads']} failed downloads).\n\n")
               s.write("| Played in the release app | OK | Keys | PLAY | Save |\n| --- | --- | --- | --- | --- |\n" + "\n".join(rows) + "\n")
           print("\n".join(rows))
           sys.exit(0 if ok else 1)
           PY
+
+      - name: Report preflight failures and intentionally skipped alternatives
+        if: always()
+        run: |
+          set -o pipefail
+          for report in build/preflight-expanded/preflight.json build/preflight/preflight.json; do
+            [ -f "$report" ] || continue
+            python3 scripts/preflight-summary.py "$report" | tee -a "$GITHUB_STEP_SUMMARY"
+          done
+
+      - name: Keep preflight diagnostics (also when a check fails)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: preflight-diagnostics
+          path: |
+            build/preflight*/preflight.json
+            build/preflight*/test.log
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Make the zip
         env:

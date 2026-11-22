@@ -56,6 +56,10 @@ struct LibraryItem: Identifiable, Hashable {
     var makers: [CatalogueV2.Maker] = []
     /// The Firmware Hub's page for it
     var hubURL: String?
+    /// FM1 Editor's card for it, when the Editor lists it
+    var editorURL: String?
+    /// another source's description (FM1 Editor's): shown only when `about` is empty, and always with its credit
+    var attributed: CatalogueV2.AttributedDescription?
 
     // MARK: engines
     /// the engine this item plays on: "rfm1" (its .rfm1 build) or "fm1-emu" (the maker's original package)
@@ -167,6 +171,8 @@ struct LibraryItem: Identifiable, Hashable {
         mayStutter = s.mac?.mayStutter ?? false
         makers = s.makers
         hubURL = s.hubURL
+        editorURL = s.editorURL
+        attributed = s.attributedDescription
         if e.isPackage {
             id = "cat:" + e.baseID
             engine = "fm1-emu"
@@ -196,6 +202,8 @@ struct LibraryItem: Identifiable, Hashable {
         mayStutter = e.mac.mayStutter
         makers = e.makers
         hubURL = e.hubURL
+        editorURL = e.editorURL
+        attributed = e.attributedDescription
     }
 
     /// a firmware Pocket no longer lists, from what the library kept about it
@@ -223,7 +231,13 @@ struct LibraryItem: Identifiable, Hashable {
     }
 
     var byline: String { [version, authors].filter { !$0.isEmpty }.joined(separator: " · ") }
-    var searchFields: [String] { [name, version, authors, about, tag, category] }
+    var searchFields: [String] { [name, version, authors, about, attributed?.text ?? "", tag, category] }
+    /// the firmware this item is, whatever list it is in: a catalogue firmware is the same one whether it is listed only
+    /// ("more:") or playable ("cat:"), so a favourite or a selection follows it when it becomes playable
+    static func firmwareKey(_ id: String) -> String {
+        if id.hasPrefix("more:") { return "cat:" + id.dropFirst(5) }
+        return id
+    }
 
     var downloadText: String {
         if isListedOnly { return "Not available in this app" }
@@ -313,6 +327,8 @@ final class LibraryModel: ObservableObject {
     @Published private(set) var moreItems: [LibraryItem] = []
     /// The Firmware Hub's credit, when the catalogue used its list
     @Published private(set) var attribution: CatalogueV2.Attribution?
+    /// FM1 Editor's credit and licence, for the About window
+    @Published private(set) var editorSource: CatalogueV2.Source?
     @Published private(set) var isRefreshing = false
     /// the last Check for Firmware Updates (the update window and the sidebar footer)
     @Published private(set) var updateCheck: UpdateCheck = .idle
@@ -329,7 +345,10 @@ final class LibraryModel: ObservableObject {
     @Published private(set) var recent: [String: Date] = [:]
 
     /// the firmware store: catalogue, downloads, cache, cleanup (PocketKit/FirmwareLibrary.swift)
-    let library = FirmwareLibrary(emuPreview: Bundle.main.url(forResource: "emu-preview", withExtension: "json").flatMap { try? Data(contentsOf: $0) })
+    // (--ui-snapshot, for CI only: a given catalogue folder and a throwaway library; see UISnapshot)
+    let library = UISnapshotConfig.enabled
+        ? FirmwareLibrary(paths: UISnapshotConfig.paths ?? LibraryPaths(), base: UISnapshotConfig.base ?? CatalogueService.defaultBase)
+        : FirmwareLibrary(emuPreview: Bundle.main.url(forResource: "emu-preview", withExtension: "json").flatMap { try? Data(contentsOf: $0) })
     private let defaults = UserDefaults.standard
     private lazy var favouritesStore = FavouritesStore(paths: library.paths)
     private lazy var engineStore = EngineChoiceStore(paths: library.paths)
@@ -341,6 +360,7 @@ final class LibraryModel: ObservableObject {
     private var builtinShot: URL?
 
     init() {
+        if UISnapshotConfig.enabled { UISnapshot.model = self }
         section = SidebarItem(key: defaults.string(forKey: "library.section") ?? "all")
         viewMode = ViewMode(rawValue: defaults.string(forKey: "library.viewMode") ?? "") ?? .icons
         // "added" (the old Date Added, a catalogue date) and no choice yet both become Latest Release
@@ -355,7 +375,7 @@ final class LibraryModel: ObservableObject {
         var list: [LibraryItem]
         switch section {
         case .all: list = items
-        case .favourites: list = (items + withdrawnItems).filter { favourites.contains($0.id) }
+        case .favourites: list = (items + withdrawnItems + moreItems).filter(isFavourite)
         case .recent: list = (items + withdrawnItems).filter { recent[$0.id] != nil }
         case .new: list = items.filter(\.isNew)
         case .withdrawn: list = withdrawnItems
@@ -405,7 +425,7 @@ final class LibraryModel: ObservableObject {
     func count(_ s: SidebarItem) -> Int {
         switch s {
         case .all: return items.count
-        case .favourites: return (items + withdrawnItems).filter { favourites.contains($0.id) }.count
+        case .favourites: return (items + withdrawnItems + moreItems).filter(isFavourite).count
         case .recent: return (items + withdrawnItems).filter { recent[$0.id] != nil }.count
         case .new: return items.filter(\.isNew).count
         case .withdrawn: return withdrawnItems.count
@@ -422,10 +442,15 @@ final class LibraryModel: ObservableObject {
 
     // MARK: favourites and recents (user-owned, in UserData/)
 
-    func isFavourite(_ item: LibraryItem) -> Bool { favourites.contains(item.id) }
+    func isFavourite(_ item: LibraryItem) -> Bool { Self.isFavourite(item.id, in: favourites) }
+    static func isFavourite(_ id: String, in favourites: Set<String>) -> Bool {
+        let k = LibraryItem.firmwareKey(id)
+        return favourites.contains { LibraryItem.firmwareKey($0) == k }
+    }
 
     func toggleFavourite(_ item: LibraryItem) {
-        if favourites.contains(item.id) { favourites.remove(item.id) } else { favourites.insert(item.id) }
+        let k = LibraryItem.firmwareKey(item.id)
+        if isFavourite(item) { favourites = favourites.filter { LibraryItem.firmwareKey($0) != k } } else { favourites.insert(item.id) }
         try? favouritesStore.save(favourites)
     }
 
@@ -450,7 +475,12 @@ final class LibraryModel: ObservableObject {
         Task { _ = try? await lib.ensureInstalled(e, priority: .interactive) }
     }
 
-    func item(_ id: LibraryItem.ID?) -> LibraryItem? { (items + withdrawnItems + moreItems).first { $0.id == id } }
+    func item(_ id: LibraryItem.ID?) -> LibraryItem? {
+        let all = items + withdrawnItems + moreItems
+        guard let id else { return nil }
+        // a remembered selection follows a listed firmware that has since become playable
+        return all.first { $0.id == id } ?? all.first { LibraryItem.firmwareKey($0.id) == LibraryItem.firmwareKey(id) }
+    }
 
     /// Shows the cached library at once, then synchronises in the background.
     func start() {
@@ -529,6 +559,7 @@ final class LibraryModel: ObservableObject {
         withdrawnItems = merged.withdrawn
         moreItems = snap.more.map { LibraryItem(listed: $0) }
         attribution = snap.attribution
+        editorSource = snap.editorSource
         if section == .withdrawn && withdrawnItems.isEmpty { section = .all }
         if section == .more && moreItems.isEmpty { section = .all }
         if section == .experimental && !list.contains(where: \.isExperimental) { section = .all }

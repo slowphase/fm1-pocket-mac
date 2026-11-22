@@ -413,6 +413,82 @@ final class LibrarySyncTests: XCTestCase {
         XCTAssertEqual(n, 1, "one download, however many asked for it")
     }
 
+    /// ARGO and Felucca 8 Patterns list the same original package under different library ids.
+    /// Both need their own install record and file, including on an offline relaunch.
+    func testIdenticalPackagesUnderDifferentIDsAreBothInstalled() async throws {
+        let site = FakePocket(), paths = freshRoot()
+        let data = Data("shared original package".utf8)
+        let maker = "/maker/releases/download/v1/shared.fwsc"
+        let ids = ["argo", "felucca8"]
+        let entries: [[String: Any]] = ids.map { id in
+            ["id": id, "name": id, "status": ["mac": ["state": "source-only"]],
+             "emu": ["package": ["url": "https://github.com" + maker, "sha256": sha256Hex(data), "size": data.count],
+                     "mac": ["state": "playable"], "preferred": ["mac": ["engine": "fm1-emu"]]]]
+        }
+        await site.set("/data/catalog-v2.json", try JSONSerialization.data(withJSONObject:
+            ["schema": 2, "snapshot": "test", "updated": "test", "firmwares": entries]))
+        await site.set(maker, data)
+        await site.hold(maker)
+        let lib = library(paths, site)
+        let sync = Task { await lib.sync() }
+        let bothStarted = await eventually { await site.count(maker) == 2 }
+        await site.release(maker)      // also releases the held request when this regression fails
+        let report = await sync.value
+        XCTAssertTrue(bothStarted, "different ids must not reuse a task that installs only one id")
+        XCTAssertEqual(report.failed, [:])
+        XCTAssertEqual(Set(report.installed), Set(ids.map { $0 + ".fwsc" }))
+        let snap = await lib.snapshot()
+        XCTAssertEqual(snap.entries.map(\.availability), [.installed, .installed])
+        for id in ids {
+            let key = id + ".fwsc"
+            XCTAssertEqual(try Data(contentsOf: paths.firmwareFile(id: key, sha256: sha256Hex(data))), data)
+            let play = try await lib.firmwareForPlayback(id: key)
+            XCTAssertEqual(play.build.id, key, "playback and saved state belong to this firmware")
+        }
+        await site.clearLog()
+        let again = await lib.sync()
+        XCTAssertTrue(again.installed.isEmpty)
+        let requests = await site.requests
+        XCTAssertFalse(requests.contains(maker), "neither installed entry is downloaded again")
+        await site.setOffline(true)
+        let offline = library(paths, site)
+        let cached = await offline.snapshot()
+        XCTAssertEqual(cached.entries.map(\.availability), [.installed, .installed])
+        for id in ids {
+            let play = try await offline.firmwareForPlayback(id: id + ".fwsc")
+            XCTAssertEqual(play.build.id, id + ".fwsc")
+            XCTAssertEqual(play.data, data)
+        }
+    }
+
+    func testIdenticalHashesDoNotHideAnotherFirmwaresDownloadFailure() async throws {
+        let site = FakePocket(), paths = freshRoot()
+        let a = FW("alpha", "1.0", image: nil)
+        var b = FW("beta", "1.0", image: nil)
+        b.data = a.data
+        await publish([a, b], on: site)
+        await site.hold("/data/" + a.file)
+        await site.hold("/data/" + b.file)
+        await site.fail("/data/" + b.file)
+        let lib = library(paths, site)
+        let sync = Task { await lib.sync() }
+        let bothStarted = await eventually {
+            let first = await site.waiting("/data/" + a.file)
+            let second = await site.waiting("/data/" + b.file)
+            return first && second
+        }
+        await site.releaseAll()
+        let report = await sync.value
+        XCTAssertTrue(bothStarted)
+        XCTAssertEqual(report.installed, ["alpha"])
+        XCTAssertEqual(Set(report.failed.keys), ["beta"])
+        let snap = await lib.snapshot()
+        XCTAssertEqual(snap.entries.map(\.availability), [.installed, .notDownloaded])
+        XCTAssertNil(snap.entries[0].lastError)
+        XCTAssertNotNil(snap.entries[1].lastError)
+        XCTAssertTrue(snap.entries.allSatisfy { !$0.downloading })
+    }
+
     // 18
     func testPlaybackJumpsTheQueue() async throws {
         let site = FakePocket(), paths = freshRoot()
@@ -421,29 +497,39 @@ final class LibrarySyncTests: XCTestCase {
         for f in fws { await site.hold("/data/" + f.file) }
         let lib = library(paths, site)
         let syncTask = Task { await lib.sync() }
-        let twoRunning = await eventually {
-            let w0 = await site.waiting("/data/" + fws[0].file)
-            let w1 = await site.waiting("/data/" + fws[1].file)
-            return w0 && w1
-        }
+        let twoRunning = await eventually { await site.inFlight == 2 }
         XCTAssertTrue(twoRunning, "two background downloads start")
         let threeQueued = await eventually { await lib.scheduler.queued.count == 3 }
         XCTAssertTrue(threeQueued, "the other three wait")
         let inFlight = await site.inFlight
         XCTAssertEqual(inFlight, 2)
-        let playTask = Task { try await lib.firmwareForPlayback(id: "fw5") }
-        let promoted = await eventually { await site.waiting("/data/" + fws[4].file) }
+        // Task-group jobs may reach the scheduler in any order. Choose a firmware actually queued, rather
+        // than assuming fw1/fw2 started first and fw5 is still waiting.
+        let requests = await site.requests
+        let queued = fws.filter { !requests.contains("/data/" + $0.file) }
+        XCTAssertEqual(queued.count, 3)
+        guard let chosen = queued.first else {
+            await site.releaseAll()
+            _ = await syncTask.value
+            XCTFail("no queued firmware to promote")
+            return
+        }
+        let playTask = Task { try await lib.firmwareForPlayback(id: chosen.id) }
+        let promoted = await eventually { await site.waiting("/data/" + chosen.file) }
         XCTAssertTrue(promoted, "the firmware chosen for playback starts at once")
-        let n3 = await site.count("/data/" + fws[2].file)
-        XCTAssertEqual(n3, 0, "ahead of the queued background downloads")
-        await site.release("/data/" + fws[4].file)
+        for other in queued.dropFirst() {
+            let count = await site.count("/data/" + other.file)
+            XCTAssertEqual(count, 0, "ahead of the queued background downloads")
+        }
+        if !promoted { await site.releaseAll() }
+        await site.release("/data/" + chosen.file)
         let play = try await playTask.value
-        XCTAssertEqual(play.data, fws[4].data)
+        XCTAssertEqual(play.data, chosen.data)
         await site.releaseAll()
         let r = await syncTask.value
         XCTAssertEqual(Set(r.failed.keys), [])
-        let n5 = await site.count("/data/" + fws[4].file)
-        XCTAssertEqual(n5, 1)
+        let count = await site.count("/data/" + chosen.file)
+        XCTAssertEqual(count, 1)
     }
 
     func testUnsafeCatalogueEntriesAreRefused() async throws {
@@ -537,6 +623,42 @@ final class LibrarySyncTests: XCTestCase {
             XCTAssertNil(snap.attribution)
             XCTAssertFalse(exists(paths.catalogueV2), "an unusable v2 is never kept")
         }
+    }
+
+    /// A firmware Pocket keeps under a permanent id (first listed from FM1 Editor, later built by RemoteFM1FW):
+    /// catalog.json uses the build's own id. After a night on catalog.json alone, the library still knows it by its
+    /// Pocket id: the same downloaded build, no second download, nothing "No Longer Listed", also offline.
+    func testPromotedBuildKeepsItsPocketIDOnCatalogJSONAlone() async throws {
+        let site = FakePocket(), paths = freshRoot()
+        let a = FW("alpha", "1.0"), g = FW("glitchdrums", "0.4.0")
+        await publish([a, g], on: site)
+        var v2 = try JSONSerialization.jsonObject(with: catalogueV2JSON([(a, "playable"), (g, "playable")])) as! [String: Any]
+        var list = v2["firmwares"] as! [[String: Any]]
+        list[1]["id"] = "glitch-ttreu"
+        list[1]["aliases"] = ["glitchdrums"]
+        v2["firmwares"] = list
+        await site.set("/data/catalog-v2.json", try JSONSerialization.data(withJSONObject: v2))
+        let r1 = await library(paths, site).sync()
+        XCTAssertEqual(r1.feed, "v2")
+        XCTAssertEqual(Set(r1.installed), ["alpha", "glitch-ttreu"])
+
+        await site.set("/data/catalog-v2.json", nil)
+        await site.clearLog()
+        let lib = library(paths, site)
+        let r2 = await lib.sync()
+        XCTAssertNil(r2.catalogueError)
+        XCTAssertEqual(r2.feed, "v1")
+        XCTAssertTrue(r2.installed.isEmpty, "nothing is downloaded again")
+        let snap = await lib.snapshot()
+        XCTAssertEqual(snap.entries.map(\.entry.id), ["alpha", "glitch-ttreu"])
+        XCTAssertEqual(snap.entries.map(\.availability), [.installed, .installed])
+        XCTAssertTrue(snap.withdrawn.isEmpty, "nothing reads No Longer Listed")
+        let reqs = await site.requests
+        XCTAssertFalse(reqs.contains("/data/" + g.file))
+
+        await site.setOffline(true)
+        let again = await library(paths, site).snapshot()
+        XCTAssertEqual(again.entries.map(\.entry.id), ["alpha", "glitch-ttreu"], "the cached catalog.json too")
     }
 
     func testV2WithdrawnFromSiteRetiresTheCachedCopy() async throws {

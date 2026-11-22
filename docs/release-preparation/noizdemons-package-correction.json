@@ -1,0 +1,25 @@
+{
+  "hub": "noizdemons",
+  "name": "NOIZ DEMONS",
+  "version": "666",
+  "author": "SPIKE the Percussionist",
+  "repo": "SPIKE-the-Percussionist/noiz_demons",
+  "license": "GPL-3.0",
+  "chip": "old",
+  "product": "FM-1_900",
+  "hubPackage": "noizdemons-666.fwsc",
+  "hubSha256": "b1c14859d45bd8ea1d5ea6ca630083e2a647178f1a45b33865e92da7a01e9b8a",
+  "hubSize": 610086,
+  "release": "https://github.com/SPIKE-the-Percussionist/noiz_demons/releases/tag/v666",
+  "source": "https://github.com/SPIKE-the-Percussionist/noiz_demons/tree/v666",
+  "assets": [
+    "noiz_demons.fwsc"
+  ],
+  "status": "maker's packages differ from the Hub's SHA-256",
+  "url": "https://github.com/SPIKE-the-Percussionist/noiz_demons/releases/download/v666/noiz_demons.fwsc",
+  "asset": "noiz_demons.fwsc",
+  "sha256": "b1c14859d45bd8ea1d5ea6ca630083e2a647178f1a45b33865e92da7a01e9b8a",
+  "mismatched": [
+    "noiz_demons.fwsc"
+  ]
+}

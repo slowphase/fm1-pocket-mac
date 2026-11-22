@@ -22,7 +22,7 @@ public actor FirmwareLibrary {
     public private(set) var discovery: CatalogueV2?
     public nonisolated let registryLoad: RegistryLoad
 
-    private var inflight: [String: Task<InstalledBuild, Error>] = [:]     // by firmware sha256
+    private var inflight: [String: Task<InstalledBuild, Error>] = [:]     // by firmware id and sha256
     private var shotInflight: [String: Task<Bool, Never>] = [:]           // by screenshot name
     private var downloadingIDs: Set<String> = []
     private var active: [String: Int] = [:]                               // sha256 -> number of players
@@ -43,7 +43,8 @@ public actor FirmwareLibrary {
         self.emuPreview = emuPreview
         let v2 = Self.readCachedV2(paths)?.withPreview(emuPreview)
         let v2cat = v2.flatMap { try? $0.macCatalogue() }
-        let cat = v2cat ?? Self.readCachedCatalogue(paths)
+        if let v2, v2cat != nil { Self.rememberAliases(v2, paths: paths) }
+        let cat = v2cat ?? Self.readCachedCatalogue(paths).map { Self.withPocketIDs($0, paths: paths) }
         self.catalogue = cat
         self.discovery = v2cat == nil ? nil : v2
         var (reg, how) = RegistryStore(paths: paths).load(catalogue: cat)
@@ -67,6 +68,33 @@ public actor FirmwareLibrary {
             r.firmwares[e.id]?.entry = e
         }
         return r
+    }
+
+    // MARK: permanent ids on catalog.json
+
+    /// catalog.json's id -> the permanent Pocket id catalog-v2.json keeps for the same firmware. A firmware Pocket first
+    /// listed from FM1 Editor keeps its id when RemoteFM1FW later builds it; catalog.json (frozen for older apps) uses
+    /// the build's own id. Remembered from the last v2, so a sync that falls back to catalog.json keeps the same
+    /// library ids, downloads, favourites and saves.
+    static func aliasesFile(_ paths: LibraryPaths) -> URL { paths.managed.appendingPathComponent("id-aliases.json") }
+
+    static func rememberAliases(_ v2: CatalogueV2, paths: LibraryPaths) {
+        let own = Set(v2.firmwares.map(\.id))
+        var map = (try? JSONDecoder().decode([String: String].self, from: Data(contentsOf: aliasesFile(paths)))) ?? [:]
+        for e in v2.firmwares where e.download != nil { for a in e.aliases where !own.contains(a) { map[a] = e.id } }
+        for k in map.keys where own.contains(k) { map[k] = nil }      // an id the catalogue now uses on its own
+        try? FileManager.default.createDirectory(at: paths.managed, withIntermediateDirectories: true)
+        if let d = try? JSONEncoder().encode(map) { try? d.write(to: aliasesFile(paths), options: .atomic) }
+    }
+
+    static func withPocketIDs(_ c: Catalogue, paths: LibraryPaths) -> Catalogue {
+        guard let map = try? JSONDecoder().decode([String: String].self, from: Data(contentsOf: aliasesFile(paths))), !map.isEmpty else { return c }
+        var c = c
+        let own = Set(c.firmwares.map(\.id))
+        for i in c.firmwares.indices {
+            if let id = map[c.firmwares[i].id], !own.contains(id), SafeName.isID(id) { c.firmwares[i].id = id }
+        }
+        return c
     }
 
     private static func readCachedV2(_ paths: LibraryPaths) -> CatalogueV2? {
@@ -116,6 +144,9 @@ public actor FirmwareLibrary {
         /// the firmware's latest release and the day it first appeared in the library (discovery)
         public var release: CatalogueV2.Release?
         public var listed: String?
+        /// another source's description (FM1 Editor's), only ever shown with its credit, and the Editor's card
+        public var attributedDescription: CatalogueV2.AttributedDescription? = nil
+        public var editorURL: String? = nil
     }
 
     public struct Snapshot: Equatable, Sendable {
@@ -132,6 +163,8 @@ public actor FirmwareLibrary {
         public var attribution: CatalogueV2.Attribution?
         /// "v2" or "v1": which feed the library came from
         public var feed: String = "v1"
+        /// FM1 Editor's credit and licence, when the catalogue lists firmware from its directory
+        public var editorSource: CatalogueV2.Source? = nil
     }
 
     public func snapshot() -> Snapshot {
@@ -149,12 +182,14 @@ public actor FirmwareLibrary {
                              preferredEngine: d?.preferredMacEngine, preferredReason: d?.preferredMacReason,
                              confidence: d?.confidence[e.isPackage ? "fm1-emu" : "rfm1"],
                              listened: (d?.listened ?? []).filter { ($0.player ?? "mac") == "mac" && $0.engine == (e.isPackage ? "fm1-emu" : "rfm1") },
-                             release: d?.release, listed: d?.listed))
+                             release: d?.release, listed: d?.listed,
+                             attributedDescription: d?.attributedDescription, editorURL: d?.editorURL))
         }
         let withdrawn = registry.firmwares.values.filter { $0.status == .withdrawn }.sorted { $0.id < $1.id }
         return Snapshot(entries: out, withdrawn: withdrawn, imports: registry.imports, catalogueUpdated: catalogue?.updated,
                         catalogueSince: catalogue?.since, registryLoad: registryLoad, more: discovery?.notDownloadable ?? [],
-                        attribution: discovery?.attribution, feed: discovery == nil ? "v1" : "v2")
+                        attribution: discovery?.attribution, feed: discovery == nil ? "v1" : "v2",
+                        editorSource: discovery?.editorSource)
     }
 
     public func localScreenshot(for e: CatalogueEntry) -> URL? {
@@ -192,11 +227,12 @@ public actor FirmwareLibrary {
            let v2 = (try? CatalogueV2.decode(got.0))?.withPreview(emuPreview), let cat = try? v2.macCatalogue() {
             try fm.createDirectory(at: paths.managed, withIntermediateDirectories: true)
             try got.0.write(to: paths.catalogueV2, options: .atomic)
+            Self.rememberAliases(v2, paths: paths)
             return (cat, v2)
         }
         let (data, code) = try await fetcher.fetch(url(for: "catalog.json"))
         guard code == 200 else { throw PocketError.http(code, "the catalogue") }
-        let cat = try Catalogue.decode(data).validated()
+        let cat = Self.withPocketIDs(try Catalogue.decode(data).validated(), paths: paths)
         try fm.createDirectory(at: paths.managed, withIntermediateDirectories: true)
         try data.write(to: paths.catalogue, options: .atomic)
         if fm.fileExists(atPath: paths.catalogueV2.path) { try? fm.removeItem(at: paths.catalogueV2) }
@@ -291,8 +327,8 @@ public actor FirmwareLibrary {
     }
 
     /// Makes sure this catalogue build is on disk: already there, adopted from a verified file a crash left behind,
-    /// or downloaded. Concurrent requests for the same build share one download; an interactive request promotes
-    /// a queued background one.
+    /// or downloaded. Concurrent requests for the same firmware id and build share one download; different ids
+    /// need their own file and registry record even when their bytes match. An interactive request promotes a queued one.
     @discardableResult
     public func ensureInstalled(_ e: CatalogueEntry, priority: DownloadScheduler.Priority = .interactive) async throws -> InstalledBuild {
         guard SafeName.isID(e.id), SafeName.isSHA256(e.sha256), SafeName.isRelativePath(e.file) else {
@@ -308,22 +344,23 @@ public actor FirmwareLibrary {
         if let data = try? Data(contentsOf: dest), sha256Hex(data) == e.sha256 {    // left by an interrupted sync
             return try commit(e, size: data.count)
         }
-        if let t = inflight[e.sha256] {
-            if priority == .interactive { await scheduler.promote(tag: e.sha256) }
+        let key = "\(e.id)-\(e.sha256)"
+        if let t = inflight[key] {
+            if priority == .interactive { await scheduler.promote(tag: key) }
             return try await t.value
         }
-        let task = Task { try await self.download(e, priority: priority) }
-        inflight[e.sha256] = task
+        let task = Task { try await self.download(e, key: key, priority: priority) }
+        inflight[key] = task
         downloadingIDs.insert(e.id)
         changed()
         do {
             let b = try await task.value
-            inflight[e.sha256] = nil
+            inflight[key] = nil
             downloadingIDs.remove(e.id)
             changed()
             return b
         } catch {
-            inflight[e.sha256] = nil
+            inflight[key] = nil
             downloadingIDs.remove(e.id)
             if var rec = registry.firmwares[e.id] { rec.lastError = error.localizedDescription; registry.firmwares[e.id] = rec }
             try? store.save(registry)
@@ -332,7 +369,7 @@ public actor FirmwareLibrary {
         }
     }
 
-    private func download(_ e: CatalogueEntry, priority: DownloadScheduler.Priority) async throws -> InstalledBuild {
+    private func download(_ e: CatalogueEntry, key: String, priority: DownloadScheduler.Priority) async throws -> InstalledBuild {
         // an original package comes from its maker's release, never from Pocket or the Hub; the hash decides
         let source: URL
         if e.isPackage {
@@ -341,7 +378,7 @@ public actor FirmwareLibrary {
         } else {
             source = try url(for: e.file)
         }
-        let granted = await scheduler.acquire(tag: e.sha256, priority: priority)
+        let granted = await scheduler.acquire(tag: key, priority: priority)
         let result: Result<(Data, Int), Error>
         do { result = .success(try await fetcher.fetch(source)) } catch { result = .failure(error) }
         await scheduler.release(granted)                        // the slot is for the network transfer only
@@ -349,7 +386,7 @@ public actor FirmwareLibrary {
         guard code == 200 else { throw PocketError.http(code, e.name) }
         let fm = FileManager.default
         try fm.createDirectory(at: paths.tmp, withIntermediateDirectories: true)
-        let tmp = paths.tmp.appendingPathComponent("\(e.sha256).download")
+        let tmp = paths.tmp.appendingPathComponent("\(key).download")
         try data.write(to: tmp)
         guard sha256Hex(data) == e.sha256 else {
             try? fm.removeItem(at: tmp)

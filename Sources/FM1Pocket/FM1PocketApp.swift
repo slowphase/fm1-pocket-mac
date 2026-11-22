@@ -30,6 +30,7 @@ struct FM1PocketApp: App {
                 .environmentObject(player)
                 .frame(minWidth: 900, minHeight: 560)
                 .onAppear { library.start() }
+                .task { if UISnapshotConfig.enabled { await UISnapshot.run(library) } }
                 .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
                     player.stop()
                 }
@@ -38,7 +39,7 @@ struct FM1PocketApp: App {
         .commands {
             CommandGroup(replacing: .newItem) {}
             CommandGroup(replacing: .appInfo) {
-                Button("About FM-1 Pocket") { AboutPanel.show(attribution: library.attribution) }
+                Button("About FM-1 Pocket") { AboutPanel.show(attribution: library.attribution, editor: library.editorSource) }
             }
             CommandGroup(after: .appInfo) {
                 CheckForUpdatesButton(library: library)
@@ -279,6 +280,10 @@ struct ShowWindowCommands: Commands {
 
 /// Keeps the app running when its windows are closed, and brings the library back when the Dock icon is clicked.
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        MainActor.assumeIsolated { UISnapshot.startFromDelegate() }
+    }
+
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
