@@ -51,7 +51,7 @@ enum UISnapshot {
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 4_000_000_000)
             // launched outside a desktop session, SwiftUI may not open the library window: open it as Window › Show Library does
-            if !NSApp.windows.contains(where: { $0.title == "FM-1 Pocket" }) {
+            if libraryWindow == nil {
                 NSApp.setActivationPolicy(.regular)
                 NSApp.activate(ignoringOtherApps: true)
                 let opened = AppDelegate.perform(menuItem: "Show Library", in: NSApp.mainMenu)
@@ -112,7 +112,7 @@ enum UISnapshot {
                 }
                 r["section"] = parts[0]
                 r["count"] = library.visible.count
-                let w = NSApp.windows.first { $0.isVisible && $0.title == "FM-1 Pocket" }
+                let w = libraryWindow
                 r["saved"] = w.map { save($0, out.appendingPathComponent(name + ".png")) } ?? false
             }
             log.append(r)
@@ -124,6 +124,12 @@ enum UISnapshot {
         note("done")
         if UISnapshotConfig.keep == nil, let r = UISnapshotConfig.root { try? FileManager.default.removeItem(at: r) }
         NSApp.terminate(nil)
+    }
+
+    /// the library window (its title follows the section shown, so it is found by its scene id, else as the largest)
+    static var libraryWindow: NSWindow? {
+        NSApp.windows.first { $0.isVisible && ($0.identifier?.rawValue.hasPrefix("library") ?? false) }
+            ?? NSApp.windows.filter { $0.isVisible && !($0 is NSPanel) }.max { $0.frame.width * $0.frame.height < $1.frame.width * $1.frame.height }
     }
 
     /// the window as drawn by the app itself (its own pixels: no screen-recording permission involved)
