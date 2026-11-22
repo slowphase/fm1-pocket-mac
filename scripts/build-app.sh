@@ -3,7 +3,7 @@
 #   VERSION=0.9.0 BUILD_NUMBER=1 scripts/build-app.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
-VERSION="${VERSION:-0.9.0}"
+VERSION="${VERSION:-0.9.1}"
 BUILD_NUMBER="${BUILD_NUMBER:-1}"
 APP="build/FM-1 Pocket.app"
 

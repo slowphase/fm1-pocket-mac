@@ -12,9 +12,7 @@ final class PreflightTests: XCTestCase {
         }
         let root = URL(fileURLWithPath: dir, isDirectory: true)
         let paths = LibraryPaths(root: root.appendingPathComponent("library", isDirectory: true))
-        // FM1_PREFLIGHT_BASE: another catalogue folder or site (the expanded catalogue in CI); the live site otherwise
-        let base = ProcessInfo.processInfo.environment["FM1_PREFLIGHT_BASE"].map { $0.hasPrefix("http") ? URL(string: $0)! : URL(fileURLWithPath: $0, isDirectory: true) }
-        let lib = FirmwareLibrary(paths: paths, base: base ?? CatalogueService.defaultBase, emuPreview: nil)
+        let lib = FirmwareLibrary(paths: paths, emuPreview: nil)
         let r = await lib.sync()
         XCTAssertNil(r.catalogueError, "the live catalogue could not be read")
         let snap = await lib.snapshot()
@@ -36,7 +34,7 @@ final class PreflightTests: XCTestCase {
         func detail(_ item: FirmwareLibrary.Entry) -> [String: String] {
             let e = item.entry
             return ["id": e.id, "name": e.name, "kind": e.isPackage ? "package" : "rfm1",
-                    "url": e.remoteURL ?? (base ?? CatalogueService.defaultBase).appendingPathComponent(e.file).absoluteString,
+                    "url": e.remoteURL ?? CatalogueService.defaultBase.appendingPathComponent(e.file).absoluteString,
                     "preferredEngine": item.preferredEngine ?? "?"]
         }
         let failures = r.failed.keys.sorted().map { id -> [String: String] in

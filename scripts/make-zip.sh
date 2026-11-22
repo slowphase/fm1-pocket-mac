@@ -5,7 +5,7 @@
 # ditto keeps the app's signature, permissions and extended attributes intact (a plain zip can break them).
 set -euo pipefail
 cd "$(dirname "$0")/.."
-VERSION="${VERSION:-0.9.0}"
+VERSION="${VERSION:-0.9.1}"
 APP="build/FM-1 Pocket.app"
 ZIP="build/FM1-Pocket-$VERSION.zip"
 rm -f "$ZIP"
