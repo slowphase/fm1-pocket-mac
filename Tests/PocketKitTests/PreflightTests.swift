@@ -66,6 +66,7 @@ final class PreflightTests: XCTestCase {
         XCTAssertGreaterThan(packages.count, 100, "original packages in the live catalogue")
         XCTAssertGreaterThan(preferEmu.count, 100, "the emulator preferred for most of them")
         XCTAssertGreaterThan(installed.count, 100, "original packages downloaded and checked")
+        XCTAssertTrue(pending.isEmpty, "every missing installation must be a reported download failure or an intentional alternative: \(pending.map { $0.entry.id })")
         XCTAssertEqual(pick.count, 5)
     }
 }
