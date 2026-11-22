@@ -497,29 +497,39 @@ final class LibrarySyncTests: XCTestCase {
         for f in fws { await site.hold("/data/" + f.file) }
         let lib = library(paths, site)
         let syncTask = Task { await lib.sync() }
-        let twoRunning = await eventually {
-            let w0 = await site.waiting("/data/" + fws[0].file)
-            let w1 = await site.waiting("/data/" + fws[1].file)
-            return w0 && w1
-        }
+        let twoRunning = await eventually { await site.inFlight == 2 }
         XCTAssertTrue(twoRunning, "two background downloads start")
         let threeQueued = await eventually { await lib.scheduler.queued.count == 3 }
         XCTAssertTrue(threeQueued, "the other three wait")
         let inFlight = await site.inFlight
         XCTAssertEqual(inFlight, 2)
-        let playTask = Task { try await lib.firmwareForPlayback(id: "fw5") }
-        let promoted = await eventually { await site.waiting("/data/" + fws[4].file) }
+        // Task-group jobs may reach the scheduler in any order. Choose a firmware actually queued, rather
+        // than assuming fw1/fw2 started first and fw5 is still waiting.
+        let requests = await site.requests
+        let queued = fws.filter { !requests.contains("/data/" + $0.file) }
+        XCTAssertEqual(queued.count, 3)
+        guard let chosen = queued.first else {
+            await site.releaseAll()
+            _ = await syncTask.value
+            XCTFail("no queued firmware to promote")
+            return
+        }
+        let playTask = Task { try await lib.firmwareForPlayback(id: chosen.id) }
+        let promoted = await eventually { await site.waiting("/data/" + chosen.file) }
         XCTAssertTrue(promoted, "the firmware chosen for playback starts at once")
-        let n3 = await site.count("/data/" + fws[2].file)
-        XCTAssertEqual(n3, 0, "ahead of the queued background downloads")
-        await site.release("/data/" + fws[4].file)
+        for other in queued.dropFirst() {
+            let count = await site.count("/data/" + other.file)
+            XCTAssertEqual(count, 0, "ahead of the queued background downloads")
+        }
+        if !promoted { await site.releaseAll() }
+        await site.release("/data/" + chosen.file)
         let play = try await playTask.value
-        XCTAssertEqual(play.data, fws[4].data)
+        XCTAssertEqual(play.data, chosen.data)
         await site.releaseAll()
         let r = await syncTask.value
         XCTAssertEqual(Set(r.failed.keys), [])
-        let n5 = await site.count("/data/" + fws[4].file)
-        XCTAssertEqual(n5, 1)
+        let count = await site.count("/data/" + chosen.file)
+        XCTAssertEqual(count, 1)
     }
 
     func testUnsafeCatalogueEntriesAreRefused() async throws {
