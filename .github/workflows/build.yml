@@ -55,7 +55,7 @@ jobs:
         run: |
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then V="${GITHUB_REF#refs/tags/v}"
           elif [ -n "${{ inputs.version }}" ]; then V="${{ inputs.version }}"
-          else V="0.9.0"; fi
+          else V="0.9.1"; fi
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "Version $V, build ${{ github.run_number }}"
 
@@ -183,7 +183,7 @@ jobs:
           test ! -e "$APP/Contents/Resources/emu-preview.json" || { echo "emu-preview.json is inside the app"; exit 1; }
           rm -rf build/preflight && mkdir -p build/preflight
           # the app's library code, as the release runs it: live catalog-v2.json, original packages downloaded, SHA-256 checked
-          FM1_PREFLIGHT="$PWD/build/preflight" swift test --filter PreflightTests 2>&1 | tail -15
+          FM1_PREFLIGHT="$PWD/build/preflight" swift test --filter PreflightTests 2>&1 | tee build/preflight/test.log | tail -15
           cat build/preflight/preflight.json
           # the packaged release app plays five of the packages the library downloaded (keys, MIDI, PLAY, a save)
           python3 - "$APP/Contents/MacOS/FM1Pocket" <<'PY'
@@ -199,12 +199,29 @@ jobs:
               rows.append(f"| {f['name']} | {r.get('ok')} | {r.get('keysRms', 0):.3f} | {r.get('playRms', 0):.3f} | {r.get('saveRoundTrip')} |")
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as s:
               s.write("## Release preflight (no emu-preview.json, live catalogue)\n\n")
-              s.write(f"Feed {p['feed']}: {p['packages']} original packages, {p['preferEmulator']} preferring the emulator, "
-                      f"{p['packagesDownloaded']} downloaded and checked ({p['failedDownloads']} failed downloads).\n\n")
               s.write("| Played in the release app | OK | Keys | PLAY | Save |\n| --- | --- | --- | --- | --- |\n" + "\n".join(rows) + "\n")
           print("\n".join(rows))
           sys.exit(0 if ok else 1)
           PY
+
+      - name: Report preflight failures and intentionally skipped alternatives
+        if: always()
+        run: |
+          set -o pipefail
+          if [ -f build/preflight/preflight.json ]; then
+            python3 scripts/preflight-summary.py build/preflight/preflight.json | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Keep preflight diagnostics (also when a check fails)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: preflight-diagnostics
+          path: |
+            build/preflight/preflight.json
+            build/preflight/test.log
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Make the zip
         env:

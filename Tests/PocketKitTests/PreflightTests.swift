@@ -21,10 +21,40 @@ final class PreflightTests: XCTestCase {
         let preferEmu = packages.filter { $0.preferredEngine == "fm1-emu" }
         let playable = installed.filter { $0.preferredEngine == "fm1-emu" && $0.emu?.mac.state == .playable }
         let pick = Array(playable.sorted { $0.entry.size < $1.entry.size }.prefix(5))
+        let discovery = await lib.discovery
+        // A fresh preflight skips an alternative engine until the user chooses it. Do not call that a failure.
+        let skipped = snap.entries.filter {
+            $0.availability != .installed && $0.current == nil && r.failed[$0.entry.id] == nil
+                && discovery?.alternative(for: $0.entry.id) == true
+        }
+        let skippedIDs = Set(skipped.map { $0.entry.id })
+        let pending = snap.entries.filter {
+            $0.availability != .installed && r.failed[$0.entry.id] == nil && !skippedIDs.contains($0.entry.id)
+        }
+        func detail(_ item: FirmwareLibrary.Entry) -> [String: String] {
+            let e = item.entry
+            return ["id": e.id, "name": e.name, "kind": e.isPackage ? "package" : "rfm1",
+                    "url": e.remoteURL ?? CatalogueService.defaultBase.appendingPathComponent(e.file).absoluteString,
+                    "preferredEngine": item.preferredEngine ?? "?"]
+        }
+        let failures = r.failed.keys.sorted().map { id -> [String: String] in
+            var row = snap.entries.first(where: { $0.entry.id == id }).map(detail) ?? ["id": id]
+            row["error"] = r.failed[id]
+            return row
+        }
         let summary: [String: Any] = [
             "feed": r.feed ?? "?", "entries": snap.entries.count, "packages": packages.count,
             "packagesDownloaded": installed.count, "preferEmulator": preferEmu.count,
             "failedDownloads": r.failed.count,
+            "failedPackageDownloads": packages.filter { r.failed[$0.entry.id] != nil }.count,
+            "downloadFailures": failures,
+            "packagesSkipped": skipped.filter { $0.entry.isPackage }.count,
+            "skippedAlternatives": skipped.map { item -> [String: String] in
+                var row = detail(item)
+                row["reason"] = "Alternative engine; downloaded only when chosen."
+                return row
+            }.sorted { $0["id"]! < $1["id"]! },
+            "notDownloaded": pending.map(detail).sorted { $0["id"]! < $1["id"]! },
             "play": pick.map { ["id": $0.entry.id, "name": $0.entry.name,
                                 "file": paths.firmwareFile(id: $0.entry.id, sha256: $0.entry.sha256).path] }
         ]
@@ -34,6 +64,7 @@ final class PreflightTests: XCTestCase {
         XCTAssertGreaterThan(packages.count, 100, "original packages in the live catalogue")
         XCTAssertGreaterThan(preferEmu.count, 100, "the emulator preferred for most of them")
         XCTAssertGreaterThan(installed.count, 100, "original packages downloaded and checked")
+        XCTAssertTrue(pending.isEmpty, "every missing installation must be a reported download failure or an intentional alternative: \(pending.map { $0.entry.id })")
         XCTAssertEqual(pick.count, 5)
     }
 }
