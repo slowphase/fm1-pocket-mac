@@ -11,7 +11,7 @@ final class ExpandedLibraryTests: XCTestCase {
     static let dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Fixtures")
 
     /// the library as the app shows it after a sync of this catalogue (the cached v2 drives it; nothing downloaded)
-    private func library(_ fixture: String) async throws -> (FirmwareLibrary.Snapshot, items: [LibraryItem], more: [LibraryItem], paths: LibraryPaths) {
+    private func library(_ fixture: String) async throws -> (FirmwareLibrary.Snapshot, items: [FM1Pocket.LibraryItem], more: [FM1Pocket.LibraryItem], paths: LibraryPaths) {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("fm1-expanded-\(UUID().uuidString)", isDirectory: true)
         let paths = LibraryPaths(root: root)
         try FileManager.default.createDirectory(at: paths.managed, withIntermediateDirectories: true)
@@ -19,7 +19,7 @@ final class ExpandedLibraryTests: XCTestCase {
         let lib = FirmwareLibrary(paths: paths, base: URL(string: "https://pocket.test/data/")!)
         let snap = await lib.snapshot()
         let m = LibraryModel.merged(snap, choices: [:], base: lib.base, paths: paths, builtin: nil)
-        return (snap, m.items, snap.more.map { LibraryItem(listed: $0) }, paths)
+        return (snap, m.items, snap.more.map { FM1Pocket.LibraryItem(listed: $0) }, paths)
     }
 
     func testEditorListingsUnderMoreFirmwareWithCreditedDescriptionsCategoriesAndLinks() async throws {
@@ -84,9 +84,9 @@ final class ExpandedLibraryTests: XCTestCase {
         XCTAssertTrue(LibraryModel.isFavourite("cat:glitch-ttreu", in: favs))
         XCTAssertFalse(LibraryModel.isFavourite("cat:glitch", in: favs), "GR!MM is another firmware")
         XCTAssertFalse(LibraryModel.isFavourite("cat:kicksidefm", in: favs))
-        XCTAssertEqual(LibraryItem.firmwareKey("more:kickside"), LibraryItem.firmwareKey("cat:kickside"))
-        XCTAssertEqual(LibraryItem.firmwareKey("builtin:h1"), "builtin:h1")
-        XCTAssertEqual(LibraryItem.firmwareKey("cat:kickside.fwsc"), "cat:kickside.fwsc")
+        XCTAssertEqual(FM1Pocket.LibraryItem.firmwareKey("more:kickside"), FM1Pocket.LibraryItem.firmwareKey("cat:kickside"))
+        XCTAssertEqual(FM1Pocket.LibraryItem.firmwareKey("builtin:h1"), "builtin:h1")
+        XCTAssertEqual(FM1Pocket.LibraryItem.firmwareKey("cat:kickside.fwsc"), "cat:kickside.fwsc")
     }
 
     func testTheExistingLibraryIsUnchangedByTheListings() async throws {
