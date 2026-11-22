@@ -9,7 +9,7 @@ final class QualificationTests: XCTestCase {
         let f: [String: Any] = ["id": "sample", "name": "Sample", "version": "1", "license": "MIT",
             "file": "fw/sample.rfm1", "sha256": sha, "size": 1,
             "status": ["mac": ["state": "playable"]], "qualification": ["mac": qualification]]
-        let raw = try JSONSerialization.data(withJSONObject: ["schema": 2, "updated": "2026-11-23", "firmwares": [f]])
+        let raw = try JSONSerialization.data(withJSONObject: ["schema": 2, "snapshot": "2026-11-23", "updated": "2026-11-23", "firmwares": [f]])
         return try CatalogueV2.decode(raw).firmwares[0]
     }
 
