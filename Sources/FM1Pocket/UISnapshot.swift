@@ -49,9 +49,17 @@ enum UISnapshot {
         guard UISnapshotConfig.enabled else { return }
         note("launched")
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 8_000_000_000)
+            try? await Task.sleep(nanoseconds: 4_000_000_000)
+            // launched outside a desktop session, SwiftUI may not open the library window: open it as Window › Show Library does
+            if !NSApp.windows.contains(where: { $0.title == "FM-1 Pocket" }) {
+                NSApp.setActivationPolicy(.regular)
+                NSApp.activate(ignoringOtherApps: true)
+                let opened = AppDelegate.perform(menuItem: "Show Library", in: NSApp.mainMenu)
+                note("no library window; Show Library \(opened ? "chosen" : "not found")")
+            }
+            try? await Task.sleep(nanoseconds: 5_000_000_000)
             if !started, let m = model { note("window task did not start; starting from the app delegate"); m.start(); await run(m) }
-            else if !started { note("no library model after 8 s; windows: \(NSApp.windows.map(\.title))") }
+            else if !started { note("no library model after 9 s; windows: \(NSApp.windows.map(\.title))") }
         }
     }
 
