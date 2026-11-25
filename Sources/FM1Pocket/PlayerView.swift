@@ -106,13 +106,14 @@ private struct LeftColumn: View {
 
     var body: some View {
         VStack(spacing: 8 * s) {
+            // as on the FM-1: MASTER and SELECT on top, PRESETS and ALGORITHM below, OCT− and OCT+ under them
             if player.style == .knobs {
                 Grid(horizontalSpacing: 10 * s, verticalSpacing: 12 * s) {
+                    GridRow { ControlView(role: 7); ControlView(role: 0) }
                     GridRow { ControlView(role: 2); ControlView(role: 1) }
-                    GridRow { ControlView(role: 0); ControlView(role: 7) }
                 }
             } else {
-                ForEach([2, 1, 0, 7], id: \.self) { ControlView(role: $0) }
+                ForEach([7, 0, 2, 1], id: \.self) { ControlView(role: $0) }
             }
             HStack(spacing: 10 * s) {
                 PanelButton(button: .octDown)
