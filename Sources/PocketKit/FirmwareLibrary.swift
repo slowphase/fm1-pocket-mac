@@ -93,6 +93,8 @@ public actor FirmwareLibrary {
     }
 
     public struct Entry: Equatable, Sendable {
+        /// Visibility is independent of installation, registry and saved data.
+        public var libraryVisible: Bool = true
         public var entry: CatalogueEntry
         public var availability: Availability
         public var downloading: Bool
@@ -132,6 +134,8 @@ public actor FirmwareLibrary {
         public var attribution: CatalogueV2.Attribution?
         /// "v2" or "v1": which feed the library came from
         public var feed: String = "v1"
+        /// Internal IDs hidden by qualification; never resurfaced as withdrawn items.
+        public var hiddenIDs: Set<String> = []
     }
 
     public func snapshot() -> Snapshot {
@@ -151,10 +155,17 @@ public actor FirmwareLibrary {
                              listened: (d?.listened ?? []).filter { ($0.player ?? "mac") == "mac" && $0.engine == (e.isPackage ? "fm1-emu" : "rfm1") },
                              release: d?.release, listed: d?.listed))
         }
+        for i in out.indices {
+            let e = out[i].entry
+            out[i].libraryVisible = discovery?.entry(e.baseID)?.qualifiesMac(engine: e.isPackage ? "fm1-emu" : "rfm1") ?? false
+        }
         let withdrawn = registry.firmwares.values.filter { $0.status == .withdrawn }.sorted { $0.id < $1.id }
         return Snapshot(entries: out, withdrawn: withdrawn, imports: registry.imports, catalogueUpdated: catalogue?.updated,
                         catalogueSince: catalogue?.since, registryLoad: registryLoad, more: discovery?.notDownloadable ?? [],
-                        attribution: discovery?.attribution, feed: discovery == nil ? "v1" : "v2")
+                        attribution: discovery?.attribution, feed: discovery == nil ? "v1" : "v2",
+                        hiddenIDs: Set((discovery?.firmwares ?? []).filter {
+                            !$0.qualifiesMac(engine: "rfm1") && !$0.qualifiesMac(engine: "fm1-emu")
+                        }.map(\.id)))
     }
 
     public func localScreenshot(for e: CatalogueEntry) -> URL? {

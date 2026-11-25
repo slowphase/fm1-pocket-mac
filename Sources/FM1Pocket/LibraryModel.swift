@@ -527,7 +527,7 @@ final class LibraryModel: ObservableObject {
         let list = merged.items
         items = list
         withdrawnItems = merged.withdrawn
-        moreItems = snap.more.map { LibraryItem(listed: $0) }
+        moreItems = [] // Internal records remain available for rechecks, not browsing.
         attribution = snap.attribution
         if section == .withdrawn && withdrawnItems.isEmpty { section = .all }
         if section == .more && moreItems.isEmpty { section = .all }
@@ -549,7 +549,7 @@ final class LibraryModel: ObservableObject {
         var list: [LibraryItem] = []
         if let builtin { list.append(builtin) }
         var builds: [String: LibraryItem] = [:], packages: [String: LibraryItem] = [:], order: [String] = []
-        for e in snap.entries {
+        for e in snap.entries where e.libraryVisible {
             var it = LibraryItem(e, base: base)
             let b = e.entry.baseID
             if !order.contains(b) { order.append(b) }
@@ -572,6 +572,7 @@ final class LibraryModel: ObservableObject {
         let listed = Set(list.map(\.id))
         for r in snap.withdrawn {
             guard var w = LibraryItem(withdrawn: r, paths: paths), let e = r.entry else { continue }
+            if snap.hiddenIDs.contains(e.baseID) { continue }
             w.id = "cat:" + e.baseID
             if e.isPackage { w.engine = "fm1-emu"; w.engines = ["fm1-emu"] } else { w.engines = ["rfm1"] }
             if listed.contains(w.id) { continue }
